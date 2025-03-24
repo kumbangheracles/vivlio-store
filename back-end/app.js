@@ -32,7 +32,10 @@ db.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`, (err) => {
             id INT AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR(255) NOT NULL,
             author VARCHAR(255) NOT NULL,
-            price DECIMAL(10,2) NOT NULL
+            price DECIMAL(10,2) NOT NULL,
+            createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            
           );
         `;
 
@@ -51,8 +54,44 @@ db.connect((err) => {
 
 // Get - Read Data
 app.get("/books", (req, res) => {
-  db.query("SELECT * FROM books", (err, results) => {});
+  db.query("SELECT * FROM book", (err, results) => {});
   //   res.send(`<h1>Hello World</h1>`);
+});
+
+// Post - Create Data
+app.post("/books", (req, res) => {
+  const { title, author, price } = req.body;
+  db.query(
+    "INSERT INTO books (title, author, price) VALUES (?, ?, ?)",
+    [title, author, price],
+    (err, result) => {
+      if (err) console.error("Error inserting data:", err);
+      res.json({ id: result.insertId, title, author, price });
+    }
+  );
+});
+
+// Put - Update Data
+app.put("/books/:id", (req, res) => {
+  const { title, author, price } = req.body;
+  const { id } = req.params;
+  db.query(
+    "UPDATE books SET title=?, author=?, price=? WHERE id=?",
+    [title, author, price, id],
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: "Book updated successfully" });
+    }
+  );
+});
+
+// Delete - Delete Data
+app.delete("/books/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("DELETE FROM books WHERE id=?", [id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Book deleted successfully" });
+  });
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
