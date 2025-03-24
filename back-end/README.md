@@ -50,7 +50,7 @@ The server will run at `http://localhost:3000`
 
 ---
 
-## 📌 API Endpoints
+## 📌 API Endpoints (On progress)
 | Method | Endpoint       | Description            |
 |--------|--------------|----------------------|
 | GET    | `/books`      | Retrieve all books  |
