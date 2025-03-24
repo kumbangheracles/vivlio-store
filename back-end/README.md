@@ -1,6 +1,6 @@
-# 📚 Book Store API
+# 📚 BACK-END VIVLIO-STORE
 
-Book Store API is a backend project using Express.js, Sequelize, and MySQL to manage book data.
+This project is using Express.js, Sequelize, and MySQL to manage book data.
 
 ## 🚀 Features
 - CRUD (Create, Read, Update, Delete) operations for books.
@@ -54,9 +54,7 @@ The server will run at `http://localhost:3000`
 | Method | Endpoint       | Description            |
 |--------|--------------|----------------------|
 | GET    | `/books`      | Retrieve all books  |
-| POST   | `/books`      | Add a new book      |
-| PUT    | `/books/:id`  | Update book details |
-| DELETE | `/books/:id`  | Delete a book       |
+
 
 ---
 
