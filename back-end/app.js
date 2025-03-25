@@ -54,8 +54,9 @@ db.connect((err) => {
 
 // Get - Read Data
 app.get("/books", (req, res) => {
-  db.query("SELECT * FROM book", (err, results) => {});
-    // res.send(`<h1>Hello World</h1>`);
+  db.query("SELECT * FROM books", (err, results) => {
+    res.send(results);
+  });
 });
 
 // Post - Create Data
