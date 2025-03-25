@@ -1,8 +1,6 @@
 const express = require("express");
 const Book = require("../models/book");
 const router = express.Router();
-const upload = require("../upload");
-const Image = require("../models/image");
 // Get all books
 router.get("/", async (req, res) => {
   try {
@@ -12,15 +10,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// router.get("/image", async (req, res) => {
-//   try {
-//     const books = await Book.findAll();
-//     res.send(books);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
 
 // Create book
 router.post("/", async (req, res) => {
@@ -49,15 +38,6 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params;
     await Book.destroy({ where: { id } });
     res.json({ message: "Book deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/all", async (req, res) => {
-  try {
-    const images = await Image.findAll();
-    res.json(images); // Mengirim daftar gambar dengan URL-nya
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
