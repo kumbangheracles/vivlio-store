@@ -1,12 +1,30 @@
-module.exports = (sequelize, DataTypes) => {
-  const Book = sequelize.define(
-    "Book",
-    {
-      title: { type: DataTypes.STRING, allowNull: false },
-      author: { type: DataTypes.STRING, allowNull: false },
-      price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
+
+const Book = sequelize.define(
+  "Book",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    { tableName: "books" }
-  );
-  return Book;
-};
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    author: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+  },
+  {
+    timestamps: true, // createdAt & updatedAt otomatis dibuat
+  }
+);
+
+module.exports = Book;
