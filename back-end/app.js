@@ -16,6 +16,7 @@ sequelize.sync().then(() => console.log("Database synced"));
 
 // Routes
 app.use("/books", bookRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use((req, res) => {
   res.status(404).send("<h1>404 Not Found</h1>");
 });

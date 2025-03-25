@@ -11,12 +11,31 @@ module.exports = {
       },
       title: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       author: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       price: {
         type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      book_type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      book_subType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      book_cover: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      imageUrl: {
+        type: Sequelize.STRING, // Menyimpan URL gambar
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
