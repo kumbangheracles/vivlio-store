@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json())
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -55,7 +55,7 @@ db.connect((err) => {
 // Get - Read Data
 app.get("/books", (req, res) => {
   db.query("SELECT * FROM book", (err, results) => {});
-  //   res.send(`<h1>Hello World</h1>`);
+    // res.send(`<h1>Hello World</h1>`);
 });
 
 // Post - Create Data
@@ -94,4 +94,4 @@ app.delete("/books/:id", (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () => console.log("Server running on port http://localhost:3000"));
