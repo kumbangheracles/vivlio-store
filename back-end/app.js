@@ -15,6 +15,11 @@ const db = mysql.createConnection({
   port: process.env.DB_PORT || 3306,
 });
 
+db.connect((err) => {
+  if (err) console.error("Database connection error:", err);
+  else console.log("Database connected");
+});
+
 // Buat database jika belum ada
 db.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`, (err) => {
   if (err) console.error("Error creating database:", err);
@@ -47,15 +52,12 @@ db.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`, (err) => {
   });
 });
 
-db.connect((err) => {
-  if (err) console.error("Database connection error:", err);
-  else console.log("Database connected");
-});
-
 // Get - Read Data
 app.get("/books", (req, res) => {
-  db.query("SELECT * FROM book", (err, results) => {});
-  //   res.send(`<h1>Hello World</h1>`);
+  db.query("SELECT * FROM books", (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
 });
 
 // Post - Create Data
