@@ -107,11 +107,11 @@ In this project, we do **not** use `config/config.json` for database configurati
 
 Example `.env` file:
 ```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=book_store
-DB_PORT=3306
+DB_HOST= . . .
+DB_USER= . . . 
+DB_PASSWORD= . . .
+DB_NAME= . . .
+DB_PORT= . . .
 ```
 This setup allows each developer to use their own local database configuration without modifying project files.
 
