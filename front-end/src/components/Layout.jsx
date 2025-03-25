@@ -1,6 +1,6 @@
 import React from "react";
-import Home from "./Home";
-import Navbar from "./Navbar";
+import Home from "./HomePage/Home";
+import Navbar from "./Items/Navbar";
 export default function Layout() {
   return (
     <>

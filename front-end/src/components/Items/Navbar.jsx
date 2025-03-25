@@ -3,21 +3,19 @@ import React from "react";
 export default function Navbar() {
   return (
     <nav>
-      <div className="top-navbar p-4 flex justify-around items-center">
+      <div className="top-navbar p-4 px-3 pb-0 flex justify-around items-center ">
         <span className="logo tracking-widest font-extrabold ">
           <h4>VIVLIO</h4>
         </span>
 
         <div
-          style={{ width: "387px" }}
-          className="navbar-option flex justify-around"
+          className="navbar-option flex justify-around w-full gap-x-3"
         >
-          <div className="input-search-navbar p-2.5 flex justify-between h-10 w-70 border-1 rounded-2xl">
+          <div className="input-search-navbar p-2.5 flex justify-between h-9 w-45 border-1 rounded-2xl ms-auto">
             <input
               type="text"
-              className="outline-0"
+              className="outline-0 w-full"
               placeholder="Search Items . . . "
-              style={{ width: "300px" }}
             />
             <img
               style={{ width: "24px" }}
@@ -38,25 +36,25 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="bottom-navbar">
+      <div className="bottom-navbar pb-1 shadow-md mb-5">
         <ul
-          style={{ backgroundColor: "#D9EAFD" }}
-          className="flex gap-x-35 justify-center p-1 font-medium tracking-widest"
+          // style={{ backgroundColor: "#D9EAFD" }}
+          className="flex justify-center pt-3 tracking-widest gap-x-5 capitalize font-light"
         >
           <li>
-            <a href="">HOME</a>
+            <a href="#">home</a>
           </li>
           <li>
-            <a href="">BLOG</a>
+            <a href="#">blog</a>
           </li>
           <li>
-            <a href="">SHOP</a>
+            <a href="#">shop</a>
           </li>
           <li>
-            <a href="">ABOUT US</a>
+            <a href="#">about</a>
           </li>
           <li>
-            <a href="">CONTACT US</a>
+            <a href="#">contact</a>
           </li>
         </ul>
       </div>
