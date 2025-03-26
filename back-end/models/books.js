@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const Book = sequelize.define(
-  "Book",
+  "Books",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -26,10 +26,6 @@ const Book = sequelize.define(
     },
     book_subType: {
       type: DataTypes.STRING,
-    },
-    imageUrl: {
-      type: DataTypes.STRING, // Menyimpan URL gambar
-      allowNull: false,
     },
   },
   {

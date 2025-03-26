@@ -2,14 +2,13 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert("books", [
+    return queryInterface.bulkInsert("Books", [
       {
         title: "The Pragmatic Programmer",
         author: "Andrew Hunt",
         price: 29.99,
         book_type: "Novel",
         book_subType: "fiction",
-        imageUrl: "../image/the_pragmatic_programmer.jpg",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -19,7 +18,6 @@ module.exports = {
         price: 32.99,
         book_type: "Novel",
         book_subType: "Non-fiction",
-        imageUrl: "../image/clean_code.jpeg",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -27,6 +25,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("books", null, {});
+    return queryInterface.bulkDelete("Books", null, {});
   },
 };

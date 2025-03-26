@@ -8,6 +8,7 @@ const imageRoutes = require("./routes/image");
 const app = express();
 app.use(cors());
 app.use(express.json());
+// const port = procces.env.PORT || "3000";
 
 // Connect to database
 connectDB();
