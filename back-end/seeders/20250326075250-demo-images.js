@@ -1,6 +1,7 @@
 "use strict";
+
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     return queryInterface.bulkInsert("Images", [
       {
         filename: "clean_code.jpeg",
@@ -14,14 +15,14 @@ module.exports = {
         filename: "the_pragmatic_programmer.jpg",
         bookId: 2,
         url: "http://localhost:3000/books/uploads/the_pragmatic_programmer.jpg",
-        type: "gallery",
+        type: "cover",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ]);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  async down(queryInterface, Sequelize) {
     return queryInterface.bulkDelete("Images", null, {});
   },
 };

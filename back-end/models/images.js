@@ -17,7 +17,7 @@ const Image = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Book",
+        model: "Books",
         key: "id",
       },
       onDelete: "CASCADE",
