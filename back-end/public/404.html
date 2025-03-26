@@ -24,6 +24,18 @@
         font-size: 100px;
         font-weight: bold;
         color: #6ca9e6; /* Warna biru dari logo */
+        animation: floating 3s ease-in-out infinite; /* Animasi */
+      }
+      @keyframes floating {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
       }
       .error-text {
         font-size: 24px;
