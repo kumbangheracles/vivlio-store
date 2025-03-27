@@ -8,7 +8,7 @@ const imageRoutes = require("./routes/image");
 const app = express();
 app.use(cors());
 app.use(express.json());
-// const port = procces.env.PORT || "3000";
+const port = 3000;
 
 // Connect to database
 connectDB();
@@ -34,4 +34,4 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
 });
 
-app.listen(3000, () => console.log("Server running on port http://localhost:3000"));
+app.listen(port, () => console.log(`Server running on port ${port}`));
