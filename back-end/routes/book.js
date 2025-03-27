@@ -1,7 +1,6 @@
 const express = require("express");
-const Book = require("../models/book");
+const Book = require("../models/books");
 const router = express.Router();
-
 // Get all books
 router.get("/", async (req, res) => {
   try {
@@ -9,6 +8,15 @@ router.get("/", async (req, res) => {
     res.json(books);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const book = await Book.findOne({ where: { id: req.params.id } });
+    res.json(book);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
