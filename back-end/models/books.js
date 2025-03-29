@@ -33,6 +33,7 @@ const Book = sequelize.define(
     },
   },
   {
+    tableName: "Books",
     timestamps: true, // createdAt & updatedAt otomatis dibuat
   }
 );
