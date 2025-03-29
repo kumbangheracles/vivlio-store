@@ -5,6 +5,7 @@ const { sequelize, connectDB } = require("./config/database");
 const bookRoutes = require("./routes/book");
 const path = require("path");
 const imageRoutes = require("./routes/image");
+const userRoutes = require("./routes/user");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -22,6 +23,8 @@ app.use("/books", bookRoutes);
 app.use("/books/uploads", express.static("uploads"));
 
 app.use("/books/images", imageRoutes);
+
+app.use("/books/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.json({
