@@ -120,7 +120,7 @@ Example `.env` file:
 
 ```
 DB_HOST= . . .
-DB_USER= . . . 
+DB_USER= . . .
 DB_PASSWORD= . . .
 DB_NAME= . . .
 DB_PORT= . . .
@@ -221,6 +221,12 @@ npx sequelize-cli db:seed:all
 | `npx sequelize-cli db:seed:undo:all`    | Undo all seeders        |
 
 ---
+
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
+
+npx sequelize-cli db:seed:undo:all
+npx sequelize-cli db:migrate:undo:all
 
 ## ✅ Best Practices
 
