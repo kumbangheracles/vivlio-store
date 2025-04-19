@@ -15,10 +15,12 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
 // add & upload image
 router.post("/upload-img", upload.single("file"), (req, res) => {
   res.json(req.file);
 });
+
 // Get All Image
 router.get("/all", async (req, res) => {
   try {

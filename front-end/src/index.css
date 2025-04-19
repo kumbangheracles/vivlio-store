@@ -4,11 +4,27 @@
 @import "tailwindcss";
 @tailwind utilities;
 
+* {
+  scroll-behavior: smooth;
+}
+
+#root {
+  scrollbar-color: transparent transparent;
+}
+
+.title {
+  font-family: "Nunito", sans-serif;
+  color: #263241;
+}
+
+.content {
+  font-family: "Poppins", sans-serif;
+}
+
 .logo {
   font-family: "Nunito", sans-serif;
 }
 
-.bottom-navbar ul {
-  font-family: "Poppins", sans-serif;
-  font-size: 13px;
+ul li:hover {
+  color: orange;
 }
