@@ -15,7 +15,6 @@ module.exports = {
       },
       user_id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal("UUID()"),
         allowNull: false,
         unique: true,
       },
@@ -30,10 +29,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },

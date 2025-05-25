@@ -2,15 +2,15 @@ import React from "react";
 // import Link from "react-router-dom";
 export default function Navbar() {
   return (
-    <nav>
-      <div className="top-navbar p-4 flex justify-around items-center">
-        <span className="logo tracking-widest font-extrabold ">
+    <nav className="fixed top-0 w-screen h-[auto] bg-white">
+      <div className="flex items-center justify-around p-2 top-navbar">
+        <span className="font-extrabold tracking-widest logo ">
           <h4>VIVLIO</h4>
         </span>
 
         <div
           style={{ width: "387px" }}
-          className="navbar-option flex justify-around"
+          className="flex justify-around navbar-option"
         >
           <div className="input-search-navbar p-2.5 flex justify-between h-10 w-70 border-1 rounded-2xl">
             <input
@@ -41,7 +41,7 @@ export default function Navbar() {
       <div className="bottom-navbar">
         <ul
           style={{ backgroundColor: "#D9EAFD" }}
-          className="flex gap-x-35 justify-center p-1 font-medium tracking-widest"
+          className="flex justify-center p-1 font-medium tracking-widest gap-x-35"
         >
           <li>
             <a href="">HOME</a>

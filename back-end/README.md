@@ -211,6 +211,11 @@ npx sequelize-cli db:seed:all
 
 ---
 
+## Check Migration And Seeder
+
+npx sequelize-cli db:migrate:status
+npx sequelize-cli db:seed:status
+
 ## 🔄 Running Sequelize Commands
 
 | Command                                 | Description             |
