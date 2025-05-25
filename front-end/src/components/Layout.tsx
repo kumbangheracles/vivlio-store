@@ -1,7 +1,10 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import styled from "styled-components";
 import Navbar from "./Navbar";
-export default function Layout({ children }) {
+interface LayoutProps {
+  children: ReactNode;
+}
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <WrapperLayout>
@@ -10,7 +13,7 @@ export default function Layout({ children }) {
       </WrapperLayout>
     </>
   );
-}
+};
 
 const WrapperLayout = styled.div`
   padding: 0;
