@@ -6,6 +6,7 @@ const bookRoutes = require("./routes/book");
 const path = require("path");
 const imageRoutes = require("./routes/image");
 const userRoutes = require("./routes/user");
+const BookCategoryRoutes = require("./routes/book_category");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -22,14 +23,16 @@ app.use("/books", bookRoutes);
 
 app.use("/books/uploads", express.static("uploads"));
 
-app.use("/books/images", imageRoutes);
+app.use("/images", imageRoutes);
 
-app.use("/books/users", userRoutes);
+app.use("/users", userRoutes);
+
+app.use("/book-category", BookCategoryRoutes);
 
 app.get("/", (req, res) => {
   res.json({
     message: "success",
-    docs: "/books",
+    docs: "",
   });
 });
 

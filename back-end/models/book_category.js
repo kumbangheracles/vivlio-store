@@ -1,10 +1,10 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-
+const Book = require("./books");
 const BookCategory = sequelize.define(
   "book_category",
   {
-    id: {
+    categoryId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -26,4 +26,8 @@ const BookCategory = sequelize.define(
   }
 );
 
+// BookCategory.hasMany(Book, {
+//   foreignKey: "categoryId",
+//   as: "categoryId",
+// });
 module.exports = BookCategory;

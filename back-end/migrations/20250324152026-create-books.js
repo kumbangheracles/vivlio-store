@@ -25,15 +25,20 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      book_subType: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       book_cover: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-
+      categoryId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "book_category",
+          key: "categoryId",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "RESTRICT",
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

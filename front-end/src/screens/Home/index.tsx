@@ -1,6 +1,7 @@
 import React from "react";
 import Layout from "../../components/Layout";
 import Banner from "./components/Banner";
+import ListBook from "./components/ListBook";
 export default function Home() {
   return (
     <>
@@ -8,12 +9,7 @@ export default function Home() {
         <div>
           <Banner />
         </div>
-        <div className="banner">WELCOME TO VIVLIO STORE</div>
-        <div className="dictionary">
-          <span>INTERNATONAL BOOK</span>
-          <span>E-BOOK</span>
-          <span>NEW BOOK</span>
-        </div>
+        <ListBook />
       </Layout>
     </>
   );

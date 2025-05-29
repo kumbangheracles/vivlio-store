@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-const Image = require("../models/images");
+const Image = require("./images");
+const BookCategory = require("./book_category");
 const Book = sequelize.define(
   "Books",
   {
@@ -24,12 +25,19 @@ const Book = sequelize.define(
     book_type: {
       type: DataTypes.STRING,
     },
-    book_subType: {
-      type: DataTypes.STRING,
-    },
+
     book_cover: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "book_category", // nama tabel
+        key: "id",
+      },
     },
   },
   {
@@ -45,7 +53,11 @@ Book.hasOne(Image, {
     type: "cover", // Hanya ambil gambar dengan tipe "cover"
   },
 });
-
 Image.belongsTo(Book, { foreignKey: "bookId" });
+
+// Book.belongsTo(BookCategory, {
+//   foreignKey: "categoryId",
+//   as: "category",
+// });
 
 module.exports = Book;

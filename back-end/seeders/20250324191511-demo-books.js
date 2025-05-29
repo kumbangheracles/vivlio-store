@@ -2,13 +2,24 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const categories = await queryInterface.sequelize.query(
+      `SELECT categoryId FROM book_category LIMIT 1;`
+    );
+
+    const categoryId = categories[0][0]?.categoryId;
+
+    if (!categoryId) {
+      throw new Error(
+        "No category found in book_category. Please seed category first."
+      );
+    }
     return queryInterface.bulkInsert("Books", [
       {
         title: "The Pragmatic Programmer",
         author: "Andrew Hunt",
         price: 29.99,
         book_type: "Novel",
-        book_subType: "fiction",
+        categoryId: categoryId,
         book_cover: "",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -18,7 +29,7 @@ module.exports = {
         author: "Robert C. Martin",
         price: 32.99,
         book_type: "Novel",
-        book_subType: "Non-fiction",
+        categoryId: categoryId,
         book_cover: "",
         createdAt: new Date(),
         updatedAt: new Date(),

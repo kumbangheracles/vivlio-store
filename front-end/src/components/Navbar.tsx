@@ -1,5 +1,5 @@
 import React from "react";
-// import Link from "react-router-dom";
+import { Link } from "react-router-dom";
 export default function Navbar() {
   return (
     <nav className="fixed top-0 w-screen h-[auto] bg-white">
@@ -44,19 +44,19 @@ export default function Navbar() {
           className="flex justify-center p-1 font-medium tracking-widest gap-x-35"
         >
           <li>
-            <a href="">HOME</a>
+            <Link to="/">HOME</Link>
           </li>
           <li>
-            <a href="">BLOG</a>
+            <Link to="">BLOG</Link>
           </li>
           <li>
-            <a href="">SHOP</a>
+            <Link to="">SHOP</Link>
           </li>
           <li>
-            <a href="">ABOUT US</a>
+            <Link to="">ABOUT US</Link>
           </li>
           <li>
-            <a href="">CONTACT US</a>
+            <Link to="">CONTACT US</Link>
           </li>
         </ul>
       </div>

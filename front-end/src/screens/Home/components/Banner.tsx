@@ -6,10 +6,20 @@ const Banner = () => {
     <>
       <BannerContainer>
         <ImageWrapper>
-          <img src={bannerImage} alt="banner-image" />
-          <img src={bannerImage} alt="banner-image" />
+          <img
+            style={{ filter: "contrast(0.5)" }}
+            src={bannerImage}
+            alt="banner-image"
+          />
+          <TitleBanner className="text-shadow-md">
+            Welcome to vivlio
+          </TitleBanner>
+          <img
+            style={{ filter: "contrast(0.5)" }}
+            src={bannerImage}
+            alt="banner-image"
+          />
         </ImageWrapper>
-        <TitleBanner className="text-shadow-md">Welcome to vivlio</TitleBanner>
       </BannerContainer>
     </>
   );
@@ -17,28 +27,29 @@ const Banner = () => {
 
 const BannerContainer = styled.div`
   width: 100%;
-
-  position: relative;
   z-index: -20;
+  position: relative;
 `;
 
 const ImageWrapper = styled.div`
   display: flex;
   width: 100%;
-
+  justify-content: center;
   overflow: hidden;
-
-  filter: contrast(0.5);
+  position: relative;
 `;
 
 const TitleBanner = styled.h1`
   font-weight: 700;
-  color: #508acd;
-  font-size: 62px;
-  top: 30%;
-  left: 26%;
+  color: #7badff;
+  font-size: 42px;
   padding: 3rem;
   background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  width: 600px;
+  top: 30%;
+  z-index: 5;
   position: absolute;
   border-radius: 12px;
   text-shadow: 1px 4px 0px rgba(0, 0, 0, 0.12);
