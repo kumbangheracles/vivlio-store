@@ -5,7 +5,7 @@ const Image = sequelize.define(
   "Images",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       primaryKey: true,
       autoIncrement: true,
     },

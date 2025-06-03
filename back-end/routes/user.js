@@ -3,6 +3,7 @@ const path = require("path");
 const router = express.Router();
 const User = require("../models/user");
 const { route } = require("./image");
+const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 
 // create user
 router.post("/create", async (req, res) => {
@@ -15,25 +16,40 @@ router.post("/create", async (req, res) => {
 });
 
 // Update user
-router.put("/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    await User.update(req.body, { where: { username } });
-    res.json({ message: "User updated successfully" });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+router.put(
+  "/:username",
+  authMiddleware,
+  checkRole("admin"),
+  async (req, res) => {
+    try {
+      const { username } = req.params;
+      await User.update(req.body, { where: { username } });
+      res.json({ message: "User updated successfully" });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
   }
-});
+);
 
 // Delete User
-router.delete("/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    await Book.destroy({ where: { username } });
-    res.json({ message: "User deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+router.delete(
+  "/:username",
+  authMiddleware,
+  checkRole("admin"),
+  async (req, res) => {
+    try {
+      const { username } = req.params;
+      await Book.destroy({ where: { username } });
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
+);
+
+router.get("/", authMiddleware, checkRole("admin"), async (req, res) => {
+  const users = await User.findAll();
+  res.json(users);
 });
 
 module.exports = router;

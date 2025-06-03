@@ -6,7 +6,7 @@ const Book = sequelize.define(
   "Books",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       autoIncrement: true,
       primaryKey: true,
     },
@@ -33,7 +33,7 @@ const Book = sequelize.define(
 
     categoryId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "book_category", // nama tabel
         key: "id",

@@ -14,10 +14,13 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    user_id: {
+    role_id: {
       type: DataTypes.UUID,
-      defaultValue: uuidv4,
       allowNull: false,
+      references: {
+        model: "Roles",
+        key: "id",
+      },
     },
     email: {
       type: DataTypes.STRING,

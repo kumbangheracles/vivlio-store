@@ -7,6 +7,7 @@ const path = require("path");
 const imageRoutes = require("./routes/image");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
+const authRoutes = require("./routes/auth");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -28,6 +29,8 @@ app.use("/images", imageRoutes);
 app.use("/users", userRoutes);
 
 app.use("/book-category", BookCategoryRoutes);
+
+app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({
