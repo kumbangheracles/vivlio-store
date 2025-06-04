@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-
+import type { BookProps } from "../../../types/books.type";
+import type { BaseMultipleResponse } from "../../../types/base.type";
 const dataDummy = [
   {
     title: "My Book",
@@ -9,23 +10,29 @@ const dataDummy = [
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum minima non omnis possimus praesentium inventore, quasi delectus quibusdam optio officiis? Provident in excepturi pariatur aut voluptatibus? Facilis fuga itaque perferendis?",
   },
 ];
-const CardBook: React.FC<{ index: number }> = ({ index }) => {
+const desc =
+  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum minima non omnis possimus praesentium inventore, quasi delectus quibusdam optio officiis? Provident in excepturi pariatur aut voluptatibus? Facilis fuga itaque perferendis?";
+const CardBook: React.FC<BookProps> = ({
+  author,
+  book_type,
+  price,
+  title,
+  book_cover,
+  categoryId,
+  id,
+}) => {
   return (
-    <Card key={index}>
+    <Card key={id}>
       <BookWrapper>
-        <BookImage src="/vivlio_logo.jpg" alt="logo" />
+        <BookImage src={book_cover} alt="logo" />
       </BookWrapper>
       <div>
-        <h2 style={{ fontWeight: "700", textAlign: "center" }}>
-          {dataDummy[0].title}
-        </h2>
+        <h2 style={{ fontWeight: "700", textAlign: "center" }}>{title}</h2>
         <BaseDescription>
           {" "}
           {(() => {
             const maxLength = 50;
-            const rawText =
-              dataDummy[0].desription.replace(/<\/?(p|em)>/g, "") ||
-              "No Content";
+            const rawText = desc.replace(/<\/?(p|em)>/g, "") || "No Content";
             const trimmedText =
               rawText.length > maxLength
                 ? rawText.slice(0, maxLength).trim() + " . . . ."

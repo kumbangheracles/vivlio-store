@@ -5,9 +5,19 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const books = await Book.findAll();
-    res.json(books);
+
+    res.status(200).json({
+      status: true,
+      message: "Books retrieved successfully",
+      payload: books,
+      total: books.length, // optional
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      status: false,
+      message: error.message || "Internal server error",
+      data: [],
+    });
   }
 });
 

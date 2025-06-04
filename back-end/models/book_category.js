@@ -5,7 +5,7 @@ const BookCategory = sequelize.define(
   "book_category",
   {
     categoryId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,

@@ -25,6 +25,7 @@ module.exports = {
     await queryInterface.bulkInsert("Users", [
       {
         username: "herkaladmin",
+        fullName: "Ahmad Herkal Taqyudin",
         email: "herkal@admin.com",
         password: await bcrypt.hash("admin123", 10),
         role_id: adminRoleId,
@@ -33,17 +34,10 @@ module.exports = {
       },
       {
         username: "herkalcustomer",
+        fullName: "Ahmad Herkal Taqyudin",
         email: "herkal@customer.com",
         password: await bcrypt.hash("customer123", 10),
         role_id: customerRoleId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        username: "herkal",
-        email: "herkal@gmail.com",
-        password: await bcrypt.hash("herkal123", 10),
-        role_id: adminRoleId,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

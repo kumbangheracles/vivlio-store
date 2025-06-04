@@ -1,16 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CardBook from "./CardBook";
 import styled from "styled-components";
-
+import axios from "axios";
+import type { BaseMultipleResponse } from "../../../types/base.type";
+import type { BookProps } from "../../../types/books.type";
 const ListBook: React.FC = () => {
+  const [dataBook, setDataBook] = useState<BookProps[]>([]);
+  const fetchBook = async () => {
+    try {
+      const res = await axios.get<BaseMultipleResponse<BookProps>>(
+        "http://localhost:3000/books"
+      );
+      console.log("data book: ", res.data.payload);
+      setDataBook(res.data.payload);
+    } catch (error) {
+      console.log("error fetch data book: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBook();
+  }, []);
   return (
     // Book Overview
     <>
       <div style={{ marginTop: "50px" }}>
         <TitleList>Book Overview</TitleList>
         <ListBookWrapper className="grid gap-[10px] p-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-3">
-          {[...Array(8)].map((_, i) => (
-            <CardBook key={i} index={i} />
+          {dataBook.map((item) => (
+            <CardBook
+              key={item?.id}
+              title={item?.title}
+              price={item?.price}
+              author={item?.author}
+              categoryId={item?.categoryId}
+              book_type={item?.book_type}
+              book_cover={item?.book_cover}
+            />
           ))}
         </ListBookWrapper>
       </div>
