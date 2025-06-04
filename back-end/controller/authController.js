@@ -11,25 +11,30 @@ const registerValidateModels = Yup.object({
   confirmPassword: Yup.string()
     .required()
     .oneOf([Yup.ref("password")], "Password not match"),
+  role: Yup.string()
+    .oneOf(["admin", "customer"], "Invalid role")
+    .required("Role is required"),
 });
 module.exports = {
   async register(req, res) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const { fullName, username, email, password, confirmPassword } = req.body;
+    const { fullName, username, email, password, confirmPassword, role } =
+      req.body;
     try {
       await registerValidateModels.validate({
         fullName,
         username,
         email,
-        password: hashedPassword,
+        password,
+        role,
         confirmPassword,
       });
-
+      const hashedPassword = await bcrypt.hash(password, 10);
       const result = await User.create({
         fullName,
         username,
         email,
         password: hashedPassword,
+        role,
       });
 
       res.status(200).json({
@@ -56,7 +61,7 @@ module.exports = {
        */
     const { identifier, password } = req.body;
     try {
-      const userByIdentifier = await User.findByPk({
+      const userByIdentifier = await User.findOne({
         where: {
           [Op.or]: [{ username: identifier }, { email: identifier }],
         },
@@ -88,8 +93,8 @@ module.exports = {
           id: userByIdentifier.id,
           role: userByIdentifier.role,
         },
-        process.env.JWT_SECRET || "default_secret",
-        { expiresIn: "1d" }
+        process.env.SECRET || "default_secret",
+        { expiresIn: "1h" }
       );
       res.status(200).json({
         message: "Login success",
@@ -112,7 +117,9 @@ module.exports = {
        */
     try {
       const user = req.user;
-      const result = await User.findByPk(user?.id);
+      const result = await User.findOne({
+        where: { id: user?.id },
+      });
 
       res.status(200).json({
         message: "Success get user profile",

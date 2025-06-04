@@ -17,5 +17,5 @@ module.exports = {
   BookCategory,
 };
 
-User.belongsTo(Role, { foreignKey: "role_id" });
-Role.hasMany(User, { foreignKey: "role_id" });
+User.belongsTo(Role, { foreignKey: "role" });
+Role.hasMany(User, { foreignKey: "name" });

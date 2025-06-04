@@ -17,10 +17,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      role_id: {
-        type: Sequelize.UUID,
+      role: {
+        type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
       email: {
         type: Sequelize.STRING,
