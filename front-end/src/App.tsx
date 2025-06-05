@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ConfigProvider } from "antd";
+import RegisterForm from "./screens/auth/register";
 import "./App.css";
 import Home from "./screens/Home";
 
@@ -8,11 +10,14 @@ function App() {
 
   return (
     <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </Router>
+      <ConfigProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<RegisterForm />} />
+          </Routes>
+        </Router>
+      </ConfigProvider>
     </>
   );
 }

@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update book
-router.put("/:id", async (req, res) => {
+router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await Book.update(req.body, { where: { id } });

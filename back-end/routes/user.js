@@ -16,7 +16,7 @@ router.post("/create", async (req, res) => {
 });
 
 // Update user
-router.put(
+router.patch(
   "/:username",
   authMiddleware,
   checkRole("admin"),
