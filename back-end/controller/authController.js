@@ -5,6 +5,7 @@ const Yup = require("yup");
 const { Op } = require("sequelize");
 const sendEmailVerification = require("../service/email.service");
 const { v4: uuidv4 } = require("uuid");
+const { generateVerificationCode } = require("../utils/verificationCode");
 const registerValidateModels = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
@@ -31,9 +32,8 @@ module.exports = {
         confirmPassword,
       });
       const hashedPassword = await bcrypt.hash(password, 10);
-      const verificationCode = Math.floor(
-        100000 + Math.random() * 900000
-      ).toString();
+      const verificationCode = generateVerificationCode();
+      const verificationCodeCreatedAt = new Date();
       const result = await User.create({
         fullName,
         username,
@@ -41,6 +41,7 @@ module.exports = {
         password: hashedPassword,
         role,
         verificationCode,
+        verificationCodeCreatedAt,
         isVerified: false,
       });
       await sendEmailVerification(email, verificationCode);
@@ -58,6 +59,48 @@ module.exports = {
     }
   },
 
+  /**
+   * @swagger
+   * components:
+   *   schemas:
+   *     ResendVerificationCodeRequest:
+   *       type: object
+   *       required:
+   *         - email
+   *       properties:
+   *         email:
+   *           type: string
+   *           format: email
+   *           example: user@example.com
+   *        message:
+   *           type: string
+   *           example: "Verification code resent successfully."
+   */
+
+  async resendVerificationCode(req, res) {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) return res.status(404).json({ message: "User not found" });
+      if (user.isVerified)
+        return res.status(400).json({ message: "User already verified" });
+
+      const code = generateVerificationCode();
+      const createdAt = new Date();
+
+      await user.update({
+        verificationCode: code,
+        verificationCodeCreatedAt: createdAt,
+      });
+
+      await sendEmailVerification(email, code);
+
+      res.status(200).json({ message: "Verification code resent!" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
   /**
    * @swagger
    * components:
@@ -83,6 +126,16 @@ module.exports = {
       const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.status(404).json({ message: "User not found", data: user });
+      }
+
+      // const EXPIRATION_TIME = 5 * 60 * 1000; //5 menit
+      const EXPIRATION_TIME = 1 * 60 * 1000; //1 menit
+
+      const createdAt = new Date(user.verificationCodeCreatedAt).getTime();
+      const now = Date.now();
+
+      if (now - createdAt > EXPIRATION_TIME) {
+        return res.status(400).json({ message: "Verification code expired" });
       }
 
       console.log("Stored:", user.verificationCode, "Input:", verificationCode);
@@ -117,16 +170,17 @@ module.exports = {
         },
       });
 
-      if (!userByIdentifier.isVerified) {
-        return res.status(403).json({
-          message: "User is not verified yet",
-          data: null,
-        });
-      }
       // validasi identifier
       if (!userByIdentifier) {
         return res.status(403).json({
           message: "User not found",
+          data: null,
+        });
+      }
+      // validasi isVerified
+      if (!userByIdentifier.isVerified) {
+        return res.status(403).json({
+          message: "User is not verified yet",
           data: null,
         });
       }

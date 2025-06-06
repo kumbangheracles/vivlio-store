@@ -77,6 +77,38 @@ router.post("/register", authController.register);
 
 /**
  * @swagger
+ * /auth/resend-code-verification:
+ *   post:
+ *     summary: Resend Email Verification Code
+ *     description: Mengirim ulang kode verifikasi ke email pengguna yang belum diverifikasi.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResendVerificationCodeRequest'
+ *           example:
+ *             email: user@example.com
+ *     responses:
+ *       200:
+ *         description: Kode verifikasi berhasil dikirim ulang
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Verification code resent successfully
+ *               data:
+ *                 email: user@example.com
+ *                 verificationCodeSentAt: 2025-06-05T15:30:00.000Z
+ *       400:
+ *         description: Permintaan tidak valid (e.g. email tidak ditemukan atau user sudah diverifikasi)
+ *       500:
+ *         description: Terjadi kesalahan server saat mengirim ulang kode
+ */
+
+router.post("/resend-code-verification", authController.resendVerificationCode);
+/**
+ * @swagger
  * /auth/verify-email:
  *   post:
  *     summary: Verify Email
