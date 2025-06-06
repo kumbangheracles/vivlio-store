@@ -9,6 +9,7 @@ const User = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
+      defaultValue: DataTypes.UUIDV4,
     },
     fullName: {
       type: DataTypes.STRING,
@@ -34,6 +35,14 @@ const User = sequelize.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    verificationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   },
   {

@@ -9,6 +9,7 @@ const BookCategory = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
+      defaultValue: DataTypes.UUIDV4,
     },
     name: {
       type: DataTypes.STRING,

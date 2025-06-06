@@ -5,6 +5,7 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
         allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       filename: {
         type: Sequelize.STRING,

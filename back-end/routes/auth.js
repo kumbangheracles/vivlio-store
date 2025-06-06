@@ -77,6 +77,38 @@ router.post("/register", authController.register);
 
 /**
  * @swagger
+ * /auth/verify-email:
+ *   post:
+ *     summary: Verify Email
+ *     description: Verifikasi email pengguna menggunakan kode OTP yang dikirim ke email.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyEmailRequest'
+ *           example:
+ *             email: user@example.com
+ *             verificationCode: "123456"
+ *     responses:
+ *       200:
+ *         description: Verifikasi email berhasil
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Email berhasil diverifikasi
+ *               data:
+ *                 email: user@example.com
+ *                 verifiedAt: 2025-06-05T15:30:00.000Z
+ *       400:
+ *         description: Permintaan tidak valid (e.g. OTP tidak sesuai atau kedaluwarsa)
+ *       403:
+ *         description: Kode OTP salah, silakan coba kembali
+ */
+router.post("/verify-email", authController.verifyEmail);
+/**
+ * @swagger
  * /auth/login:
  *   post:
  *     summary: Login user

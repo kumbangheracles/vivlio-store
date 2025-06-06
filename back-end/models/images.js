@@ -8,6 +8,7 @@ const Image = sequelize.define(
       type: DataTypes.STRING,
       primaryKey: true,
       autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     filename: {
       type: DataTypes.STRING,

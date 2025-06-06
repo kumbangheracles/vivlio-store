@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const Yup = require("yup");
 const { Op } = require("sequelize");
+const sendEmailVerification = require("../service/email.service");
+const { v4: uuidv4 } = require("uuid");
 const registerValidateModels = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
@@ -29,16 +31,22 @@ module.exports = {
         confirmPassword,
       });
       const hashedPassword = await bcrypt.hash(password, 10);
+      const verificationCode = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
       const result = await User.create({
         fullName,
         username,
         email,
         password: hashedPassword,
         role,
+        verificationCode,
+        isVerified: false,
       });
-
+      await sendEmailVerification(email, verificationCode);
       res.status(200).json({
-        message: "Success Registration!",
+        message:
+          "Success Registration! Please check your email for verification code.",
         data: result,
       });
     } catch (error) {
@@ -47,6 +55,48 @@ module.exports = {
         message: error.message,
         data: null,
       });
+    }
+  },
+
+  /**
+   * @swagger
+   * components:
+   *   schemas:
+   *     VerifyEmailRequest:
+   *       type: object
+   *       required:
+   *         - email
+   *         - verificationCode
+   *       properties:
+   *         email:
+   *           type: string
+   *           format: email
+   *           example: user@example.com
+   *         verificationCode:
+   *           type: string
+   *           example: "123456"
+   */
+
+  async verifyEmail(req, res) {
+    try {
+      const { email, verificationCode } = req.body;
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(404).json({ message: "User not found", data: user });
+      }
+
+      console.log("Stored:", user.verificationCode, "Input:", verificationCode);
+
+      if (user.verificationCode !== verificationCode.toString()) {
+        return res.status(400).json({ message: "Invalid verification code" });
+      }
+
+      user.isVerified = true;
+      user.verificationCode = null; // hapus code biar tidak bisa dipakai ulang
+      await user.save();
+      res.status(200).json({ message: "Email successfully verified!" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -59,14 +109,20 @@ module.exports = {
        }
        
        */
-    const { identifier, password } = req.body;
     try {
+      const { identifier, password } = req.body;
       const userByIdentifier = await User.findOne({
         where: {
           [Op.or]: [{ username: identifier }, { email: identifier }],
         },
       });
 
+      if (!userByIdentifier.isVerified) {
+        return res.status(403).json({
+          message: "User is not verified yet",
+          data: null,
+        });
+      }
       // validasi identifier
       if (!userByIdentifier) {
         return res.status(403).json({
@@ -96,9 +152,13 @@ module.exports = {
         process.env.SECRET || "default_secret",
         { expiresIn: "1h" }
       );
+
       res.status(200).json({
         message: "Login success",
-        data: token,
+        data: {
+          token: token,
+          isVerified: userByIdentifier?.isVerified,
+        },
       });
     } catch (error) {
       const err = error;

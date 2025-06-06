@@ -7,6 +7,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING,
+        defaultValue: Sequelize.UUIDV4,
       },
       fullName: {
         type: Sequelize.STRING,
@@ -27,6 +28,14 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      verificationCode: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       createdAt: {
         allowNull: false,

@@ -55,6 +55,65 @@
         }
       }
     },
+    "/auth/verify-email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Verify user email with OTP code",
+        "description": "Mengverifikasi email pengguna berdasarkan kode OTP yang dikirimkan ke email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequest"
+              },
+              "example": {
+                "email": "user@example.com",
+                "verificationCode": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email berhasil diverifikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email": { "type": "string" },
+                        "verifiedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Email successfully verified",
+                    "data": {
+                      "email": "user@example.com",
+                      "verifiedAt": "2025-06-05T15:30:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g. OTP salah atau kedaluwarsa)"
+          },
+          "403": {
+            "description": "Forbidden (e.g. email tidak ditemukan)"
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "description": "",
@@ -74,12 +133,12 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#components/schemas/LoginRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             },
             "application/xml": {
               "schema": {
-                "$ref": "#components/schemas/LoginRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
@@ -130,6 +189,21 @@
         },
         "xml": {
           "name": "LoginRequest"
+        }
+      },
+      "VerifyEmailRequest": {
+        "type": "object",
+        "required": ["email", "verificationCode"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "verificationCode": {
+            "type": "string",
+            "example": "123456"
+          }
         }
       }
     }

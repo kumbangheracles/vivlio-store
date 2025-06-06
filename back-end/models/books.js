@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const Image = require("./images");
 const BookCategory = require("./book_category");
+const { Sequelize } = require("sequelize");
 const Book = sequelize.define(
   "Books",
   {
@@ -9,6 +10,7 @@ const Book = sequelize.define(
       type: DataTypes.STRING,
       autoIncrement: true,
       primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     title: {
       type: DataTypes.STRING,
