@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 export default function Navbar() {
+  const navigate = useNavigate();
   return (
     <nav className="fixed top-0 w-screen h-[auto] bg-white">
       <div className="flex items-center justify-around p-2 top-navbar">
@@ -26,7 +27,8 @@ export default function Navbar() {
             />
           </div>
           <img
-            style={{ width: "24px" }}
+            style={{ width: "24px", cursor: "pointer" }}
+            onClick={() => navigate("/register")}
             src="/icons/account.svg"
             alt="account-icon"
           />

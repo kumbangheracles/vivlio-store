@@ -4,7 +4,7 @@ const User = require("../models/user");
 const Yup = require("yup");
 const { Op } = require("sequelize");
 const sendEmailVerification = require("../service/email.service");
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
 const { generateVerificationCode } = require("../utils/verificationCode");
 const registerValidateModels = Yup.object({
   fullName: Yup.string().required(),
@@ -31,6 +31,21 @@ module.exports = {
         role,
         confirmPassword,
       });
+
+      // check existing username and email
+      const existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ email }, { username }],
+        },
+      });
+
+      if (existingUser) {
+        const field = existingUser.email === email ? "Email" : "Username";
+        return res.status(400).json({
+          message: `${field} Already Exist`,
+          data: null,
+        });
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       const verificationCode = generateVerificationCode();
       const verificationCodeCreatedAt = new Date();
@@ -193,7 +208,7 @@ module.exports = {
 
       if (!validatePassword) {
         return res.status(403).json({
-          message: "User not found",
+          message: "Incorrect email or password",
           data: null,
         });
       }
@@ -207,6 +222,12 @@ module.exports = {
         { expiresIn: "1h" }
       );
 
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, // set true in production with HTTPS
+        sameSite: "Lax", // or "Strict"
+        maxAge: 60 * 60 * 1000, // 1 hour
+      });
       res.status(200).json({
         message: "Login success",
         data: {

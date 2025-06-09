@@ -4,6 +4,25 @@
 @import "tailwindcss";
 @tailwind utilities;
 
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #ffffff;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(213, 213, 247, 1) 32%,
+    rgba(242, 252, 255, 1) 100%
+  );
+}
+.ant-message {
+  z-index: 9999 !important;
+  letter-spacing: 1px;
+}
+
 .logo {
   font-family: "Nunito", sans-serif;
 }

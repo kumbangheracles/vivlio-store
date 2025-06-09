@@ -10,10 +10,16 @@ const BookCategoryRoutes = require("./routes/book_category");
 const authRoutes = require("./routes/auth");
 const { swaggerUi, specs } = require("./docs/swagger");
 const bodyParser = require("body-parser");
+require("./jobs/cleanUpUnverifiedUsers");
 async function init() {
   try {
     const app = express();
-    app.use(cors());
+    app.use(
+      cors({
+        origin: process.env.CLIENT_ORIGIN,
+        credentials: true,
+      })
+    );
     app.use(bodyParser.json());
     app.use(express.json());
     const port = 3000;
