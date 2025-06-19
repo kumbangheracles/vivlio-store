@@ -27,33 +27,24 @@ import {
   TwitterCircleFilled,
 } from "@ant-design/icons";
 import axios from "axios";
-import { myAxios } from "../../../helper/myAxios";
+import myAxios from "../../../helper/myAxios";
 interface OptionProps {
   id: number;
   label: string;
 }
-
+import { EUserRole } from "../../../types/user.type";
 const RegisterForm: React.FC = () => {
-  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [selectedRole, setSelectedRole] = useState<EUserRole | null>(null);
   const { setUser, user } = useContext(UserContext)!;
   const [loading, setLoading] = useState<boolean>(false);
   const isEmpty = (val?: string) =>
     !val || val.trim() === "" || val === undefined;
   const isEmptyRole = (val: number | string) => !val;
   const navigate = useNavigate();
-  const listDataRole: OptionProps[] = [
-    { id: 1, label: "admin" },
-    { id: 2, label: "customer" },
-  ];
-
-  const selectOptions = listDataRole.map((item) => ({
-    label: item.label,
-    value: item.label,
+  const roleOptions = Object.values(EUserRole).map((role) => ({
+    label: role, // Bisa kamu ubah jadi lebih friendly label jika perlu
+    value: role,
   }));
-
-  // const selectedRole = listDataRole.find((item) => item.label);
-
-  // setDataRole(selectedRole);
 
   const handleSubmit = async (userData: UserProperties) => {
     if (
@@ -102,7 +93,7 @@ const RegisterForm: React.FC = () => {
         navigate("/register/verification-code");
       }
       console.log("Data terkirim: ", res.data);
-      // navigate("/verification-code");
+
       setUser(res.data);
 
       message.success(
@@ -202,15 +193,17 @@ const RegisterForm: React.FC = () => {
               >
                 <Select
                   variant="filled"
-                  options={selectOptions}
-                  value={selectedRole}
+                  value={selectedRole} // Harus enum atau string yang sesuai
                   onChange={(value) => {
-                    setSelectedRole(value);
+                    const newRole = value as EUserRole;
+
+                    setSelectedRole(newRole);
                     setUser({
                       ...user,
-                      role: value,
+                      role: newRole,
                     });
                   }}
+                  options={roleOptions}
                   placeholder="Select role"
                 />
               </Form.Item>

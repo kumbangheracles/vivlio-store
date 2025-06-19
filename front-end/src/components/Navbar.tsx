@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AppInput from "./Form/AppInput";
 export default function Navbar() {
   const navigate = useNavigate();
   return (
@@ -13,18 +14,8 @@ export default function Navbar() {
           style={{ width: "387px" }}
           className="flex justify-around navbar-option"
         >
-          <div className="input-search-navbar p-2.5 flex justify-between h-10 w-70 border-1 rounded-2xl">
-            <input
-              type="text"
-              className="outline-0"
-              placeholder="Search Items . . . "
-              style={{ width: "300px" }}
-            />
-            <img
-              style={{ width: "24px" }}
-              src="/icons/search.svg"
-              alt="search-icon"
-            />
+          <div className="input-search-navbar ">
+            <AppInput />
           </div>
           <img
             style={{ width: "24px", cursor: "pointer" }}
@@ -43,7 +34,7 @@ export default function Navbar() {
       <div className="bottom-navbar">
         <ul
           style={{ backgroundColor: "#D9EAFD" }}
-          className="flex justify-center p-1 font-medium tracking-widest gap-x-35"
+          className="flex justify-center p-[20px] font-medium tracking-widest gap-x-35"
         >
           <li>
             <Link to="/">HOME</Link>

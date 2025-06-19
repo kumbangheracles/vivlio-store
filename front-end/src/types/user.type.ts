@@ -4,7 +4,7 @@ export type UserProperties = {
   username?: string;
   password?: string;
   email?: string;
-  role?: string | number;
+  role?: EUserRole;
   confirmPassword?: string;
   verificationCode?: string;
 };
@@ -14,13 +14,18 @@ export const ERole = {
   CUSTOMER: "customer",
 } as const;
 
+export enum EUserRole {
+  ADMIN = "admin",
+  CUSTOMER = "customer",
+}
+
 export type LoginProps = Pick<UserProperties, "password"> & {
   identifier?: string;
 };
 
 export const initialLogin: LoginProps = {
-  identifier: "",
-  password: "",
+  identifier: "herkal@admin.com",
+  password: "admin123",
 };
 
 export const initialUser: UserProperties = {
@@ -29,5 +34,5 @@ export const initialUser: UserProperties = {
   username: "",
   password: "",
   confirmPassword: "",
-  role: ERole.ADMIN,
+  role: EUserRole.ADMIN,
 };

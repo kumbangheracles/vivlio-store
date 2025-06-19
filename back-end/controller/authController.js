@@ -230,11 +230,37 @@ module.exports = {
       });
       res.status(200).json({
         message: "Login success",
-        data: {
-          token: token,
+        results: {
           isVerified: userByIdentifier?.isVerified,
+          role: userByIdentifier.role,
+          token: token,
+          username: userByIdentifier.username,
+          name: userByIdentifier.name,
+          email: userByIdentifier.email,
         },
       });
+    } catch (error) {
+      const err = error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async logout(req, res) {
+    try {
+      const user = req.user;
+      const result = await User.destroy({
+        where: { id: user?.id },
+      });
+
+      if (!result) {
+        res.status(200).json({
+          message: "Logout success",
+          data: result,
+        });
+      }
     } catch (error) {
       const err = error;
       res.status(400).json({

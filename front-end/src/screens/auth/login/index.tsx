@@ -15,18 +15,21 @@ import {
   message,
   Modal,
 } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { initialLogin, type LoginProps } from "../../../types/user.type";
 import { isEmpty } from "../../../helper/validation";
-import { myAxios } from "../../../helper/myAxios";
+import myAxios from "../../../helper/myAxios";
 import { ErrorHandler } from "../../../helper/handleError";
-
+import { UserContext } from "../../../context/UserContext";
+// import useSignIn from "react-auth-kit/hooks/useSignIn";
 const LoginForm: React.FC = () => {
+  const { setUser } = useContext(UserContext)!;
   const navigate = useNavigate();
   const [loading, setLoading] = useState<Boolean>(false);
   const [dataLogin, setDataLogin] = useState<LoginProps>(initialLogin);
+  // const signIn = useSignIn();
   const handleSubmit = async (data: LoginProps) => {
     if (isEmpty(data.identifier)) {
       message.error("Username or Email are required!!");
@@ -44,7 +47,20 @@ const LoginForm: React.FC = () => {
       };
 
       const res = await myAxios.post("/auth/login", body);
-      console.log("Data login: ", res.data);
+      const user = res.data.results;
+      // signIn({
+      //   auth: {
+      //     token: user.token,
+      //     type: "Bearer",
+      //   },
+      //   refresh: user.token,
+
+      //   userState: { email: body.identifier },
+      // });
+
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      console.log("Login results: ", res.data);
       message.success("Login Success");
       navigate("/");
     } catch (error: any) {
@@ -79,6 +95,7 @@ const LoginForm: React.FC = () => {
               <Input
                 variant="filled"
                 required={true}
+                value={dataLogin.identifier}
                 onChange={(e) => {
                   setDataLogin({
                     ...dataLogin,
@@ -104,6 +121,7 @@ const LoginForm: React.FC = () => {
                 variant="filled"
                 type="password"
                 required={true}
+                value={dataLogin.password}
                 onChange={(e) => {
                   setDataLogin({
                     ...dataLogin,

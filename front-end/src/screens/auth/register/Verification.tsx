@@ -4,10 +4,9 @@ import { InputOTP } from "antd-input-otp";
 import { ArrowLeftOutlined, LoadingOutlined } from "@ant-design/icons";
 import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { UserContext } from "../../../context/UserContext";
 import dayjs from "dayjs";
-import { myAxios } from "../../../helper/myAxios";
+import myAxios from "../../../helper/myAxios";
 
 const Verification: React.FC = () => {
   const [openModalVerif, setOpenModalVerif] = useState<boolean>(true);

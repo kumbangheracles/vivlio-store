@@ -240,3 +240,20 @@ npx sequelize-cli db:migrate:undo:all
 - Regularly backup your database before running migrations.
 
 This guide provides a structured way to use Sequelize in the Book Store API project efficiently. 🚀
+
+# Flow Token
+
+[User Login]
+↓
+POST /auth/login
+↓
+[Backend generate JWT]
+↓
+[JWT stored in cookie]
+↓
+[Frontend auto sends cookie]
+↓
+GET /auth/me → authMiddleware → controller
+↓
+✅ If token valid → return user data
+🚫 If invalid/expired → 401 Unauthorized

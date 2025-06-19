@@ -1,35 +1,31 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ConfigProvider } from "antd";
-import RegisterForm from "./screens/auth/register";
 import "./App.css";
-import Home from "./screens/Home";
 import { UserProvider } from "./context/UserContext";
-import Verification from "./screens/auth/register/Verification";
-import NotFound from "./components/NotFound";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import LoginForm from "./screens/auth/login";
+import RouteNavigation from "./navigation/RouteNavigation";
+import { BrowserRouter } from "react-router-dom";
+// import AuthProvider from "react-auth-kit";
+// import createStore from "react-auth-kit/createStore";
+
 function App() {
   AOS.init();
+  // const myStore = createStore({
+  //   authName: "_auth",
+  //   authType: "cookie",
+  //   cookieDomain: window.location.hostname,
+  //   cookieSecure: false,
+  // });
   return (
     <>
       <ConfigProvider>
-        <UserProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/register" element={<RegisterForm />} />
-              <Route path="/login" element={<LoginForm />} />
-              <Route
-                path="/register/verification-code"
-                element={<Verification />}
-              />
-
-              {/* Ini route wildcard untuk semua path yang tidak ditemukan */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
-        </UserProvider>
+        {/* <AuthProvider store={myStore}> */}
+        <BrowserRouter>
+          <UserProvider>
+            <RouteNavigation />
+          </UserProvider>
+        </BrowserRouter>
+        {/* </AuthProvider> */}
       </ConfigProvider>
     </>
   );
