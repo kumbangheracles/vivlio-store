@@ -1,26 +1,9 @@
-// import { Navigate } from "react-router-dom";
-// import { useUser } from "@/context/UserContext";
-// import { UserProvider } from "../context/UserContext";
-
-// export const ProtectedRoute = ({
-//   children,
-//   roles,
-// }: {
-//   children: JSX.Element;
-//   roles: ("ADMIN" | "CUSTOMER")[];
-// }) => {
-//   const { user } = UserProvider();
-
-//   if (!user) return <Navigate to="/login" />;
-//   if (!roles.includes(user.role)) return <Navigate to="/unauthorized" />;
-
-//   return children;
-// };
-
-import React, { type ReactNode, useContext, useEffect } from "react";
+import React, { type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
-import type { UserProperties } from "../types/user.type";
+import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import GlobalLoading from "../components/GlobalLoading";
+import { type UserProperties } from "../types/user.type";
 
 type ProtectedRouteProps = {
   children: ReactNode;
@@ -28,29 +11,22 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
-  const userContext = useContext(UserContext);
+  const isAuthenticated = useIsAuthenticated();
+  const auth = useAuthUser<UserProperties>();
 
-  if (!userContext) {
-    // Context belum tersedia, redirect ke login
-    return <Navigate to="/login" />;
-  }
-  const { user } = userContext;
-  useEffect(() => {
-    console.log("Current User: ", user);
-  }, [user]);
+  console.log("User login: ", auth);
+  // if (typeof isAuthenticated !== "boolean" || auth === null) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
-  if (!user) {
-    // Belum login, redirect ke login
-    return <Navigate to="/login" />;
+  if (!isAuthenticated || !auth) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (!roles.includes(user.role)) {
-    // Role tidak diizinkan, redirect ke unauthorized page
-
-    return <Navigate to="/unauthorized" />;
+  if (!roles.includes(auth.role)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  // User valid dan role cocok, render children
   return <>{children}</>;
 };
 

@@ -158,12 +158,11 @@ router.post("/verify-email", authController.verifyEmail);
  *         description: User tidak ditemukan atau password salah
  */
 router.post("/login", authController.login);
-
 /**
  * @swagger
  * /auth/me:
  *   get:
- *     summary: Ambil profil user yang sedang login
+ *     summary: user yang sedang login
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
@@ -171,10 +170,39 @@ router.post("/login", authController.login);
  *       200:
  *         description: Data profil user
  *       401:
- *         description: Token tidak ada
+ *         description: user tidak
  *       403:
  *         description: Token tidak valid
  */
 router.get("/me", authMiddleware, authController.me);
+/**
+ * @swagger
+ * /auth/refresh:
+ *   get:
+ *     summary: refresh token user yg sedang login
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User yang sedang login
+ *       400:
+ *         description: Token tidak ada
+ *       403:
+ *         description: Token tidak valid
+ */
+router.get("/refresh", authMiddleware, authController.refresh);
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Logout berhasil
+ */
+
+router.post("/logout", authController.logout);
 
 module.exports = router;

@@ -1,34 +1,19 @@
-// const jwt = require("jsonwebtoken");
-
-// exports.authMiddleware = (req, res, next) => {
-//   const token = req.headers.authorization?.split(" ")[1];
-
-//   if (!token) return res.status(401).json({ message: "No token provided" });
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.SECRET);
-//     req.user = decoded;
-//     next();
-//   } catch (err) {
-//     res.status(403).json({ message: "Invalid token" });
-//   }
-// };
-
 const jwt = require("jsonwebtoken");
-
 exports.authMiddleware = (req, res, next) => {
-  // Ambil token dari cookie DULUAN
-  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1]; // fallback header
+  const authHeader = req.headers.authorization || req.headers.Authorization;
 
-  if (!token) return res.status(401).json({ message: "No token provided" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(403).json({ message: "Invalid token" });
+  if (!authHeader?.startsWith("Bearer")) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Forbidden" });
+    req.user = decoded.UserInfo.username;
+    req.role = decoded.UserInfo.role;
+    next();
+  });
 };
 exports.checkRole = (roleName) => {
   return (req, res, next) => {

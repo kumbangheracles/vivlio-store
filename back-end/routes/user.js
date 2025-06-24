@@ -5,6 +5,8 @@ const User = require("../models/user");
 const { route } = require("./image");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 
+router.use(authMiddleware);
+
 // create user
 router.post("/create", async (req, res) => {
   try {

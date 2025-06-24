@@ -1,10 +1,25 @@
-import { Modal, message } from "antd";
+import { Button, Modal, message } from "antd";
 import { useEffect, useState } from "react";
 import type { UserProperties } from "../types/user.type";
 import myAxios from "../helper/myAxios";
 import { useLocation, useNavigate } from "react-router-dom";
+import useSignOut from "react-auth-kit/hooks/useSignOut";
+import { ErrorHandler } from "../helper/handleError";
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 const SESSION_DURATION = 10 * 60 * 1000; // 10 menit
 const MODAL_BEFORE = 30 * 1000; // 30 detik sebelum logout
+
+const TIMOUT_SESSION = SESSION_DURATION - MODAL_BEFORE;
+let remainingTime = TIMOUT_SESSION / 1000;
+
+const countdownInterval = setInterval(() => {
+  console.log(`⏳ Session will expire in ${remainingTime} seconds`);
+  remainingTime--;
+  if (remainingTime <= 0) {
+    clearInterval(countdownInterval);
+    console.log("⚠️ Session countdown finished");
+  }
+}, 1000);
 export const useSessionManager = (
   user: UserProperties | undefined,
   setUser: (user: UserProperties | undefined) => void
@@ -15,6 +30,8 @@ export const useSessionManager = (
   const location = useLocation();
   const navigate = useNavigate();
   const publicPaths = ["/login", "/register", "/forgot-password"]; // halaman tanpa session
+  const signOut = useSignOut();
+  const authHeader = useAuthHeader();
 
   useEffect(() => {
     // Clear timeout sebelum pasang ulang
@@ -27,8 +44,8 @@ export const useSessionManager = (
     if (user) {
       const modal = setTimeout(() => {
         setModalVisible(true);
-      }, SESSION_DURATION - MODAL_BEFORE);
-
+      }, TIMOUT_SESSION);
+      console.log("Session duration: ", SESSION_DURATION);
       const logout = setTimeout(() => {
         handleLogout();
       }, SESSION_DURATION);
@@ -43,16 +60,31 @@ export const useSessionManager = (
     };
   }, [user, location.pathname]);
 
-  const handleLogout = () => {
-    setUser(undefined);
-    localStorage.removeItem("user");
-    message.info("Session expired, please login again.");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await myAxios.post("/auth/logout");
+      message.info("Session expired, please login again.");
+      navigate("/login");
+    } catch (error) {
+      console.log("Error: ", error);
+    } finally {
+      signOut();
+    }
   };
 
   const handleStay = async () => {
     try {
-      await myAxios.get("/auth/me"); // validasi token
+      const token = authHeader?.replace("Bearer ", "");
+
+      if (!token) throw new Error("No auth token found");
+
+      const res = await myAxios.get("/auth/refresh", {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       message.success("Session refreshed");
       setModalVisible(false);
 
@@ -75,6 +107,7 @@ export const useSessionManager = (
     } catch (err) {
       handleLogout();
       console.log("error: ", err);
+      ErrorHandler(err);
     }
   };
 
@@ -84,15 +117,14 @@ export const useSessionManager = (
         title="Are you still there?"
         open={modalVisible}
         onOk={handleStay}
-        onCancel={() => {
-          setModalVisible(false);
-          handleLogout();
-        }}
-        okText="Yes"
-        cancelText="No"
+        okText="I'm still here"
+        footer={null}
         centered
       >
         <p>Your session is about to expire. Are you still there?</p>
+        <Button type="primary" onClick={handleStay}>
+          I'm still here
+        </Button>
       </Modal>
     ),
   };

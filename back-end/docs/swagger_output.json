@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "version": "v0.0.1",
-    "title": "Dokumentasi API ACARA",
-    "description": "Dokumentasi API ACARA"
+    "title": "Dokumentasi API VIVLIO",
+    "description": "Dokumentasi API VIVLIO"
   },
   "servers": [
     {

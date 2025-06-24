@@ -241,19 +241,28 @@ npx sequelize-cli db:migrate:undo:all
 
 This guide provides a structured way to use Sequelize in the Book Store API project efficiently. 🚀
 
-# Flow Token
+# Flow jwt cookie 2 secret keys
 
-[User Login]
-↓
-POST /auth/login
-↓
-[Backend generate JWT]
-↓
-[JWT stored in cookie]
-↓
-[Frontend auto sends cookie]
-↓
-GET /auth/me → authMiddleware → controller
-↓
-✅ If token valid → return user data
-🚫 If invalid/expired → 401 Unauthorized
++------------+ +-------------+ +-----------------+
+| Register | ---> | Verify Email| ---> | Login |
++------------+ +-------------+ +-----------------+
+
+                                                      |
+                                                      | Access Token (in memory)
+                                                      | Refresh Token (cookie)
+                                                      v
+
+
+                                                +------------+
+                                                |  Access API|
+                                                +------------+
+
+                                                    |
+                                                    |-- If accessToken expired -->
+                                                    |
+                                              +-----------------+
+                                              | Refresh (/refresh)
+                                              +-----------------+
+                                                      |
+                                                      v
+                                                New accessToken

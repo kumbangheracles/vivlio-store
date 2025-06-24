@@ -23,13 +23,13 @@ import { isEmpty } from "../../../helper/validation";
 import myAxios from "../../../helper/myAxios";
 import { ErrorHandler } from "../../../helper/handleError";
 import { UserContext } from "../../../context/UserContext";
-// import useSignIn from "react-auth-kit/hooks/useSignIn";
+import useSignIn from "react-auth-kit/hooks/useSignIn";
 const LoginForm: React.FC = () => {
   const { setUser } = useContext(UserContext)!;
   const navigate = useNavigate();
   const [loading, setLoading] = useState<Boolean>(false);
   const [dataLogin, setDataLogin] = useState<LoginProps>(initialLogin);
-  // const signIn = useSignIn();
+  const signIn = useSignIn();
   const handleSubmit = async (data: LoginProps) => {
     if (isEmpty(data.identifier)) {
       message.error("Username or Email are required!!");
@@ -48,23 +48,25 @@ const LoginForm: React.FC = () => {
 
       const res = await myAxios.post("/auth/login", body);
       const user = res.data.results;
-      // signIn({
-      //   auth: {
-      //     token: user.token,
-      //     type: "Bearer",
-      //   },
-      //   refresh: user.token,
+      signIn({
+        auth: {
+          token: user.token,
+          type: "Bearer",
+        },
+        refresh: user.token,
 
-      //   userState: { email: body.identifier },
-      // });
-
-      localStorage.setItem("user", JSON.stringify(user));
+        userState: {
+          identifier: body.identifier,
+          password: body.password,
+          role: user.role,
+        },
+      });
       setUser(user);
-      console.log("Login results: ", res.data);
       message.success("Login Success");
       navigate("/");
     } catch (error: any) {
       ErrorHandler(error);
+      console.log("Error login: ", error);
     } finally {
       setLoading(false);
     }
@@ -142,6 +144,7 @@ const LoginForm: React.FC = () => {
               onClick={() => {
                 handleSubmit(dataLogin!);
               }}
+              disabled={loading ? true : false}
             >
               {loading ? (
                 <>
