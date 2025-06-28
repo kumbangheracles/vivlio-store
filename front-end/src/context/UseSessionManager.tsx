@@ -13,7 +13,7 @@ const TIMOUT_SESSION = SESSION_DURATION - MODAL_BEFORE;
 let remainingTime = TIMOUT_SESSION / 1000;
 
 const countdownInterval = setInterval(() => {
-  console.log(`⏳ Session will expire in ${remainingTime} seconds`);
+  // console.log(`⏳ Session will expire in ${remainingTime} seconds`);
   remainingTime--;
   if (remainingTime <= 0) {
     clearInterval(countdownInterval);
@@ -45,7 +45,7 @@ export const useSessionManager = (
       const modal = setTimeout(() => {
         setModalVisible(true);
       }, TIMOUT_SESSION);
-      console.log("Session duration: ", SESSION_DURATION);
+      // console.log("Session duration: ", SESSION_DURATION);
       const logout = setTimeout(() => {
         handleLogout();
       }, SESSION_DURATION);

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppInput from "./Form/AppInput";
 import Dropdown from "antd/es/dropdown/dropdown";
@@ -6,7 +6,10 @@ import myAxios from "../helper/myAxios";
 import { message } from "antd";
 import { ErrorHandler } from "../helper/handleError";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
+import { styled } from "styled-components";
+import { Modal } from "antd";
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const signOut = useSignOut();
@@ -47,7 +50,7 @@ export default function Navbar() {
                 {
                   key: "logout",
                   label: "Logout",
-                  onClick: () => handleLogout(),
+                  onClick: () => setIsOpen(true),
                 },
                 // {
                 //   key: "edit",
@@ -78,27 +81,78 @@ export default function Navbar() {
       </div>
 
       <div className="bottom-navbar">
-        <ul
-          style={{ backgroundColor: "#D9EAFD" }}
-          className="flex justify-center p-[20px] font-medium tracking-widest gap-x-35"
-        >
+        <BottomNavbar>
           <li>
-            <Link to="/">HOME</Link>
+            <StyledLink to="/">HOME</StyledLink>
           </li>
           <li>
-            <Link to="">BLOG</Link>
+            <StyledLink to="">BLOG</StyledLink>
           </li>
           <li>
-            <Link to="">SHOP</Link>
+            <StyledLink to="">SHOP</StyledLink>
           </li>
           <li>
-            <Link to="">ABOUT US</Link>
+            <StyledLink to="">ABOUT US</StyledLink>
           </li>
           <li>
-            <Link to="">CONTACT US</Link>
+            <StyledLink to="">CONTACT US</StyledLink>
           </li>
-        </ul>
+        </BottomNavbar>
       </div>
+      <Modal
+        open={isOpen}
+        okText={"Yes"}
+        cancelText={"Cancel"}
+        onCancel={() => setIsOpen(false)}
+        onOk={() => handleLogout()}
+        title={
+          <>
+            <h1 className="text-center font-bolf">Logout</h1>
+          </>
+        }
+        centered={true}
+      >
+        <div className="text-center">
+          <h1>Are you sure, want to logout?</h1>
+        </div>
+      </Modal>
     </nav>
   );
 }
+
+const BottomNavbar = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  font-size: 12px;
+  --tw-tracking: var(--tracking-widest);
+  letter-spacing: var(--tracking-widest);
+  gap: 130px;
+  background-color: #d9eafd;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: "Poppins", sans-serif;
+
+  li {
+    text-decoration: none;
+    list-style: none;
+    position: relative;
+  }
+`;
+
+const StyledLink = styled(Link)`
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: black;
+    transition: all 0.3s ease;
+  }
+
+  &:hover&:after {
+    width: 100%;
+  }
+`;
