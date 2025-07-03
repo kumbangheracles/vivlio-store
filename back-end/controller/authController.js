@@ -18,8 +18,12 @@ const registerValidateModels = Yup.object({
     .oneOf(["admin", "customer"], "Invalid role")
     .required("Role is required"),
 });
+
 module.exports = {
   async register(req, res) {
+    /**
+      #swagger.tags = ['Auth']
+     */
     const { fullName, username, email, password, confirmPassword, role } =
       req.body;
     try {
@@ -74,25 +78,21 @@ module.exports = {
     }
   },
 
-  /**
-   * @swagger
-   * components:
-   *   schemas:
-   *     ResendVerificationCodeRequest:
-   *       type: object
-   *       required:
-   *         - email
-   *       properties:
-   *         email:
-   *           type: string
-   *           format: email
-   *           example: user@example.com
-   *        message:
-   *           type: string
-   *           example: "Verification code resent successfully."
-   */
-
   async resendVerificationCode(req, res) {
+    /**
+     * @swagger
+     * components:
+     *   schemas:
+     *     ResendVerificationCodeRequest:
+     *       type: object
+     *       required:
+     *         - email
+     *       properties:
+     *         email:
+     *           type: string
+     *           format: email
+     *           example: user@example.com
+     */
     try {
       const { email } = req.body;
       const user = await User.findOne({ where: { email } });
@@ -116,26 +116,26 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
-  /**
-   * @swagger
-   * components:
-   *   schemas:
-   *     VerifyEmailRequest:
-   *       type: object
-   *       required:
-   *         - email
-   *         - verificationCode
-   *       properties:
-   *         email:
-   *           type: string
-   *           format: email
-   *           example: user@example.com
-   *         verificationCode:
-   *           type: string
-   *           example: "123456"
-   */
 
   async verifyEmail(req, res) {
+    /**
+     * @swagger
+     * components:
+     *   schemas:
+     *     VerifyEmailRequest:
+     *       type: object
+     *       required:
+     *         - email
+     *         - verificationCode
+     *       properties:
+     *         email:
+     *           type: string
+     *           format: email
+     *           example: user@example.com
+     *         verificationCode:
+     *           type: string
+     *           example: "123456"
+     */
     try {
       const { email, verificationCode } = req.body;
       const user = await User.findOne({ where: { email } });
@@ -170,13 +170,44 @@ module.exports = {
 
   async login(req, res) {
     /**
-       #swagger.requestBody = {
-       required: true,
-       schema: {
-       $ref: "#components/schemas/LoginRequest"}
-       }
-       
-       */
+     * @swagger
+     * components:
+     *   schemas:
+     *     LoginRequest:
+     *       type: object
+     *       required:
+     *         - identifier
+     *         - password
+     *       properties:
+     *         identifier:
+     *           type: string
+     *           example: "ahmadherkal"
+     *         password:
+     *           type: string
+     *           example: "1234"
+     */
+
+    /**
+     * @swagger
+     * /auth/login:
+     *   post:
+     *     summary: Login user
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/LoginRequest'
+     *     responses:
+     *       200:
+     *         description: Login successful
+     *       400:
+     *         description: Bad request
+     *       403:
+     *         description: Incorrect credentials or unverified
+     */
+
     try {
       const { identifier, password } = req.body;
       const userByIdentifier = await User.findOne({
@@ -282,10 +313,10 @@ module.exports = {
   // refresh
   async refresh(req, res) {
     /**
-      #swagger.security = [{
-       "bearerAuth": []
-       }]
-       */
+     * #swagger.security = [{
+     * "bearerAuth": []
+     * }]
+     **/
     try {
       const cookies = req.cookies;
       if (!cookies?.jwt) {

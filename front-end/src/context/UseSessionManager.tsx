@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
 import { ErrorHandler } from "../helper/handleError";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
-const SESSION_DURATION = 10 * 60 * 1000; // 10 menit
+const SESSION_DURATION = 1 * 60 * 60 * 1000;
 const MODAL_BEFORE = 30 * 1000; // 30 detik sebelum logout
 
 const TIMOUT_SESSION = SESSION_DURATION - MODAL_BEFORE;
@@ -22,7 +22,7 @@ const countdownInterval = setInterval(() => {
 }, 1000);
 export const useSessionManager = (
   user: UserProperties | undefined,
-  setUser: (user: UserProperties | undefined) => void
+  setUser?: (user: UserProperties | undefined) => void
 ) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutTimer, setLogoutTimer] = useState<NodeJS.Timeout>();
@@ -34,18 +34,16 @@ export const useSessionManager = (
   const authHeader = useAuthHeader();
 
   useEffect(() => {
-    // Clear timeout sebelum pasang ulang
     if (logoutTimer) clearTimeout(logoutTimer);
     if (modalTimer) clearTimeout(modalTimer);
 
-    // Jangan set timer kalau di halaman public
     if (publicPaths.includes(location.pathname)) return;
 
     if (user) {
       const modal = setTimeout(() => {
         setModalVisible(true);
       }, TIMOUT_SESSION);
-      // console.log("Session duration: ", SESSION_DURATION);
+
       const logout = setTimeout(() => {
         handleLogout();
       }, SESSION_DURATION);
@@ -69,6 +67,7 @@ export const useSessionManager = (
       console.log("Error: ", error);
     } finally {
       signOut();
+      setModalVisible(false);
     }
   };
 
@@ -120,6 +119,7 @@ export const useSessionManager = (
         okText="I'm still here"
         footer={null}
         centered
+        closable={true}
       >
         <p>Your session is about to expire. Are you still there?</p>
         <Button type="primary" onClick={handleStay}>

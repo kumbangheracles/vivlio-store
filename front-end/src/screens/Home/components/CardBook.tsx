@@ -24,7 +24,7 @@ const CardBook: React.FC<BookProps> = ({
   return (
     <Card key={id}>
       <BookWrapper>
-        <BookImage src={book_cover} alt="logo" />
+        <BookImage src={book_cover || "/images/no-image.png"} alt="logo" />
       </BookWrapper>
       <div>
         <h2 style={{ fontWeight: "700", textAlign: "center" }}>{title}</h2>

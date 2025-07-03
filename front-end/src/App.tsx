@@ -8,14 +8,14 @@ import AuthProvider from "react-auth-kit";
 import createStore from "react-auth-kit/createStore";
 import createRefresh from "react-auth-kit/createRefresh";
 import myAxios from "./helper/myAxios";
-import { UserContext, UserProvider } from "./context/UserContext";
+import { UserProvider } from "./context/UserContext";
+import { useEffect } from "react";
 
 const refresh = createRefresh({
   interval: 10,
   refreshApiCallback: async ({ authToken }) => {
     try {
-      const res = await myAxios.get("/auth/refresh", {
-        withCredentials: true,
+      const res = await myAxios.get<{ token: string }>("/auth/refresh", {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -39,7 +39,9 @@ const refresh = createRefresh({
 });
 
 function App() {
-  AOS.init();
+  useEffect(() => {
+    AOS.init();
+  }, []);
   const myStore = createStore({
     authName: "_auth",
     authType: "cookie",

@@ -25,7 +25,7 @@ const WrapperLayout = styled.div`
 `;
 
 const WrapperChildren = styled.div`
-  margin-top: 80px;
+  margin-block: 80px;
 `;
 
 export default Layout;

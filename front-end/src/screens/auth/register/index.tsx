@@ -33,6 +33,7 @@ interface OptionProps {
   label: string;
 }
 import { EUserRole } from "../../../types/user.type";
+import { ErrorHandler } from "../../../helper/handleError";
 const RegisterForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<EUserRole | null>(null);
   const { setUser, user } = useContext(UserContext)!;
@@ -47,34 +48,6 @@ const RegisterForm: React.FC = () => {
   }));
 
   const handleSubmit = async (userData: UserProperties) => {
-    if (
-      isEmpty(userData.fullName) ||
-      isEmpty(userData.username) ||
-      isEmpty(userData.email) ||
-      isEmptyRole(userData.role!) ||
-      isEmpty(userData.password) ||
-      isEmpty(userData.confirmPassword)
-    ) {
-      message.error("All fields are required");
-      console.log("All fields are required");
-      return;
-    }
-
-    if (userData.password!.length < 6) {
-      message.error("Password must be at least 6 characters");
-      return;
-    }
-
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
-    if (!regex.test(userData.password!)) {
-      message.error("Password must include alphabet and numeric");
-      return;
-    }
-
-    if (userData.password !== userData.confirmPassword) {
-      message.error("Passwords do not match");
-      return;
-    }
     try {
       setLoading(true);
       const body: UserProperties = {
@@ -94,24 +67,48 @@ const RegisterForm: React.FC = () => {
       }
       console.log("Data terkirim: ", res.data);
 
-      setUser(res.data);
+      // setUser(res.data);
 
       message.success(
         "Success Registration! Please check your email for verification code."
       );
     } catch (error: any) {
       console.log(error);
-      const backendMsg =
-        error?.response?.data?.message ||
-        "Registration Failed! Please try again later";
-      console.log("Error from backend:", backendMsg);
-      message.error(backendMsg);
+      ErrorHandler(error);
     } finally {
       setLoading(false);
     }
   };
 
   const submitted = (data: UserProperties) => {
+    if (
+      isEmpty(data.fullName) ||
+      isEmpty(data.username) ||
+      isEmpty(data.email) ||
+      isEmptyRole(data.role!) ||
+      isEmpty(data.password) ||
+      isEmpty(data.confirmPassword)
+    ) {
+      message.error("All fields are required");
+      console.log("All fields are required");
+      return;
+    }
+
+    if (data.password!.length < 6) {
+      message.error("Password must be at least 6 characters");
+      return;
+    }
+
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!regex.test(data.password!)) {
+      message.error("Password must include alphabet and numeric");
+      return;
+    }
+
+    if (data.password !== data.confirmPassword) {
+      message.error("Passwords not match");
+      return;
+    }
     handleSubmit(data);
   };
   return (
@@ -136,6 +133,7 @@ const RegisterForm: React.FC = () => {
               style={{ marginBlock: "10px" }}
               required={true}
               label="Full Name"
+              name={"fullName"}
             >
               <Input
                 variant="filled"
@@ -152,6 +150,7 @@ const RegisterForm: React.FC = () => {
               style={{ marginBlock: "10px" }}
               required={true}
               label="Username"
+              name={"username"}
             >
               <Input
                 variant="filled"
@@ -168,6 +167,7 @@ const RegisterForm: React.FC = () => {
               <Form.Item
                 required={true}
                 label="Email"
+                name={"email"}
                 style={{ width: "100%" }}
                 rules={[
                   { required: true, message: "Email is required " },
@@ -190,6 +190,7 @@ const RegisterForm: React.FC = () => {
                 required={true}
                 label="Role"
                 style={{ width: "60%", letterSpacing: 1 }}
+                name={"role"}
               >
                 <Select
                   variant="filled"
@@ -213,6 +214,7 @@ const RegisterForm: React.FC = () => {
               style={{ marginBottom: "5px", marginTop: "-5px" }}
               required={true}
               label="Password"
+              name={"password"}
               rules={[
                 { required: true, message: "Password is required" },
                 { min: 6, message: "6 character are needed" },
@@ -238,6 +240,7 @@ const RegisterForm: React.FC = () => {
               style={{ marginBlock: "10px" }}
               required={true}
               label="Confirm Password"
+              name={"confirmPassword"}
               rules={[
                 { required: true, message: "Confirm password is required" },
                 { min: 6, message: "6 character are needed" },

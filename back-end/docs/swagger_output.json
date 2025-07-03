@@ -3,54 +3,36 @@
   "info": {
     "version": "v0.0.1",
     "title": "Dokumentasi API VIVLIO",
-    "description": "Dokumentasi API VIVLIO"
+    "description": "Dokumentasi API untuk aplikasi VIVLIO yang mencakup otentikasi pengguna dan manajemen akun."
   },
   "servers": [
     {
       "url": "http://localhost:3000/api",
       "description": "Local Server"
-    },
-    {
-      "url": "https://back-end-acara-taupe-zeta.vercel.app/api",
-      "description": "Deploy Server"
     }
   ],
   "paths": {
     "/auth/register": {
       "post": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        },
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "description": "Mendaftarkan user baru dengan nama lengkap, email, dan password.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "fullName": {
-                    "example": "any"
-                  },
-                  "username": {
-                    "example": "any"
-                  },
-                  "email": {
-                    "example": "any"
-                  },
-                  "password": {
-                    "example": "any"
-                  },
-                  "confirmPassword": {
-                    "example": "any"
-                  }
-                }
+                "$ref": "#/components/schemas/RegisterRequest"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Bad Request (e.g. validasi gagal)"
           }
         }
       }
@@ -116,18 +98,9 @@
     },
     "/auth/login": {
       "post": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Melakukan login dengan username/email dan password.",
         "requestBody": {
           "required": true,
           "content": {
@@ -135,19 +108,58 @@
               "schema": {
                 "$ref": "#/components/schemas/LoginRequest"
               }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "token": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "identifier": { "type": "string" },
+                        "role": { "type": "string" }
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Login successful",
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "data": {
+                      "identifier": "ahmadherkal",
+                      "role": "USER"
+                    }
+                  }
+                }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request (e.g. data login tidak lengkap)"
+          },
+          "403": {
+            "description": "Forbidden (e.g. kredensial salah)"
           }
         }
       }
     },
     "/auth/me": {
       "get": {
-        "description": "",
+        "tags": ["Authentication"],
+        "summary": "Get user profile",
+        "description": "Mengambil data profil pengguna berdasarkan token yang dikirimkan.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -156,14 +168,9 @@
             "description": "Bad Request"
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden (e.g. token tidak valid)"
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     }
   },
@@ -171,12 +178,14 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "schemas": {
       "LoginRequest": {
         "type": "object",
+        "required": ["identifier", "password"],
         "properties": {
           "identifier": {
             "type": "string",
@@ -186,9 +195,27 @@
             "type": "string",
             "example": "1234"
           }
-        },
-        "xml": {
-          "name": "LoginRequest"
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "fullName",
+          "username",
+          "email",
+          "password",
+          "confirmPassword"
+        ],
+        "properties": {
+          "fullName": { "type": "string", "example": "Hera Cles" },
+          "username": { "type": "string", "example": "heracles" },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "hera@example.com"
+          },
+          "password": { "type": "string", "example": "123456" },
+          "confirmPassword": { "type": "string", "example": "123456" }
         }
       },
       "VerifyEmailRequest": {

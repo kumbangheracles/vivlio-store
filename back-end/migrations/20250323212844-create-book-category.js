@@ -16,6 +16,10 @@ module.exports = {
       description: {
         type: Sequelize.STRING,
       },
+      isPopular: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

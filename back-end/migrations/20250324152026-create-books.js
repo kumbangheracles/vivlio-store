@@ -39,6 +39,10 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
+      isPopular: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

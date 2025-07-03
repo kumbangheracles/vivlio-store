@@ -3,14 +3,32 @@ const Book = require("../models/books");
 const router = express.Router();
 // Get all books
 router.get("/", async (req, res) => {
-  try {
-    const books = await Book.findAll();
+  const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
 
+  const filters = {};
+  if (isPopular !== undefined) {
+    filters.isPopular = isPopular === "true" || isPopular === "1";
+  }
+  if (categoryId) filters.categoryId = categoryId;
+  if (title) {
+    filters.title = { [Op.like]: `%${title}%` };
+  }
+
+  const offset = (page - 1) * limit;
+  try {
+    const { count, rows } = await Book.findAndCountAll({
+      where: filters,
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset,
+    });
     res.status(200).json({
-      status: true,
+      status: "Success",
       message: "Books retrieved successfully",
-      payload: books,
-      total: books.length, // optional
+      results: rows,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
     });
   } catch (error) {
     res.status(500).json({

@@ -7,14 +7,13 @@ import { type UserProperties } from "../types/user.type";
 
 type ProtectedRouteProps = {
   children: ReactNode;
-  roles: UserProperties["role"][]; // array of allowed roles
+  roles: UserProperties["role"][];
 };
 
 const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
   const isAuthenticated = useIsAuthenticated();
   const auth = useAuthUser<UserProperties>();
 
-  console.log("User login: ", auth);
   // if (typeof isAuthenticated !== "boolean" || auth === null) {
   //   return <Navigate to="/login" replace />;
   // }

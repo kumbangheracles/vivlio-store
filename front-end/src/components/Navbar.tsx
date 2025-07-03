@@ -8,11 +8,16 @@ import { ErrorHandler } from "../helper/handleError";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
 import { styled } from "styled-components";
 import { Modal } from "antd";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import type { UserProperties } from "../types/user.type";
+import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const auth = useAuthUser<UserProperties>();
   const navigate = useNavigate();
-
+  const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
+  const [isHover, setIshover] = useState<boolean>(false);
 
   const handleLogout = async () => {
     try {
@@ -29,49 +34,71 @@ export default function Navbar() {
     }
   };
 
+  const items = isAuthenticated
+    ? [
+        {
+          key: isAuthenticated ? "profile" : "",
+          label: isAuthenticated ? "Profile" : "",
+          // onClick: () => handleEdit(record.articleId),
+        },
+        {
+          key: isAuthenticated ? "logout" : "login",
+          label: isAuthenticated ? "Logout" : "Login",
+          onClick: () => {
+            isAuthenticated ? setIsOpen(true) : navigate("/login");
+          },
+        },
+      ]
+    : [
+        {
+          key: isAuthenticated ? "logout" : "login",
+          label: isAuthenticated ? "Logout" : "Login",
+          onClick: () => {
+            isAuthenticated ? setIsOpen(true) : navigate("/login");
+          },
+        },
+      ];
+
   return (
-    <nav className="fixed top-0 w-screen h-[auto] bg-white">
-      <div className="flex items-center justify-around p-2 top-navbar">
+    <nav className="fixed top-0 w-full h-[auto] bg-white">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginInline: "100px",
+        }}
+      >
         <span className="font-extrabold tracking-widest logo ">
           <h4>VIVLIO</h4>
         </span>
 
         <div
-          style={{ width: "387px" }}
+          style={{ width: "357px" }}
           className="flex justify-around navbar-option"
         >
           <div className="input-search-navbar ">
             <AppInput />
           </div>
-          <Dropdown
-            trigger={["click"]}
-            menu={{
-              items: [
-                {
-                  key: "logout",
-                  label: "Logout",
-                  onClick: () => setIsOpen(true),
-                },
-                // {
-                //   key: "edit",
-                //   label: "Edit",
-                //   // onClick: () => handleEdit(record.articleId),
-                // },
-                // {
-                //   key: "delete",
-                //   label: "Delete",
-                //   danger: true,
-                //   // onClick: () => openDeleteModal(record.articleId),
-                // },
-              ],
-            }}
+          <div
+            onMouseEnter={() => setIshover(true)}
+            onMouseLeave={() => setIshover(false)}
           >
-            <img
-              style={{ width: "24px", cursor: "pointer" }}
-              src="/icons/account.svg"
-              alt="account-icon"
-            />
-          </Dropdown>
+            <Dropdown
+              trigger={["click"]}
+              menu={{
+                items: items,
+              }}
+            >
+              <AccountIcon isTriggered={isHover}>
+                <img
+                  style={{ objectFit: "contain", cursor: "pointer" }}
+                  src="/icons/account.svg"
+                  alt="account-icon"
+                />
+              </AccountIcon>
+            </Dropdown>
+          </div>
           <img
             style={{ width: "24px" }}
             src="/icons/chart.svg"
@@ -97,6 +124,11 @@ export default function Navbar() {
           <li>
             <StyledLink to="">CONTACT US</StyledLink>
           </li>
+          {auth?.role === "admin" && (
+            <li>
+              <StyledLink to="/cms">CMS SECTION</StyledLink>
+            </li>
+          )}
         </BottomNavbar>
       </div>
       <Modal
@@ -127,12 +159,12 @@ const BottomNavbar = styled.div`
   font-size: 12px;
   --tw-tracking: var(--tracking-widest);
   letter-spacing: var(--tracking-widest);
-  gap: 130px;
+  justify-content: space-around;
   background-color: #d9eafd;
   font-weight: 700;
   text-decoration: none;
   font-family: "Poppins", sans-serif;
-
+  width: 100%;
   li {
     text-decoration: none;
     list-style: none;
@@ -154,5 +186,27 @@ const StyledLink = styled(Link)`
 
   &:hover&:after {
     width: 100%;
+  }
+`;
+
+interface IconProps {
+  isTriggered?: boolean;
+}
+
+const AccountIcon = styled.div<IconProps>`
+  height: 34px;
+  width: 34px;
+  cursor: pointer;
+  border: 1px solid;
+  border-color: ${({ isTriggered }) => (isTriggered ? "black" : "white")};
+  border-radius: 50%;
+  padding: 3px;
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s all ease;
+  &:hover {
+    border-color: black;
   }
 `;

@@ -23,11 +23,11 @@ const options = {
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    // security: [
+    //   {
+    //     bearerAuth: [],
+    //   },
+    // ],
   },
   apis: ["./routes/*.js", "./controller/*.js"], // Lokasi dokumentasi
 };

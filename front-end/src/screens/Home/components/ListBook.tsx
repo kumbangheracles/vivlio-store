@@ -4,7 +4,13 @@ import styled from "styled-components";
 import axios from "axios";
 import type { BaseMultipleResponse } from "../../../types/base.type";
 import type { BookProps } from "../../../types/books.type";
-const ListBook: React.FC = () => {
+import { Empty } from "antd";
+
+interface BookTypes {
+  titleSection?: string;
+}
+
+const ListBook: React.FC<BookTypes> = ({ titleSection }) => {
   const [dataBook, setDataBook] = useState<BookProps[]>([]);
   const fetchBook = async () => {
     try {
@@ -22,23 +28,31 @@ const ListBook: React.FC = () => {
     fetchBook();
   }, []);
   return (
-    // Book Overview
     <>
       <div style={{ marginTop: "50px" }}>
-        <TitleList>Book Overview</TitleList>
-        <ListBookWrapper className="grid gap-[10px] p-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-3">
-          {dataBook.map((item) => (
-            <CardBook
-              key={item?.id}
-              title={item?.title}
-              price={item?.price}
-              author={item?.author}
-              categoryId={item?.categoryId}
-              book_type={item?.book_type}
-              book_cover={item?.book_cover}
-            />
-          ))}
-        </ListBookWrapper>
+        {dataBook?.length > 0 ? (
+          <>
+            <TitleList>{titleSection}</TitleList>
+            <ListBookWrapper className="grid gap-[10px] p-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-3">
+              {dataBook?.map((item) => (
+                <CardBook
+                  key={item?.id}
+                  title={item?.title}
+                  price={item?.price}
+                  author={item?.author}
+                  categoryId={item?.categoryId}
+                  book_type={item?.book_type}
+                  book_cover={item?.book_cover || "/images/no-image.png"}
+                />
+              ))}
+            </ListBookWrapper>
+          </>
+        ) : (
+          <>
+            <TitleList>{titleSection}</TitleList>
+            <Empty />
+          </>
+        )}
       </div>
     </>
   );

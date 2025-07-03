@@ -9,6 +9,7 @@ import React, { Suspense } from "react";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import GlobalLoading from "../components/GlobalLoading";
 import { EUserRole } from "../types/user.type";
+import GuestRoute from "../helper/GuestRoute";
 
 const RouteNavigation = () => {
   const Home = React.lazy(() => import("../screens/Home"));
@@ -19,12 +20,28 @@ const RouteNavigation = () => {
   const Verification = React.lazy(
     () => import("../screens/auth/register/Verification")
   );
+
+  const CmsSection = React.lazy(() => import("../screens/cms/index"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
         <Routes>
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route
+            path="/register"
+            element={
+              <GuestRoute>
+                <RegisterForm />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <LoginForm />
+              </GuestRoute>
+            }
+          />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route
             path="/register/verification-code"
@@ -33,8 +50,16 @@ const RouteNavigation = () => {
           <Route
             path="/"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.CUSTOMER]}>
-                <Home />
+              // <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.CUSTOMER]}>
+              <Home />
+              // </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <CmsSection />
               </ProtectedRoute>
             }
           />

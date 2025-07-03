@@ -23,3 +23,12 @@
   font-family: "Poppins", sans-serif;
   /* font-size: 13px; */
 }
+
+/* Hilangkan scrollbar tapi tetap bisa scroll */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}

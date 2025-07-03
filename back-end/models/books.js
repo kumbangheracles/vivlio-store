@@ -32,7 +32,10 @@ const Book = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-
+    isPopular: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     categoryId: {
       type: DataTypes.INTEGER,
       allowNull: true,

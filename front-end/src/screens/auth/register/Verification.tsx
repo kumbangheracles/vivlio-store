@@ -66,6 +66,7 @@ const Verification: React.FC = () => {
           navigate("/login");
         }, 1000);
       }
+      localStorage.removeItem("email");
     } catch (error: any) {
       console.log(error);
       const backendMsg =
@@ -84,10 +85,10 @@ const Verification: React.FC = () => {
         data-aos="fade-up"
         style={{ cursor: loading ? "wait" : "default" }}
       >
-        <ArrowLeftOutlined
+        {/* <ArrowLeftOutlined
           style={{ fontSize: "20px", cursor: "pointer" }}
-          onClick={() => navigate(-1)}
-        />
+          onClick={() => navigate("/register")}
+        /> */}
         {/* <Modal
             open={true}
             onCancel={() => {
