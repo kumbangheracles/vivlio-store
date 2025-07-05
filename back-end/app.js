@@ -16,26 +16,37 @@ require("./jobs/cleanUpUnverifiedUsers");
 async function init() {
   try {
     const app = express();
-    app.use((req, res, next) => {
-      res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      );
-      res.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
-      );
-      next();
-    });
+    // app.use((req, res, next) => {
+    //   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+    //   res.header("Access-Control-Allow-Credentials", "true");
+    //   res.header(
+    //     "Access-Control-Allow-Headers",
+    //     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    //   );
+    //   res.header(
+    //     "Access-Control-Allow-Methods",
+    //     "GET, POST, PUT, DELETE, OPTIONS"
+    //   );
+    //   next();
+    // });
 
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: (origin, callback) => {
+          const allowedOrigins = [
+            "http://localhost:5173",
+            "http://localhost:3001",
+          ];
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error("Not allowed by CORS"));
+          }
+        },
         credentials: true,
       })
     );
+
     app.use(cookieParser());
     app.use(express.json());
     app.use(bodyParser.json());

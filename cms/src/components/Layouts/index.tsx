@@ -1,20 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AppInput from "./Form/AppInput";
-import Dropdown from "antd/es/dropdown/dropdown";
-import myAxios from "../helper/myAxios";
-import { message } from "antd";
-import { ErrorHandler } from "../helper/handleError";
-import useSignOut from "react-auth-kit/hooks/useSignOut";
-import { styled } from "styled-components";
-import { Modal } from "antd";
+import {
+  Badge,
+  Button,
+  ConfigProvider,
+  Dropdown,
+  Input,
+  Layout,
+  Menu,
+  type MenuProps,
+  message,
+  Modal,
+  Select,
+} from "antd";
+import {
+  BookFilled,
+  CalendarFilled,
+  CreditCardOutlined,
+  DashOutlined,
+} from "@ant-design/icons";
+import { useState, type ReactNode } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { BiSolidCategory } from "react-icons/bi";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
-import type { UserProperties } from "../types/user.type";
 import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
-export default function Navbar() {
+import useSignOut from "react-auth-kit/hooks/useSignOut";
+import { ErrorHandler } from "../../helper/handleError";
+import myAxios from "../../helper/myAxios";
+import { UserProperties } from "../../types/user.type";
+import { styled } from "styled-components";
+const { Header, Content, Sider } = Layout;
+
+const sidebarItems: MenuProps["items"] = [
+  { key: "/dashboard", label: "Dashboard", icon: <DashOutlined /> },
+  { key: "/category", label: "Category", icon: <BiSolidCategory /> },
+];
+
+interface PropTypes {
+  children?: ReactNode;
+}
+
+const AppLayout = ({ children }: PropTypes) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuthUser<UserProperties>();
-  const navigate = useNavigate();
+
   const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
   const [isHover, setIshover] = useState<boolean>(false);
@@ -58,33 +87,27 @@ export default function Navbar() {
           },
         },
       ];
-
   return (
-    <nav className="fixed top-0 w-full h-[auto] bg-white">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginInline: "100px",
-        }}
-      >
-        <span className="font-extrabold tracking-widest logo ">
-          <h4>VIVLIO</h4>
-        </span>
-
-        <div
-          style={{ width: "357px" }}
-          className="flex justify-around navbar-option"
+    <>
+      <Layout>
+        <Header
+          style={{
+            background: "#76b4e6",
+            padding: "0 20px",
+            position: "sticky",
+            top: 0,
+            zIndex: "9999",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
         >
-          <div className="input-search-navbar ">
-            <AppInput />
-          </div>
+          <h1 style={{ margin: 0, fontSize: 20 }}>Vivlio CMS</h1>
           <div
             onMouseEnter={() => setIshover(true)}
             onMouseLeave={() => setIshover(false)}
           >
             <Dropdown
+              overlayStyle={{ zIndex: "1000000" }}
               trigger={["click"]}
               menu={{
                 items: items,
@@ -99,33 +122,41 @@ export default function Navbar() {
               </AccountIcon>
             </Dropdown>
           </div>
-          <img
-            style={{ width: "24px" }}
-            src="/icons/chart.svg"
-            alt="chart-icon"
-          />
-        </div>
-      </div>
+        </Header>
+        <Layout>
+          <Sider
+            width={230}
+            style={{
+              background: "#76b4e6",
 
-      <div className="bottom-navbar">
-        <BottomNavbar>
-          <li>
-            <StyledLink to="/">HOME</StyledLink>
-          </li>
-          <li>
-            <StyledLink to="">BLOG</StyledLink>
-          </li>
-          <li>
-            <StyledLink to="">SHOP</StyledLink>
-          </li>
-          <li>
-            <StyledLink to="">ABOUT US</StyledLink>
-          </li>
-          <li>
-            <StyledLink to="">CONTACT US</StyledLink>
-          </li>
-        </BottomNavbar>
-      </div>
+              height: "100vh",
+            }}
+          >
+            <Menu
+              style={{ backgroundColor: "#76b4e6" }}
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              items={sidebarItems}
+              onClick={({ key }) => {
+                if (key === "/logout") {
+                } else {
+                  navigate(key);
+                }
+              }}
+            />
+          </Sider>
+          <Layout style={{ padding: "24px" }}>
+            <Content
+              style={{
+                background: "#fff",
+              }}
+            >
+              {children}
+            </Content>
+          </Layout>
+        </Layout>
+      </Layout>
+
       <Modal
         open={isOpen}
         okText={"Yes"}
@@ -143,47 +174,11 @@ export default function Navbar() {
           <h1>Are you sure, want to logout?</h1>
         </div>
       </Modal>
-    </nav>
+    </>
   );
-}
+};
 
-const BottomNavbar = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  font-size: 12px;
-  --tw-tracking: var(--tracking-widest);
-  letter-spacing: var(--tracking-widest);
-  justify-content: space-around;
-  background-color: #d9eafd;
-  font-weight: 700;
-  text-decoration: none;
-  font-family: "Poppins", sans-serif;
-  width: 100%;
-  li {
-    text-decoration: none;
-    list-style: none;
-    position: relative;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  &:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 2px;
-    width: 0;
-    background-color: black;
-    transition: all 0.3s ease;
-  }
-
-  &:hover&:after {
-    width: 100%;
-  }
-`;
-
+export default AppLayout;
 interface IconProps {
   isTriggered?: boolean;
 }
@@ -193,7 +188,7 @@ const AccountIcon = styled.div<IconProps>`
   width: 34px;
   cursor: pointer;
   border: 1px solid;
-  border-color: ${({ isTriggered }) => (isTriggered ? "black" : "white")};
+  border-color: ${({ isTriggered }) => (isTriggered ? "white" : "#76b4e6")};
   border-radius: 50%;
   padding: 3px;
   display: flex;
@@ -202,6 +197,6 @@ const AccountIcon = styled.div<IconProps>`
   justify-content: center;
   transition: 0.3s all ease;
   &:hover {
-    border-color: black;
+    border-color: white;
   }
 `;

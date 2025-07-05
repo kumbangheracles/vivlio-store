@@ -12,7 +12,6 @@ import { EUserRole } from "../types/user.type";
 import GuestRoute from "../helper/GuestRoute";
 
 const RouteNavigation = () => {
-  const Home = React.lazy(() => import("../screens/Home"));
   const Unauthorized = React.lazy(() => import("../components/Unoutherized"));
   const NotFound = React.lazy(() => import("../components/NotFound"));
   const RegisterForm = React.lazy(() => import("../screens/auth/register"));
@@ -20,6 +19,7 @@ const RouteNavigation = () => {
   const Verification = React.lazy(
     () => import("../screens/auth/register/Verification")
   );
+  const DashboardIndex = React.lazy(() => import("../screens/dashboard/index"));
 
   return (
     <>
@@ -33,6 +33,7 @@ const RouteNavigation = () => {
               </GuestRoute>
             }
           />
+
           <Route
             path="/login"
             element={
@@ -46,12 +47,13 @@ const RouteNavigation = () => {
             path="/register/verification-code"
             element={<Verification />}
           />
+
           <Route
             path="/"
             element={
-              // <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.CUSTOMER]}>
-              <Home />
-              // </ProtectedRoute>
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <DashboardIndex />
+              </ProtectedRoute>
             }
           />
 
