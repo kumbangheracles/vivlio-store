@@ -1,6 +1,7 @@
 import {
   Badge,
   Button,
+  Card,
   ConfigProvider,
   Dropdown,
   Input,
@@ -16,6 +17,7 @@ import {
   CalendarFilled,
   CreditCardOutlined,
   DashOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import { useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -30,7 +32,7 @@ import { styled } from "styled-components";
 const { Header, Content, Sider } = Layout;
 
 const sidebarItems: MenuProps["items"] = [
-  { key: "/dashboard", label: "Dashboard", icon: <DashOutlined /> },
+  { key: "/", label: "Dashboard", icon: <DashOutlined /> },
   { key: "/category", label: "Category", icon: <BiSolidCategory /> },
 ];
 
@@ -43,7 +45,7 @@ const AppLayout = ({ children }: PropTypes) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuthUser<UserProperties>();
-
+  const [collapsed, setCollapsed] = useState(false);
   const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
   const [isHover, setIshover] = useState<boolean>(false);
@@ -126,15 +128,38 @@ const AppLayout = ({ children }: PropTypes) => {
         <Layout>
           <Sider
             width={230}
+            collapsible
+            collapsed={collapsed}
+            onCollapse={(value) => setCollapsed(value)}
+            trigger={null}
             style={{
               background: "#76b4e6",
 
               height: "100vh",
             }}
           >
+            <div
+              style={{
+                padding: "12px",
+                display: "flex",
+              }}
+            >
+              <div
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  background: "#1677ff",
+                  padding: 10,
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                <MenuOutlined style={{ color: "white", fontSize: 20 }} />
+              </div>
+            </div>
             <Menu
               style={{ backgroundColor: "#76b4e6" }}
-              mode="inline"
+              mode="vertical"
+              inlineCollapsed={collapsed}
               selectedKeys={[location.pathname]}
               items={sidebarItems}
               onClick={({ key }) => {
@@ -146,12 +171,8 @@ const AppLayout = ({ children }: PropTypes) => {
             />
           </Sider>
           <Layout style={{ padding: "24px" }}>
-            <Content
-              style={{
-                background: "#fff",
-              }}
-            >
-              {children}
+            <Content>
+              <Card>{children}</Card>
             </Content>
           </Layout>
         </Layout>

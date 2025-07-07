@@ -19,8 +19,11 @@ const RouteNavigation = () => {
   const Verification = React.lazy(
     () => import("../screens/auth/register/Verification")
   );
+  // Dashboard
   const DashboardIndex = React.lazy(() => import("../screens/dashboard/index"));
 
+  // Category
+  const CategoryIndex = React.lazy(() => import("../screens/category/index"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -53,6 +56,14 @@ const RouteNavigation = () => {
             element={
               <ProtectedRoute roles={[EUserRole.ADMIN]}>
                 <DashboardIndex />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/category"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <CategoryIndex />
               </ProtectedRoute>
             }
           />
