@@ -1,8 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-const Image = require("./images");
-const BookCategory = require("./book_category");
-const { Sequelize } = require("sequelize");
+
 const Book = sequelize.define(
   "Books",
   {
@@ -50,19 +48,5 @@ const Book = sequelize.define(
     timestamps: true, // createdAt & updatedAt otomatis dibuat
   }
 );
-
-Book.hasOne(Image, {
-  foreignKey: "bookId",
-  as: "coverImage", // Alias untuk query
-  scope: {
-    type: "cover", // Hanya ambil gambar dengan tipe "cover"
-  },
-});
-Image.belongsTo(Book, { foreignKey: "bookId" });
-
-// Book.belongsTo(BookCategory, {
-//   foreignKey: "categoryId",
-//   as: "category",
-// });
 
 module.exports = Book;

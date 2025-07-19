@@ -20,6 +20,10 @@ const BookCategory = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     isPopular: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

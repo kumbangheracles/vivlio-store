@@ -4,17 +4,13 @@ import { InputOTP } from "antd-input-otp";
 import { ArrowLeftOutlined, LoadingOutlined } from "@ant-design/icons";
 import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../../context/UserContext";
 import dayjs from "dayjs";
 import myAxios from "../../../helper/myAxios";
-
+import AOS from "aos";
 const Verification: React.FC = () => {
-  const [openModalVerif, setOpenModalVerif] = useState<boolean>(true);
-  // const { setUser, user } = useContext(UserContext)!;
   const [loading, setLoading] = useState<boolean>(false);
   const [verifCode, setVerifCode] = useState<string[]>([]);
   const navigate = useNavigate();
-  const isEmpty = (val?: string) => !val || val.trim() === "";
   const email = localStorage.getItem("email");
   const deadline = dayjs().add(1, "minutes").valueOf();
   console.log("current email: ", email);
@@ -78,6 +74,10 @@ const Verification: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    AOS.init();
+  });
   return (
     <>
       <CardVerification
@@ -85,17 +85,6 @@ const Verification: React.FC = () => {
         data-aos="fade-up"
         style={{ cursor: loading ? "wait" : "default" }}
       >
-        {/* <ArrowLeftOutlined
-          style={{ fontSize: "20px", cursor: "pointer" }}
-          onClick={() => navigate("/register")}
-        /> */}
-        {/* <Modal
-            open={true}
-            onCancel={() => {
-              setOpenModalVerif(false), setVerifCode([]);
-            }}
-      
-          > */}
         <Form.Item>
           <h1
             style={{

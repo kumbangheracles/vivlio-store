@@ -62,7 +62,7 @@ export default function HeaderPage({
             style={{
               fontSize: 14,
               color: "#A1A1AA",
-              fontWeight: 300,
+              fontWeight: 600,
             }}
           >
             {breadcrumb}

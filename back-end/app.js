@@ -4,10 +4,10 @@ const cors = require("cors");
 const { sequelize, connectDB } = require("./config/database");
 const bookRoutes = require("./routes/book");
 const path = require("path");
-const imageRoutes = require("./routes/image");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
 const authRoutes = require("./routes/auth");
+const mediaRoutes = require("./routes/media");
 const cookieParser = require("cookie-parser");
 const { swaggerUi, specs } = require("./docs/swagger");
 const bodyParser = require("body-parser");
@@ -36,6 +36,7 @@ async function init() {
           const allowedOrigins = [
             "http://localhost:5173",
             "http://localhost:3001",
+            "http://localhost:3002",
           ];
           if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -50,7 +51,7 @@ async function init() {
     app.use(cookieParser());
     app.use(express.json());
     app.use(bodyParser.json());
-    const port = 3000;
+    const port = 3002;
 
     // Connect to database
     await connectDB();
@@ -63,11 +64,11 @@ async function init() {
 
     app.use("/books/uploads", express.static("uploads"));
 
-    app.use("/images", imageRoutes);
-
     app.use("/users", userRoutes);
 
     app.use("/book-category", BookCategoryRoutes);
+
+    app.use("/media", mediaRoutes);
 
     app.use("/auth", authRoutes);
 

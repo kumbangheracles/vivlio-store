@@ -12,14 +12,12 @@ import {
   Modal,
   Select,
 } from "antd";
+import { DashOutlined } from "@ant-design/icons";
 import {
-  BookFilled,
-  CalendarFilled,
-  CreditCardOutlined,
-  DashOutlined,
-  MenuOutlined,
-} from "@ant-design/icons";
-import { useState, type ReactNode } from "react";
+  TbLayoutSidebarLeftCollapse,
+  TbLayoutSidebarRightCollapse,
+} from "react-icons/tb";
+import { useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BiSolidCategory } from "react-icons/bi";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
@@ -29,12 +27,9 @@ import { ErrorHandler } from "../../helper/handleError";
 import myAxios from "../../helper/myAxios";
 import { UserProperties } from "../../types/user.type";
 import { styled } from "styled-components";
+import sidebarItems from "./items";
+import { ItemType } from "antd/es/menu/interface";
 const { Header, Content, Sider } = Layout;
-
-const sidebarItems: MenuProps["items"] = [
-  { key: "/", label: "Dashboard", icon: <DashOutlined /> },
-  { key: "/category", label: "Category", icon: <BiSolidCategory /> },
-];
 
 interface PropTypes {
   children?: ReactNode;
@@ -45,16 +40,16 @@ const AppLayout = ({ children }: PropTypes) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuthUser<UserProperties>();
-  const [collapsed, setCollapsed] = useState(false);
+  console.log("Auth: ", auth);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
   const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
   const [isHover, setIshover] = useState<boolean>(false);
-
+  console.log("isAuth: ", isAuthenticated);
   const handleLogout = async () => {
     try {
       await myAxios.post("/auth/logout");
       message.info("Logout Success");
-      // localStorage.removeItem("user");
 
       navigate("/login");
     } catch (error) {
@@ -64,6 +59,35 @@ const AppLayout = ({ children }: PropTypes) => {
       signOut();
     }
   };
+
+  const getMatchingSidebarKey = (
+    pathname: string,
+    sidebarItems: ItemType[] = []
+  ): string[] => {
+    const flatKeys = sidebarItems.flatMap((item) => {
+      if (!item || typeof item === "string") return [];
+
+      if ("children" in item && Array.isArray(item.children)) {
+        return [
+          item.key?.toString() || "",
+          ...item.children.map((child) => child?.key?.toString() || ""),
+        ];
+      }
+
+      return [item.key?.toString() || ""];
+    });
+
+    const matched = flatKeys
+      .filter((key) => pathname.startsWith(key))
+      .sort((a, b) => b.length - a.length);
+
+    return matched.length ? [matched[0]] : [];
+  };
+
+  const selectedKeys = useMemo(
+    () => getMatchingSidebarKey(location.pathname, sidebarItems),
+    [location.pathname]
+  );
 
   const items = isAuthenticated
     ? [
@@ -91,92 +115,128 @@ const AppLayout = ({ children }: PropTypes) => {
       ];
   return (
     <>
-      <Layout>
-        <Header
-          style={{
-            background: "#76b4e6",
-            padding: "0 20px",
-            position: "sticky",
-            top: 0,
-            zIndex: "9999",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <h1 style={{ margin: 0, fontSize: 20 }}>Vivlio CMS</h1>
-          <div
-            onMouseEnter={() => setIshover(true)}
-            onMouseLeave={() => setIshover(false)}
-          >
-            <Dropdown
-              overlayStyle={{ zIndex: "1000000" }}
-              trigger={["click"]}
-              menu={{
-                items: items,
-              }}
-            >
-              <AccountIcon isTriggered={isHover}>
-                <img
-                  style={{ objectFit: "contain", cursor: "pointer" }}
-                  src="/icons/account.svg"
-                  alt="account-icon"
-                />
-              </AccountIcon>
-            </Dropdown>
-          </div>
-        </Header>
-        <Layout>
-          <Sider
-            width={230}
-            collapsible
-            collapsed={collapsed}
-            onCollapse={(value) => setCollapsed(value)}
-            trigger={null}
+      <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+        <Layout style={{ height: "100%", width: "100%" }}>
+          <Header
             style={{
               background: "#76b4e6",
-
-              height: "100vh",
+              padding: "0 20px",
+              position: "sticky",
+              top: 0,
+              zIndex: "9999",
+              display: "flex",
+              justifyContent: "space-between",
             }}
           >
+            <Logo>VIVLIO CMS</Logo>
             <div
-              style={{
-                padding: "12px",
-                display: "flex",
-              }}
+              onMouseEnter={() => setIshover(true)}
+              onMouseLeave={() => setIshover(false)}
+              style={{ display: "flex", alignItems: "center", gap: "10px" }}
             >
-              <div
-                onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  background: "#1677ff",
-                  padding: 10,
-                  borderRadius: 8,
-                  cursor: "pointer",
+              <Dropdown
+                overlayStyle={{ zIndex: "1000000" }}
+                trigger={["click"]}
+                menu={{
+                  items: items,
                 }}
               >
-                <MenuOutlined style={{ color: "white", fontSize: 20 }} />
-              </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+
+                    height: 50,
+                    gap: 10,
+                  }}
+                >
+                  <AccountIcon isTriggered={isHover}>
+                    <img
+                      style={{ objectFit: "contain", cursor: "pointer" }}
+                      src="/icons/account.svg"
+                      alt="account-icon"
+                    />
+                  </AccountIcon>
+                </div>
+              </Dropdown>
+              <Username>{auth?.username}</Username>
             </div>
-            <Menu
-              style={{ backgroundColor: "#76b4e6" }}
-              mode="vertical"
-              inlineCollapsed={collapsed}
-              selectedKeys={[location.pathname]}
-              items={sidebarItems}
-              onClick={({ key }) => {
-                if (key === "/logout") {
-                } else {
-                  navigate(key);
-                }
+          </Header>
+          <Layout style={{ height: "100%" }}>
+            <Sider
+              width={230}
+              collapsible
+              collapsed={collapsed}
+              collapsedWidth={70}
+              onCollapse={(value) => setCollapsed(value)}
+              trigger={null}
+              style={{
+                background: "#76b4e6",
+
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                position: "relative",
               }}
-            />
-          </Sider>
-          <Layout style={{ padding: "24px" }}>
-            <Content>
-              <Card>{children}</Card>
-            </Content>
+            >
+              <Menu
+                style={{ backgroundColor: "#76b4e6" }}
+                mode="vertical"
+                selectedKeys={selectedKeys}
+                items={sidebarItems}
+                onClick={({ key }) => {
+                  if (key === "/logout") {
+                  } else {
+                    navigate(key);
+                  }
+                }}
+              />
+
+              <div
+                style={{
+                  padding: "12px",
+                  display: "flex",
+                  position: "absolute",
+                  bottom: "0",
+                  right: 0,
+                }}
+              >
+                <div
+                  onClick={() => setCollapsed((prev) => !prev)}
+                  style={{
+                    padding: 10,
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                >
+                  <>
+                    {collapsed ? (
+                      <>
+                        <TbLayoutSidebarRightCollapse
+                          style={{ color: "white", fontSize: 35 }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <TbLayoutSidebarLeftCollapse
+                          style={{ color: "white", fontSize: 35 }}
+                        />
+                      </>
+                    )}
+                  </>
+                </div>
+              </div>
+            </Sider>
+            <Layout style={{ padding: "24px" }}>
+              <Content
+                style={{ overflow: "auto", height: "calc(100vh - 64px)" }}
+              >
+                <Card>{children}</Card>
+              </Content>
+            </Layout>
           </Layout>
         </Layout>
-      </Layout>
+      </div>
 
       <Modal
         open={isOpen}
@@ -209,9 +269,10 @@ const AccountIcon = styled.div<IconProps>`
   width: 34px;
   cursor: pointer;
   border: 1px solid;
+  background-color: white;
   border-color: ${({ isTriggered }) => (isTriggered ? "white" : "#76b4e6")};
   border-radius: 50%;
-  padding: 3px;
+  padding: 5px;
   display: flex;
   margin-top: 10px;
   align-items: center;
@@ -220,4 +281,33 @@ const AccountIcon = styled.div<IconProps>`
   &:hover {
     border-color: white;
   }
+`;
+
+const Username = styled.h1`
+  padding: 10px;
+
+  background-color: white;
+  color: #76b4e6;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  margin: auto;
+  letter-spacing: 1px;
+`;
+
+const Logo = styled.h1`
+  font-size: 16px;
+  background-color: white;
+  color: #76b4e6;
+  border-radius: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  height: 50px;
+  margin-block: auto;
+  letter-spacing: 1px;
 `;

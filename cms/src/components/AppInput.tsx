@@ -18,7 +18,6 @@ export default AppInput;
 
 const CustomInput = styled(Input)`
   font-size: 14px;
-  text-align: center;
   height: 38px;
   border: 1px solid gray;
   border-radius: 4px;

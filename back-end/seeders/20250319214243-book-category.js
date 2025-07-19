@@ -7,6 +7,7 @@ module.exports = {
       {
         categoryId: uuidv4(),
         name: "Programming",
+        status: true,
         description: "Books about software development and programming",
         createdAt: new Date(),
         updatedAt: new Date(),

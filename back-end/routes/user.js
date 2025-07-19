@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 const router = express.Router();
 const User = require("../models/user");
-const { route } = require("./image");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 
 router.use(authMiddleware);

@@ -10,6 +10,7 @@ import { Loading3QuartersOutlined } from "@ant-design/icons";
 import GlobalLoading from "../components/GlobalLoading";
 import { EUserRole } from "../types/user.type";
 import GuestRoute from "../helper/GuestRoute";
+import AppLayout from "../components/Layouts";
 
 const RouteNavigation = () => {
   const Unauthorized = React.lazy(() => import("../components/Unoutherized"));
@@ -24,6 +25,8 @@ const RouteNavigation = () => {
 
   // Category
   const CategoryIndex = React.lazy(() => import("../screens/category/index"));
+  const CategoryEdit = React.lazy(() => import("../screens/category/Edit"));
+  const CategoryDetail = React.lazy(() => import("../screens/category/Detail"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -55,7 +58,9 @@ const RouteNavigation = () => {
             path="/"
             element={
               <ProtectedRoute roles={[EUserRole.ADMIN]}>
-                <DashboardIndex />
+                <AppLayout>
+                  <DashboardIndex />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -63,7 +68,39 @@ const RouteNavigation = () => {
             path="/category"
             element={
               <ProtectedRoute roles={[EUserRole.ADMIN]}>
-                <CategoryIndex />
+                <AppLayout>
+                  <CategoryIndex />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/category/add"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <CategoryEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/category/:id/edit"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <CategoryEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/category/:id/detail"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <CategoryDetail />
+                </AppLayout>
               </ProtectedRoute>
             }
           />

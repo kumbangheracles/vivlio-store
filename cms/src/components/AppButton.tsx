@@ -1,9 +1,9 @@
 import { Button } from "antd";
 import { ReactNode } from "react";
 import { styled } from "styled-components";
-// import { ButtonProps } from "antd";
-interface PropTypes {
-  color?: "primary" | "danger" | "normal";
+import { ButtonProps } from "antd";
+interface PropTypes extends ButtonProps {
+  customColor?: "primary" | "danger" | "normal";
   label?: string;
   icon?: ReactNode;
   style?: React.CSSProperties;
@@ -32,16 +32,26 @@ const getColor = (color?: string) => {
       };
     default:
       return {
-        border: "1px solid rgba(176, 176, 176, 1)",
-        color: "rgba(69, 69, 69, 1)",
-        backgroundColor: "rgba(176, 176, 176, 1)",
+        border: "1px solid #7a7a7a",
+        color: "#9e9e9e",
+        backgroundColor: "#fdfdfd",
       };
   }
 };
 
-const AppButton: React.FC<PropTypes> = ({ label, color, icon, style }) => {
+const AppButton: React.FC<PropTypes> = ({
+  label,
+  customColor,
+  icon,
+  style,
+  ...rest
+}) => {
   return (
-    <MyButton icon={icon} style={{ ...getColor(color), ...style }}>
+    <MyButton
+      icon={icon}
+      style={{ ...getColor(customColor), ...style }}
+      {...rest}
+    >
       {label}
     </MyButton>
   );

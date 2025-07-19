@@ -3,6 +3,15 @@ export type CategoryProps = {
   name: string;
   description?: string;
   isPopular?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  status?: boolean | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export const initialCategoryValue: CategoryProps = {
+  categoryId: "",
+  name: "",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  status: null,
 };

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../context/UserContext";
 import {
   Row,
@@ -26,7 +26,7 @@ import {
   LoadingOutlined,
   TwitterCircleFilled,
 } from "@ant-design/icons";
-import axios from "axios";
+import AOS from "aos";
 import myAxios from "../../../helper/myAxios";
 interface OptionProps {
   id: number;
@@ -43,7 +43,7 @@ const RegisterForm: React.FC = () => {
   const isEmptyRole = (val: number | string) => !val;
   const navigate = useNavigate();
   const roleOptions = Object.values(EUserRole).map((role) => ({
-    label: role, // Bisa kamu ubah jadi lebih friendly label jika perlu
+    label: role,
     value: role,
   }));
 
@@ -111,6 +111,10 @@ const RegisterForm: React.FC = () => {
     }
     handleSubmit(data);
   };
+
+  useEffect(() => {
+    AOS.init();
+  });
   return (
     <>
       <Container data-aos="fade-up">

@@ -15,7 +15,7 @@ import {
   message,
   Modal,
 } from "antd";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { initialLogin, type LoginProps } from "../../../types/user.type";
@@ -24,6 +24,7 @@ import myAxios from "../../../helper/myAxios";
 import { ErrorHandler } from "../../../helper/handleError";
 import { UserContext } from "../../../context/UserContext";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
+import AOS from "aos";
 const LoginForm: React.FC = () => {
   const { setUser } = useContext(UserContext)!;
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ const LoginForm: React.FC = () => {
           identifier: body.identifier,
           password: body.password,
           role: user.role,
+          username: user.username,
         },
       });
       setUser(user);
@@ -71,6 +73,10 @@ const LoginForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    AOS.init();
+  });
   return (
     <>
       <Container data-aos="fade-up">
@@ -199,23 +205,10 @@ const TitleRegister = styled.h1`
   text-align: center;
 `;
 
-const FooterModalOtp = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 10px;
-  letter-spacing: 1px;
-  justify-content: center;
-`;
-
 const ButtonIcon = styled(Button)`
   padding: 16px;
   width: 100%;
   color: grey;
-`;
-
-const ButtonModal = styled(Button)`
-  letter-spacing: 1px;
-  width: 100%;
 `;
 
 const ListIcon = styled.div`
@@ -228,13 +221,14 @@ const ListIcon = styled.div`
 const CardRegister = styled(Card)`
   width: 450px;
   margin: 1rem;
-  height: 100%;
 `;
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
-  height: 100%;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
 `;
 
 const WrapperDeviderTop = styled.div`
@@ -283,4 +277,5 @@ const WrapperSignIn = styled.div`
   gap: 10px;
 `;
 
+const WrapperContent = styled.div``;
 const WrapperHeader = styled.div``;

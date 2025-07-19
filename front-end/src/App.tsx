@@ -1,5 +1,4 @@
 import { ConfigProvider } from "antd";
-import "./App.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import RouteNavigation from "./navigation/RouteNavigation";

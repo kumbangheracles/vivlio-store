@@ -15,13 +15,9 @@ const AppTable = <T extends object>(props: PropTypes<T>) => {
       border-radius: 0;
     }
 
-    .ant-table-tbody > tr > td {
+    .ant-table-tbody > tr {
       border-bottom: none;
-    }
-
-    .ant-table {
-      border: none;
-      border-radius: 0 !important;
+      border: 2px solid black;
     }
   `;
   return (

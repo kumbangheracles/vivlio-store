@@ -16,6 +16,10 @@ module.exports = {
       description: {
         type: Sequelize.STRING,
       },
+      status: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
       isPopular: {
         type: Sequelize.BOOLEAN,
         allowNull: true,
