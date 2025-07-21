@@ -25,11 +25,6 @@ const Book = sequelize.define(
     book_type: {
       type: DataTypes.STRING,
     },
-
-    book_cover: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     isPopular: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

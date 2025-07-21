@@ -1,83 +1,37 @@
 const express = require("express");
 const Book = require("../models/books");
 const router = express.Router();
+const uploadMiddleware = require("../middleware/uploadMiddleware");
+const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
+const bookController = require("../controller/book.controller");
 // Get all books
-router.get("/", async (req, res) => {
-  const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+router.get("/", [authMiddleware, checkRole(["admin"])], bookController.getAll);
 
-  const filters = {};
-  if (isPopular !== undefined) {
-    filters.isPopular = isPopular === "true" || isPopular === "1";
-  }
-  if (categoryId) filters.categoryId = categoryId;
-  if (title) {
-    filters.title = { [Op.like]: `%${title}%` };
-  }
-
-  const offset = (page - 1) * limit;
-  try {
-    const { count, rows } = await Book.findAndCountAll({
-      where: filters,
-      order: [["createdAt", "DESC"]],
-      limit: parseInt(limit),
-      offset,
-    });
-    res.status(200).json({
-      status: "Success",
-      message: "Books retrieved successfully",
-      results: rows,
-      total: count,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit),
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: error.message || "Internal server error",
-      data: [],
-    });
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try {
-    const book = await Book.findOne({ where: { id: req.params.id } });
-    res.json(book);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get(
+  "/:id",
+  [authMiddleware, checkRole(["admin"])],
+  bookController.getOne
+);
 
 // Create book
-router.post("/", async (req, res) => {
-  try {
-    const book = await Book.create(req.body);
-    res.json(book);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.post(
+  "/",
+  [authMiddleware, checkRole(["admin"]), uploadMiddleware.multiple("images")],
+  bookController.createBook
+);
 
 // Update book
-router.patch("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Book.update(req.body, { where: { id } });
-    res.json({ message: "Book updated successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.patch(
+  "/:id",
+  [authMiddleware, checkRole(["admin"]), uploadMiddleware.multiple("images")],
+  bookController.updateBook
+);
 
 // Delete book
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Book.destroy({ where: { id } });
-    res.json({ message: "Book deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.delete(
+  "/:id",
+  [authMiddleware, checkRole(["admin"])],
+  bookController.deleteBook
+);
 
 module.exports = router;

@@ -177,6 +177,7 @@ const AppLayout = ({ children }: PropTypes) => {
                 flexDirection: "column",
                 justifyContent: "space-between",
                 position: "relative",
+                fontWeight: 600,
               }}
             >
               <Menu

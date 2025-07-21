@@ -36,7 +36,7 @@ async function init() {
           const allowedOrigins = [
             "http://localhost:5173",
             "http://localhost:3001",
-            "http://localhost:3002",
+            "http://localhost:3000",
           ];
           if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -51,7 +51,7 @@ async function init() {
     app.use(cookieParser());
     app.use(express.json());
     app.use(bodyParser.json());
-    const port = 3002;
+    const port = 3000;
 
     // Connect to database
     await connectDB();
@@ -61,8 +61,6 @@ async function init() {
 
     // Routes
     app.use("/books", bookRoutes);
-
-    app.use("/books/uploads", express.static("uploads"));
 
     app.use("/users", userRoutes);
 

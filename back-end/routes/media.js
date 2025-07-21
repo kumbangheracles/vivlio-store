@@ -3,7 +3,6 @@ const mediaController = require("../controller/media.controller");
 const express = require("express");
 const router = express.Router();
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
-const { aclMiddleware } = require("../middleware/aclMiddleware");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 
 router.post(

@@ -25,10 +25,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      book_cover: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
+
       categoryId: {
         type: Sequelize.STRING,
         allowNull: false,
