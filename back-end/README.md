@@ -211,6 +211,11 @@ npx sequelize-cli db:seed:all
 
 ---
 
+## Generate Migration And Seeder
+
+npx sequelize-cli migration:generate --name migrate-name
+npx sequelize-cli seed:generate --name seed-name
+
 ## Check Migration And Seeder
 
 npx sequelize-cli db:migrate:status

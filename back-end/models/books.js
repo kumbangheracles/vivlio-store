@@ -25,6 +25,7 @@ const Book = sequelize.define(
     book_type: {
       type: DataTypes.STRING,
     },
+
     isPopular: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -33,14 +34,14 @@ const Book = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "book_category", // nama tabel
+        model: "book_category",
         key: "id",
       },
     },
   },
   {
     tableName: "Books",
-    timestamps: true, // createdAt & updatedAt otomatis dibuat
+    timestamps: true,
   }
 );
 
