@@ -17,9 +17,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      role: {
+      roleId: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
+        references: {
+          model: "Roles",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
       email: {
         type: Sequelize.STRING,

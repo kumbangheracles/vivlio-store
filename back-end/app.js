@@ -6,7 +6,10 @@ const bookRoutes = require("./routes/book");
 const path = require("path");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
+const genresRoutes = require("./routes/genre");
+const rolesRoutes = require("./routes/role");
 const authRoutes = require("./routes/auth");
+
 const mediaRoutes = require("./routes/media");
 const cookieParser = require("cookie-parser");
 const { swaggerUi, specs } = require("./docs/swagger");
@@ -65,6 +68,10 @@ async function init() {
     app.use("/users", userRoutes);
 
     app.use("/book-category", BookCategoryRoutes);
+
+    app.use("/genres", genresRoutes);
+
+    app.use("/roles", rolesRoutes);
 
     app.use("/media", mediaRoutes);
 

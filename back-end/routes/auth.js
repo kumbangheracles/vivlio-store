@@ -29,9 +29,9 @@ const { authMiddleware } = require("../middleware/authMiddleware");
  *         username:
  *           type: string
  *           example: johndoe
- *         role:
+ *         roleId:
  *           type: string
- *           example: admin
+ *           example: e988abed-d2c4-40d3-b8b0-15d8c84ab463
  *         email:
  *           type: string
  *           example: johndoe@example.com

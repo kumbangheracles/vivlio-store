@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const { User, Role } = require("../models");
 const Yup = require("yup");
 const { Op } = require("sequelize");
 const sendEmailVerification = require("../service/email.service");
@@ -14,9 +14,7 @@ const registerValidateModels = Yup.object({
   confirmPassword: Yup.string()
     .required()
     .oneOf([Yup.ref("password")], "Password not match"),
-  role: Yup.string()
-    .oneOf(["admin", "customer"], "Invalid role")
-    .required("Role is required"),
+  roleId: Yup.string().uuid("Invalid role format").required("Role is required"),
 });
 
 module.exports = {
@@ -24,7 +22,7 @@ module.exports = {
     /**
       #swagger.tags = ['Auth']
      */
-    const { fullName, username, email, password, confirmPassword, role } =
+    const { fullName, username, email, password, confirmPassword, roleId } =
       req.body;
     try {
       await registerValidateModels.validate({
@@ -32,7 +30,7 @@ module.exports = {
         username,
         email,
         password,
-        role,
+        roleId,
         confirmPassword,
       });
 
@@ -58,7 +56,7 @@ module.exports = {
         username,
         email,
         password: hashedPassword,
-        role,
+        roleId,
         verificationCode,
         verificationCodeCreatedAt,
         isVerified: false,
@@ -67,11 +65,16 @@ module.exports = {
       res.status(200).json({
         message:
           "Success Registration! Please check your email for verification code.",
-        data: result,
+        data: {
+          fullName,
+          username,
+          email,
+          roleId,
+        },
       });
     } catch (error) {
       console.log("Error validate register: ", error);
-      res.status(400).json({
+      res.status(500).json({
         message: error.message,
         data: null,
       });
@@ -143,8 +146,7 @@ module.exports = {
         return res.status(404).json({ message: "User not found", data: user });
       }
 
-      // const EXPIRATION_TIME = 5 * 60 * 1000; //5 menit
-      const EXPIRATION_TIME = 1 * 60 * 1000; //1 menit
+      const EXPIRATION_TIME = 60 * 60 * 1000; //1 menit
 
       const createdAt = new Date(user.verificationCodeCreatedAt).getTime();
       const now = Date.now();
@@ -244,28 +246,31 @@ module.exports = {
         });
       }
 
-      // access token
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            username: userByIdentifier.username,
-            role: userByIdentifier.role,
-          },
+      const role = await Role.findOne({
+        where: { id: userByIdentifier.roleId },
+      });
+
+      if (!role) {
+        return res.status(403).json({
+          message: "Role not found",
+          data: null,
+        });
+      }
+
+      const payload = {
+        UserInfo: {
+          username: userByIdentifier.username,
+          role: role.name,
         },
-        process.env.ACCESS_TOKEN,
-        { expiresIn: "10m" }
-      );
-      // refresh token
-      const refreshToken = jwt.sign(
-        {
-          UserInfo: {
-            username: userByIdentifier.username,
-            role: userByIdentifier.role,
-          },
-        },
-        process.env.REFRESH_TOKEN,
-        { expiresIn: "1d" }
-      );
+      };
+
+      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN, {
+        expiresIn: "10m",
+      });
+
+      const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, {
+        expiresIn: "1d",
+      });
 
       // const token = jwt.sign(
       //   {
@@ -285,8 +290,8 @@ module.exports = {
 
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
-        secure: false, // ⬅️ untuk development
-        sameSite: "Lax", // ⬅️ agar cookie tetap terkirim saat refresh
+        secure: false, //  untuk development
+        sameSite: "Lax", //  agar cookie tetap terkirim saat refresh
         maxAge: 24 * 60 * 60 * 1000, // 1 hari
       });
 
@@ -294,7 +299,7 @@ module.exports = {
         message: "Login success",
         results: {
           isVerified: userByIdentifier?.isVerified,
-          role: userByIdentifier.role,
+          role: role.name,
           username: userByIdentifier.username,
           token: accessToken,
         },
@@ -303,7 +308,7 @@ module.exports = {
       console.log("User logined: ", userByIdentifier.username);
     } catch (error) {
       const err = error;
-      res.status(400).json({
+      res.status(500).json({
         message: err.message,
         data: null,
       });

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../context/UserContext";
 import {
   Row,
@@ -26,7 +26,7 @@ import {
   LoadingOutlined,
   TwitterCircleFilled,
 } from "@ant-design/icons";
-import axios from "axios";
+import AOS from "aos";
 import myAxios from "../../../helper/myAxios";
 interface OptionProps {
   id: number;
@@ -34,18 +34,35 @@ interface OptionProps {
 }
 import { EUserRole } from "../../../types/user.type";
 import { ErrorHandler } from "../../../helper/handleError";
+import type { RoleProperties } from "../../../types/role.type";
 const RegisterForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<EUserRole | null>(null);
   const { setUser, user } = useContext(UserContext)!;
+  const [dataRole, setDataRole] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const isEmpty = (val?: string) =>
     !val || val.trim() === "" || val === undefined;
   const isEmptyRole = (val: number | string) => !val;
   const navigate = useNavigate();
-  const roleOptions = Object.values(EUserRole).map((role) => ({
-    label: role, // Bisa kamu ubah jadi lebih friendly label jika perlu
-    value: role,
-  }));
+
+  const fetchRole = async () => {
+    try {
+      const res = await myAxios.get("/roles");
+      const data = res.data.results;
+      console.log("data roles: ", data);
+      setDataRole(data);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fetchRole();
+  }, []);
+  const roleOptions = Array.isArray(dataRole)
+    ? dataRole.map((role: RoleProperties) => ({
+        label: role.name,
+        value: role.id,
+      }))
+    : [];
 
   const handleSubmit = async (userData: UserProperties) => {
     try {
@@ -57,7 +74,7 @@ const RegisterForm: React.FC = () => {
         password: userData.password,
         email: userData.email,
         confirmPassword: userData.confirmPassword,
-        role: userData.role,
+        roleId: userData.roleId,
       };
       console.log("BOdy:", body);
       localStorage.setItem("email", body.email!);
@@ -85,7 +102,7 @@ const RegisterForm: React.FC = () => {
       isEmpty(data.fullName) ||
       isEmpty(data.username) ||
       isEmpty(data.email) ||
-      isEmptyRole(data.role!) ||
+      isEmptyRole(data.roleId!) ||
       isEmpty(data.password) ||
       isEmpty(data.confirmPassword)
     ) {
@@ -111,6 +128,10 @@ const RegisterForm: React.FC = () => {
     }
     handleSubmit(data);
   };
+
+  useEffect(() => {
+    AOS.init();
+  });
   return (
     <>
       <Container data-aos="fade-up">
@@ -190,18 +211,16 @@ const RegisterForm: React.FC = () => {
                 required={true}
                 label="Role"
                 style={{ width: "60%", letterSpacing: 1 }}
-                name={"role"}
+                name={"roleId"}
               >
                 <Select
                   variant="filled"
-                  value={selectedRole} // Harus enum atau string yang sesuai
+                  value={selectedRole}
                   onChange={(value) => {
-                    const newRole = value as EUserRole;
-
-                    setSelectedRole(newRole);
+                    setSelectedRole(value);
                     setUser({
                       ...user,
-                      role: newRole,
+                      roleId: value,
                     });
                   }}
                   options={roleOptions}

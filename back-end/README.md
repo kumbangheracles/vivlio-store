@@ -238,6 +238,12 @@ npx sequelize-cli db:seed:all
 npx sequelize-cli db:seed:undo:all
 npx sequelize-cli db:migrate:undo:all
 
+## if anything isn't controllable use this
+
+npx sequelize-cli db:drop
+npx sequelize-cli db:create
+npx sequelize-cli db:migrate
+
 ## ✅ Best Practices
 
 - Keep models and migrations updated.

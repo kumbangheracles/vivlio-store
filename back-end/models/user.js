@@ -7,7 +7,6 @@ const User = sequelize.define(
     id: {
       type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
       defaultValue: DataTypes.UUIDV4,
     },
@@ -19,12 +18,12 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    role: {
+    roleId: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: "Roles",
-        key: "name",
+        key: "id",
       },
     },
     email: {

@@ -30,7 +30,9 @@ const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<Boolean>(false);
   const [dataLogin, setDataLogin] = useState<LoginProps>(initialLogin);
+  const [dataRole, setDataRole] = useState();
   const signIn = useSignIn();
+
   const handleSubmit = async (data: LoginProps) => {
     if (isEmpty(data.identifier)) {
       message.error("Username or Email are required!!");

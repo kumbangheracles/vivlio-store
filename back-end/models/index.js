@@ -23,12 +23,12 @@ Book.hasMany(BookImage, {
 });
 BookImage.belongsTo(Book, {
   foreignKey: "bookId",
-  as: "book",
+  as: "Books",
 });
 
 // User ↔ Role
-User.belongsTo(Role, { foreignKey: "role" });
-Role.hasMany(User, { foreignKey: "name" });
+User.belongsTo(Role, { foreignKey: "roleId" });
+Role.hasMany(User, { foreignKey: "roleId" });
 
 // Book ↔ Genre (Many-to-Many)
 Book.belongsToMany(Genre, {

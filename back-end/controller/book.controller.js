@@ -1,5 +1,7 @@
-const Books = require("../models/books");
-const BookImage = require("../models/bookImage");
+const { Book, BookImage, Genre } = require("../models/index");
+// const Book = require("../models/books");
+// const BookImage = require("../models/bookImage");
+// const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
 module.exports = {
@@ -17,7 +19,7 @@ module.exports = {
 
     const offset = (page - 1) * limit;
     try {
-      const { count, rows } = await Books.findAndCountAll({
+      const { count, rows } = await Book.findAndCountAll({
         where: filters,
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
@@ -27,12 +29,18 @@ module.exports = {
             as: "images",
             attributes: ["id", "imageUrl"],
           },
+          {
+            model: Genre,
+            as: "genres",
+            through: { attributes: [] },
+            attributes: ["genreid", "genre_title"],
+          },
         ],
         offset,
       });
       res.status(200).json({
         status: "Success",
-        message: "Books retrieved successfully",
+        message: "Book retrieved successfully",
         results: rows,
         total: count,
         currentPage: parseInt(page),
@@ -40,7 +48,7 @@ module.exports = {
       });
     } catch (error) {
       res.status(500).json({
-        status: false,
+        status: 500,
         message: error.message || "Internal server error",
         data: [],
       });
@@ -49,7 +57,7 @@ module.exports = {
 
   async getOne(req, res) {
     try {
-      const book = await Books.findOne({
+      const book = await Book.findOne({
         where: { id },
         include: [
           {
@@ -86,7 +94,7 @@ module.exports = {
 
       const uploadResults = await uploader.uploadMultiple(files);
 
-      const newBook = await Books.create(
+      const newBook = await Book.create(
         {
           title: req.body.title,
           author: req.body.author,
@@ -103,11 +111,21 @@ module.exports = {
         imageUrl: img.secure_url,
       }));
       await BookImage.bulkCreate(bookImagesData, { transaction: t });
+      let genreIds = req.body.genres;
+
+      if (typeof genreIds === "string") {
+        genreIds = [genreIds];
+      }
+
+      if (Array.isArray(genreIds)) {
+        await newBook.setGenres(genreIds, { transaction: t });
+        console.log("Genres set:", genreIds);
+      }
 
       await t.commit();
 
       res.status(200).json({
-        message: "Book created with images",
+        message: "Book created Successfully",
         results: {
           ...newBook.toJSON(),
           images: bookImagesData,
@@ -169,7 +187,7 @@ module.exports = {
   async deleteBook(req, res) {
     try {
       const { id } = req.params;
-      const result = await Books.destroy({ where: { id } });
+      const result = await Book.destroy({ where: { id } });
       res
         .status(200)
         .json({ message: "Book deleted successfully", result: result });

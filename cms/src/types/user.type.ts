@@ -4,7 +4,7 @@ export type UserProperties = {
   username?: string;
   password?: string;
   email?: string;
-  role?: EUserRole;
+  roleId?: string;
   confirmPassword?: string;
   verificationCode?: string;
 };
@@ -34,5 +34,5 @@ export const initialUser: UserProperties = {
   username: "",
   password: "",
   confirmPassword: "",
-  role: EUserRole.ADMIN,
+  roleId: "",
 };
