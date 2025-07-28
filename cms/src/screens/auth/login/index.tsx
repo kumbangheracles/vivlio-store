@@ -51,6 +51,7 @@ const LoginForm: React.FC = () => {
 
       const res = await myAxios.post("/auth/login", body);
       const user = res.data.results;
+
       signIn({
         auth: {
           token: user.token,
@@ -63,6 +64,7 @@ const LoginForm: React.FC = () => {
           password: body.password,
           role: user.role,
           username: user.username,
+          token: user.token,
         },
       });
       setUser(user);

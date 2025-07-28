@@ -7,6 +7,7 @@ export type UserProperties = {
   roleId?: string;
   confirmPassword?: string;
   verificationCode?: string;
+  token?: string;
 };
 
 export const ERole = {

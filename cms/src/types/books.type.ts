@@ -1,11 +1,12 @@
 export type BookProps = {
-  id?: number;
+  id?: string;
   title: string;
   author: string;
   price: number;
   book_type: string;
   book_cover?: string;
-  categoryId?: number | null;
+  categoryId?: string;
+  genre?: string[];
 };
 
 export const initialBookProps: BookProps = {
@@ -14,5 +15,5 @@ export const initialBookProps: BookProps = {
   price: 0,
   book_type: "",
   book_cover: "",
-  categoryId: null,
+  categoryId: "",
 };

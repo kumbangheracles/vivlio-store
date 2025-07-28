@@ -25,10 +25,11 @@ import { useEffect, useState } from "react";
 import { BaseResponseProps } from "../../types/base.type";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
+import { BookProps } from "../../types/books.type";
 
 const Books = () => {
   const navigate = useNavigate();
-  const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
+  const [dataBooks, setDataBooks] = useState<BookProps[]>([]);
   const [loading, setloading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -37,31 +38,32 @@ const Books = () => {
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const [filteredData, setFilteredData] = useState<CategoryProps[]>([]);
-  const fetchCategory = async (page: number, limit: number) => {
+  const [filteredData, setFilteredData] = useState<BookProps[]>([]);
+  const fetchBooks = async (page: number, limit: number) => {
     try {
       setloading(true);
-      const res = await myAxios.get("/book-category", {
+      const res = await myAxios.get("/books", {
         params: { page, limit },
       });
-      setDataCategory(res.data.results);
+      setDataBooks(res.data.results);
       setTotalItems(res.data.total);
     } catch (error) {
-      console.log("error fetch category: ", error);
+      console.log("error fetch books: ", error);
     } finally {
       setloading(false);
     }
   };
   useEffect(() => {
-    fetchCategory(page, limit);
+    console.log("Data books: ", dataBooks);
+    fetchBooks(page, limit);
   }, [page, limit]);
 
   const handleStatusChange = async (id: string, status: boolean) => {
     try {
       setloading(true);
 
-      const res = await myAxios.patch(`/book-category/${id}`, { status });
-      setDataCategory((prev) =>
+      const res = await myAxios.patch(`/books/${id}`, { status });
+      setDataBooks((prev) =>
         prev.map((item) => (item?.categoryId === id ? res.data.result : item))
       );
 
@@ -71,23 +73,21 @@ const Books = () => {
       ErrorHandler(error);
     } finally {
       setloading(false);
-      await fetchCategory(page, limit);
+      await fetchBooks(page, limit);
     }
   };
 
   const handleDelete = async () => {
     try {
       setloading(true);
-      const res = await myAxios.delete(`book-category/${selectedId}`);
-      const record = dataCategory.find(
-        (item) => item.categoryId === selectedId
-      );
+      const res = await myAxios.delete(`books/${selectedId}`);
+      const record = dataBooks.find((item) => item.categoryId === selectedId);
 
-      message.success(`Successfully delete category ${record?.name}`);
+      message.success(`Successfully delete book ${record?.title}`);
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      await fetchCategory(page, limit);
+      await fetchBooks(page, limit);
       setIsModalOpen(false);
       setSelectedId("");
       setloading(false);
@@ -99,74 +99,66 @@ const Books = () => {
     setSelectedId(categoryId);
   };
 
-  useEffect(() => {
-    if (debouncedSearch) {
-      const filtered = dataCategory.filter((item: CategoryProps) =>
-        item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(dataCategory);
-    }
-  }, [debouncedSearch, dataCategory]);
-  const categoryColumns: ColumnsType<CategoryProps> = [
+  // useEffect(() => {
+  //   if (debouncedSearch) {
+  //     const filtered = dataBooks.filter((item: CategoryProps) =>
+  //       item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  //     );
+  //     setFilteredData(filtered);
+  //   } else {
+  //     setFilteredData(dataBooks);
+  //   }
+  // }, [debouncedSearch, dataBooks]);
+  const bookColumns: ColumnsType<BookProps> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (text) =>
-        text.length > 80
-          ? text.slice(0, 80) + " . . . . ."
-          : text || "No Content",
+      title: "Author",
+      dataIndex: "author",
+      key: "author",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (_: any, record: CategoryProps) => {
-        return (
-          <Switch
-            value={record.status!}
-            onChange={(value) => {
-              handleStatusChange(record.categoryId, value);
-            }}
-            style={{ backgroundColor: record.status ? "lightgreen" : "gray" }}
-          />
-        );
-      },
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price: number) => `Rp ${price.toLocaleString("id-ID")}`,
     },
     {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (value: string) => dayjs(value).format("YYYY-MM-DD HH:mm"),
+      title: "Book Type",
+      dataIndex: "book_type",
+      key: "book_type",
+    },
+    {
+      title: "Genre",
+      dataIndex: "genre",
+      key: "genre",
+      render: (genres: string[] = []) =>
+        genres.length > 0 ? genres.join(", ") : "No Genre",
     },
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: CategoryProps) => {
+      render: (_: any, record: BookProps) => {
         const menu = (
           <Menu
             items={[
               {
                 key: "detail",
                 label: "Detail",
-                onClick: () => navigate(`${record.categoryId}/detail`),
+                onClick: () => navigate(`${record.id}/detail`),
               },
               {
                 key: "edit",
                 label: "Edit",
-                onClick: () => navigate(`${record.categoryId}/edit`),
+                onClick: () => navigate(`${record.id}/edit`),
               },
               {
                 key: "delete",
                 label: "Delete",
-                onClick: () => handleModalOpen(record.categoryId),
+                onClick: () => handleModalOpen(record.categoryId!),
                 danger: true,
               },
             ]}
@@ -210,10 +202,10 @@ const Books = () => {
 
       <AppTable
         style={{ marginTop: 20 }}
-        columns={categoryColumns}
-        dataSource={filteredData}
+        columns={bookColumns}
+        dataSource={dataBooks}
         loading={loading}
-        rowKey={"categoryId"}
+        rowKey={"id"}
         pagination={{
           current: page,
           pageSize: limit,

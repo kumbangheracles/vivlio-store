@@ -265,33 +265,17 @@ module.exports = {
       };
 
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN, {
-        expiresIn: "10m",
+        expiresIn: "1h",
       });
 
       const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, {
         expiresIn: "1d",
       });
 
-      // const token = jwt.sign(
-      //   {
-      //     id: userByIdentifier.id,
-      //     role: userByIdentifier.role,
-      //   },
-      //   process.env.SECRET || "default_secret",
-      //   { expiresIn: "1h" }
-      // );
-
-      // res.cookie("jwt", refreshToken, {
-      //   httpOnly: true,
-      //   secure: true, // set true in production with HTTPS
-      //   sameSite: "None", // or "Strict"
-      //   maxAge: 7 * 24 * 60 * 60 * 1000, // 1 day
-      // });
-
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
         secure: false, //  untuk development
-        sameSite: "Lax", //  agar cookie tetap terkirim saat refresh
+        sameSite: "Lax",
         maxAge: 24 * 60 * 60 * 1000, // 1 hari
       });
 
@@ -357,7 +341,7 @@ module.exports = {
               },
             },
             process.env.ACCESS_TOKEN,
-            { expiresIn: "10m" }
+            { expiresIn: "1h" }
           );
 
           console.log("Cookies:", req.cookies);

@@ -5,11 +5,11 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const bookController = require("../controller/book.controller");
 // Get all books
-router.get("/", [authMiddleware, checkRole(["admin"])], bookController.getAll);
+router.get("/", bookController.getAll);
 
 router.get(
   "/:id",
-  [authMiddleware, checkRole(["admin"])],
+
   bookController.getOne
 );
 
