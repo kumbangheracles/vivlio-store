@@ -102,6 +102,7 @@ module.exports = {
           price: req.body.price,
           book_type: req.body.book_type,
           status: req.body.status,
+          description: req.body.description,
           isPopular: req.body.isPopular || false,
           categoryId: req.body.categoryId || null,
         },

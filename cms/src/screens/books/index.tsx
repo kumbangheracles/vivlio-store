@@ -16,7 +16,6 @@ import HeaderPage from "../../components/HeaderPage";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { CategoryProps } from "../../types/category.types";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
@@ -108,16 +107,16 @@ const Books = () => {
     setSelectedId(categoryId);
   };
 
-  // useEffect(() => {
-  //   if (debouncedSearch) {
-  //     const filtered = dataBooks.filter((item: CategoryProps) =>
-  //       item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-  //     );
-  //     setFilteredData(filtered);
-  //   } else {
-  //     setFilteredData(dataBooks);
-  //   }
-  // }, [debouncedSearch, dataBooks]);
+  useEffect(() => {
+    if (debouncedSearch) {
+      const filtered = dataBooks.filter((item: BookProps) =>
+        item.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(dataBooks);
+    }
+  }, [debouncedSearch, dataBooks]);
   const bookColumns: ColumnsType<BookProps> = [
     {
       title: "Image",
@@ -151,6 +150,9 @@ const Books = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
+      render: (text: string) => (
+        <p style={{ textDecoration: "underline" }}>{text}</p>
+      ),
     },
     {
       title: "Author",
@@ -163,6 +165,7 @@ const Books = () => {
       key: "price",
       render: (price: number) => `Rp ${price.toLocaleString("id-ID")}`,
     },
+
     {
       title: "Status",
       dataIndex: "status",
@@ -189,7 +192,12 @@ const Books = () => {
         );
       },
     },
-
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (value: Date) => `${dayjs(value).format("DD MMMM YYYY")}`,
+    },
     {
       title: "Action",
       key: "action",
@@ -227,15 +235,15 @@ const Books = () => {
   return (
     <>
       <HeaderPage
-        title="Category"
-        breadcrumb="Home / Category"
+        title="Books"
+        breadcrumb="Home / Books"
         rightAction={
           <>
             <Space>
               <AppButton
                 customColor="primary"
-                label="Create New Category"
-                onClick={() => navigate("/category/add")}
+                label="Create New Book"
+                onClick={() => navigate("/book/add")}
               />
             </Space>
           </>
@@ -246,7 +254,7 @@ const Books = () => {
         <Col>
           <AppInput
             icon={<SearchOutlined />}
-            placeholder="Search by category name"
+            placeholder="Search by book name"
             onChange={(e) => setSearch(e.target.value)}
           />
         </Col>
@@ -255,7 +263,7 @@ const Books = () => {
       <AppTable
         style={{ marginTop: 20 }}
         columns={bookColumns}
-        dataSource={dataBooks}
+        dataSource={filteredData}
         loading={loading}
         rowKey={"id"}
         pagination={{
@@ -273,8 +281,8 @@ const Books = () => {
       />
 
       <Modal
-        title={"Delete Category"}
-        children={"Are you sure want to delete this category?"}
+        title={"Delete Book"}
+        children={"Are you sure want to delete this book?"}
         open={isModalOpen}
         okText="Yes"
         cancelText={"No"}

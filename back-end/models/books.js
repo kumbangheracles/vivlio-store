@@ -25,6 +25,10 @@ const Book = sequelize.define(
     book_type: {
       type: DataTypes.STRING,
     },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED"),
       allowNull: false,

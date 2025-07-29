@@ -12,17 +12,18 @@ import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { isEmpty, isBooleanUndefined } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
+import { BookProps, initialBookProps } from "../../types/books.type";
 
 const BookEdit = () => {
   const navigate = useNavigate();
-  const [category, setCategory] = useState<CategoryProps>(initialCategoryValue);
+  const [category, setCategory] = useState<BookProps>(initialBookProps);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const { id } = useParams();
-  const handleSubmit = async (data: CategoryProps) => {
+  const handleSubmit = async (data: BookProps) => {
     form.validateFields();
     if (
-      isEmpty(data.name) ||
+      isEmpty(data.title) ||
       isEmpty(data.description) ||
       isBooleanUndefined(data.status)
     ) {

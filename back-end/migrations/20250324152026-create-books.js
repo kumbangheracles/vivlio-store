@@ -26,6 +26,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
       status: {
         type: Sequelize.ENUM("PUBLISHED", "UNPUBLISHED"),
