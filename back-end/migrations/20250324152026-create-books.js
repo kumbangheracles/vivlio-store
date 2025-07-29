@@ -1,4 +1,5 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -24,6 +25,12 @@ module.exports = {
       book_type: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+
+      status: {
+        type: Sequelize.ENUM("PUBLISHED", "UNPUBLISHED"),
+        allowNull: false,
+        defaultValue: "UNPUBLISHED",
       },
 
       categoryId: {

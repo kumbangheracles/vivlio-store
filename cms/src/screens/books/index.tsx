@@ -2,6 +2,7 @@ import {
   Button,
   Col,
   Dropdown,
+  Image,
   Menu,
   message,
   Modal,
@@ -25,8 +26,11 @@ import { useEffect, useState } from "react";
 import { BaseResponseProps } from "../../types/base.type";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
-import { BookProps } from "../../types/books.type";
-
+import { BookProps, BookStatusType } from "../../types/books.type";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import { UserProperties } from "../../types/user.type";
+import BookDefault from "../../assets/images/bookDefault.png";
+import AppStatusSelect from "../../components/AppStatusSelect";
 const Books = () => {
   const navigate = useNavigate();
   const [dataBooks, setDataBooks] = useState<BookProps[]>([]);
@@ -37,6 +41,7 @@ const Books = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
+  const auth = useAuthUser<UserProperties>();
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<BookProps[]>([]);
   const fetchBooks = async (page: number, limit: number) => {
@@ -58,7 +63,7 @@ const Books = () => {
     fetchBooks(page, limit);
   }, [page, limit]);
 
-  const handleStatusChange = async (id: string, status: boolean) => {
+  const handleStatusChange = async (id: string, status: BookStatusType) => {
     try {
       setloading(true);
 
@@ -80,8 +85,12 @@ const Books = () => {
   const handleDelete = async () => {
     try {
       setloading(true);
-      const res = await myAxios.delete(`books/${selectedId}`);
-      const record = dataBooks.find((item) => item.categoryId === selectedId);
+      const res = await myAxios.delete(`books/${selectedId}`, {
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+        },
+      });
+      const record = dataBooks.find((item) => item.id === selectedId);
 
       message.success(`Successfully delete book ${record?.title}`);
     } catch (error) {
@@ -111,6 +120,34 @@ const Books = () => {
   // }, [debouncedSearch, dataBooks]);
   const bookColumns: ColumnsType<BookProps> = [
     {
+      title: "Image",
+      dataIndex: "images",
+      key: "images",
+      width: "130px",
+      render: (_: any, record: BookProps) => {
+        const src = record.images?.[0]?.imageUrl ?? BookDefault;
+
+        return (
+          <div
+            style={{
+              width: "130px",
+              height: "100px",
+              overflow: "hidden",
+              border: "2px solid gray",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src={src}
+              alt={record.title || "Default Image"}
+              style={{ width: "130px", height: "100px", objectFit: "cover" }}
+            />
+          </div>
+        );
+      },
+    },
+    {
       title: "Title",
       dataIndex: "title",
       key: "title",
@@ -127,17 +164,32 @@ const Books = () => {
       render: (price: number) => `Rp ${price.toLocaleString("id-ID")}`,
     },
     {
-      title: "Book Type",
-      dataIndex: "book_type",
-      key: "book_type",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, record: BookProps) => {
+        return (
+          <AppStatusSelect
+            value={record.status}
+            onChange={(value) => {
+              const newStatus = value as BookStatusType;
+              handleStatusChange(record.id!, newStatus);
+            }}
+            options={Object.values(BookStatusType).map((i) => ({
+              value: i,
+              label: i,
+              color:
+                i === BookStatusType.PUBLISH
+                  ? "success"
+                  : i === BookStatusType.UNPUBLISH
+                  ? "normal"
+                  : "",
+            }))}
+          />
+        );
+      },
     },
-    {
-      title: "Genre",
-      dataIndex: "genre",
-      key: "genre",
-      render: (genres: string[] = []) =>
-        genres.length > 0 ? genres.join(", ") : "No Genre",
-    },
+
     {
       title: "Action",
       key: "action",
@@ -158,7 +210,7 @@ const Books = () => {
               {
                 key: "delete",
                 label: "Delete",
-                onClick: () => handleModalOpen(record.categoryId!),
+                onClick: () => handleModalOpen(record.id!),
                 danger: true,
               },
             ]}

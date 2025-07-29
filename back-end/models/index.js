@@ -36,6 +36,7 @@ Book.belongsToMany(Genre, {
   foreignKey: "bookId",
   otherKey: "genreId",
   as: "genres",
+  onDelete: "CASCADE",
 });
 Genre.belongsToMany(Book, {
   through: BookGenres,

@@ -4,6 +4,7 @@ const { Book, BookImage, Genre } = require("../models/index");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
+const { where } = require("sequelize");
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
@@ -100,6 +101,7 @@ module.exports = {
           author: req.body.author,
           price: req.body.price,
           book_type: req.body.book_type,
+          status: req.body.status,
           isPopular: req.body.isPopular || false,
           categoryId: req.body.categoryId || null,
         },
@@ -187,10 +189,19 @@ module.exports = {
   async deleteBook(req, res) {
     try {
       const { id } = req.params;
+
+      const book = await Book.findByPk(id);
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+
+      await book.setGenres([]);
       const result = await Book.destroy({ where: { id } });
-      res
-        .status(200)
-        .json({ message: "Book deleted successfully", result: result });
+
+      res.status(200).json({
+        message: "Book deleted successfully",
+        result,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-
 const BookGenres = sequelize.define("book_genres", {
   id: {
     type: DataTypes.UUID,
@@ -8,12 +7,23 @@ const BookGenres = sequelize.define("book_genres", {
     primaryKey: true,
   },
   bookId: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
     allowNull: false,
+    onDelete: "CASCADE",
+    references: {
+      model: "Books",
+      key: "id",
+    },
   },
   genreId: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING,
     allowNull: false,
+    references: {
+      model: "genre",
+      key: "genreId",
+    },
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
   },
 });
 module.exports = BookGenres;

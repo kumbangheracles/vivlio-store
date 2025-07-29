@@ -10,34 +10,33 @@ import myAxios from "./helper/myAxios";
 import { UserProvider } from "./context/UserContext";
 import { useEffect } from "react";
 
-const refresh = createRefresh({
-  interval: 10,
-  refreshApiCallback: async ({ authToken }) => {
-    try {
-      const res = await myAxios.get<{ token: string }>("/auth/refresh", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-
-      return {
-        isSuccess: true,
-        newAuthToken: res.data.token,
-        newAuthTokenExpireIn: 10,
-        newRefreshTokenExpiresIn: 60,
-      };
-    } catch (err) {
-      console.error("Refresh failed", err);
-      return {
-        isSuccess: false,
-        newAuthToken: "",
-        newAuthTokenExpireIn: 0,
-      };
-    }
-  },
-});
-
 function App() {
+  const refresh = createRefresh({
+    interval: 10,
+    refreshApiCallback: async ({ authToken }) => {
+      try {
+        const res = await myAxios.get<{ token: string }>("/auth/refresh", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        return {
+          isSuccess: true,
+          newAuthToken: res.data.token,
+          newAuthTokenExpireIn: 10,
+          newRefreshTokenExpiresIn: 60,
+        };
+      } catch (err) {
+        console.error("Refresh failed", err);
+        return {
+          isSuccess: false,
+          newAuthToken: "",
+          newAuthTokenExpireIn: 0,
+        };
+      }
+    },
+  });
   useEffect(() => {
     AOS.init();
   }, []);

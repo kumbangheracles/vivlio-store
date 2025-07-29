@@ -1,7 +1,7 @@
 const express = require("express");
 const BookCategory = require("../models/book_category");
 const router = express.Router();
-
+const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 router.get("/", async (req, res) => {
   const { isPopular, title, page = 1, limit = 10 } = req.query;
 
@@ -49,7 +49,7 @@ router.get("/:categoryId", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", [authMiddleware, checkRole(["admin"])], async (req, res) => {
   try {
     const book_category = await BookCategory.create(req.body);
     res.status(200).json(book_category);
@@ -58,34 +58,42 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:categoryId", async (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    const { status } = req.body;
-    if (typeof status !== "boolean") {
-      return res.status(400).json({ error: "Invalid status" });
+router.patch(
+  "/:categoryId",
+  [authMiddleware, checkRole(["admin"])],
+  async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const { status } = req.body;
+      if (typeof status !== "boolean") {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+      await BookCategory.update(req.body, { where: { categoryId } });
+
+      const updated = await BookCategory.findByPk(categoryId);
+
+      res.status(200).json({
+        result: updated,
+        message: "Category updated successfully",
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    await BookCategory.update(req.body, { where: { categoryId } });
-
-    const updated = await BookCategory.findByPk(categoryId);
-
-    res.status(200).json({
-      result: updated,
-      message: "Category updated successfully",
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
-router.delete("/:categoryId", async (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    await BookCategory.destroy({ where: { categoryId } });
-    res.status(200).json({ message: "Book deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+router.delete(
+  "/:categoryId",
+  [authMiddleware, checkRole(["admin"])],
+  async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      await BookCategory.destroy({ where: { categoryId } });
+      res.status(200).json({ message: "Book deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 module.exports = router;
