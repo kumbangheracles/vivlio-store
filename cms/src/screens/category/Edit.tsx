@@ -42,6 +42,7 @@ const CategoryEdit = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const payload = {
         name: data.name,
         status: data.status,
@@ -52,7 +53,7 @@ const CategoryEdit = () => {
         await myAxios.post("/book-category", payload);
         message.success("Category created successfully");
       } else {
-        await myAxios.post("/book-category", payload);
+        await myAxios.patch("/book-category", payload);
         message.success("Category updated successfully");
       }
 
@@ -65,6 +66,8 @@ const CategoryEdit = () => {
       } else {
         message.success("Failed updated category");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 

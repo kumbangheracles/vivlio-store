@@ -4,7 +4,6 @@ const { Book, BookImage, Genre } = require("../models/index");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
-const { where } = require("sequelize");
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
@@ -58,6 +57,7 @@ module.exports = {
 
   async getOne(req, res) {
     try {
+      const { id } = req.params;
       const book = await Book.findOne({
         where: { id },
         include: [
@@ -75,7 +75,7 @@ module.exports = {
 
       res.status(200).json({
         message: "Success",
-        results: book,
+        result: book,
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -85,15 +85,16 @@ module.exports = {
   async createBook(req, res) {
     const t = await sequelize.transaction();
     try {
-      const files = req.files;
+      const { images } = req.body;
 
-      if (!files || files.length === 0) {
+      const parsedImages =
+        typeof images === "string" ? JSON.parse(images) : images;
+
+      if (!parsedImages || parsedImages.length === 0) {
         return res
           .status(400)
           .json({ message: "At least one book cover is required." });
       }
-
-      const uploadResults = await uploader.uploadMultiple(files);
 
       const newBook = await Book.create(
         {
@@ -109,20 +110,18 @@ module.exports = {
         { transaction: t }
       );
 
-      const bookImagesData = uploadResults.map((img) => ({
+      const bookImagesData = parsedImages.map((img) => ({
         bookId: newBook.id,
-        imageUrl: img.secure_url,
+        imageUrl: img.imageUrl,
       }));
       await BookImage.bulkCreate(bookImagesData, { transaction: t });
-      let genreIds = req.body.genres;
 
+      let genreIds = req.body.genres;
       if (typeof genreIds === "string") {
         genreIds = [genreIds];
       }
-
       if (Array.isArray(genreIds)) {
         await newBook.setGenres(genreIds, { transaction: t });
-        console.log("Genres set:", genreIds);
       }
 
       await t.commit();
@@ -139,37 +138,52 @@ module.exports = {
       res.status(500).json({ error: error.message });
     }
   },
-
   async updateBook(req, res) {
     const t = await sequelize.transaction();
     try {
       const { id } = req.params;
-      const { title, author, price, book_type, isPopular, categoryId, images } =
+      const { title, author, price, book_type, isPopular, categoryId } =
         req.body;
-
+      let images = req.body.images;
       // Update book utama
-      await Book.update(
-        { title, author, price, book_type, isPopular, categoryId },
-        { where: { id }, transaction: t }
-      );
-
+      await Book.update(req.body, { where: { id }, transaction: t });
+      console.log("typeof images:", typeof images);
+      if (typeof images === "string") {
+        try {
+          images = JSON.parse(images);
+        } catch (err) {
+          console.error("Gagal parse images:", err.message);
+          images = [];
+        }
+      }
       if (Array.isArray(images)) {
-        // Ambil ID gambar yang dikirim dari frontend
         const sentImageIds = images
           .filter((img) => img.id)
           .map((img) => img.id);
+        console.log("sentImageIds:", sentImageIds);
 
-        // Hapus gambar yang tidak ada di list
-        await BookImage.destroy({
-          where: {
-            bookId: id,
-            id: { [Op.notIn]: sentImageIds },
-          },
-          transaction: t,
-        });
+        // update gambar yang sudah ada
+        const existingImages = images.filter((img) => img.id && img.imageUrl);
+        for (const img of existingImages) {
+          await BookImage.update(
+            { imageUrl: img.imageUrl },
+            { where: { id: img.id, bookId: id }, transaction: t }
+          );
+        }
 
-        // Tambahkan gambar baru (tanpa id)
-        const newImages = images.filter((img) => !img.id);
+        // hapus gambar yang tidak dikirim dari frontend
+        if (sentImageIds.length > 0) {
+          await BookImage.destroy({
+            where: {
+              bookId: id,
+              id: { [Op.notIn]: sentImageIds },
+            },
+            transaction: t,
+          });
+        }
+
+        // tambahkan gambar baru
+        const newImages = images.filter((img) => !img.id && img.imageUrl);
         if (newImages.length > 0) {
           const imageData = newImages.map((img) => ({
             bookId: id,

@@ -51,6 +51,7 @@ const Books = () => {
       });
       setDataBooks(res.data.results);
       setTotalItems(res.data.total);
+      console.log("Data books: ", res.data);
     } catch (error) {
       console.log("error fetch books: ", error);
     } finally {
@@ -58,7 +59,6 @@ const Books = () => {
     }
   };
   useEffect(() => {
-    console.log("Data books: ", dataBooks);
     fetchBooks(page, limit);
   }, [page, limit]);
 
@@ -68,11 +68,11 @@ const Books = () => {
 
       const res = await myAxios.patch(`/books/${id}`, { status });
       setDataBooks((prev) =>
-        prev.map((item) => (item?.categoryId === id ? res.data.result : item))
+        prev.map((item) => (item?.categoryId === id ? res.data : item))
       );
 
       message.success("Success update status");
-      console.log("response: ", res.data.result);
+      console.log("response: ", res.data);
     } catch (error) {
       ErrorHandler(error);
     } finally {
