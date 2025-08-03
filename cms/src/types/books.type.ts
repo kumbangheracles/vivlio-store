@@ -1,3 +1,5 @@
+import { CategoryProps } from "./category.types";
+
 export type BookProps = {
   id?: string;
   title: string;
@@ -10,6 +12,7 @@ export type BookProps = {
   genre?: string[];
   images?: BookImage[];
   description?: string;
+  categories?: CategoryProps;
 };
 export type BookImage = {
   bookId?: string;

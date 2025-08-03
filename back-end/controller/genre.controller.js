@@ -44,7 +44,7 @@ module.exports = {
       const genre = await Genre.findOne({
         where: { genreId },
       });
-      req.status(200).json({
+      res.status(200).json({
         status: 200,
         message: "Success",
         result: genre,

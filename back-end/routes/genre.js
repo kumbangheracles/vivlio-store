@@ -6,7 +6,7 @@ const genreController = require("../controller/genre.controller");
 router.get("/", [authMiddleware, checkRole(["admin"])], genreController.getAll);
 
 router.get(
-  "/:id",
+  "/:genreId",
   [authMiddleware, checkRole(["admin"])],
   genreController.getOne
 );
@@ -20,14 +20,14 @@ router.post(
 
 // Update Genre
 router.patch(
-  "/:id",
+  "/:genreId",
   [authMiddleware, checkRole(["admin"])],
   genreController.updateGenre
 );
 
 // Delete Genre
 router.delete(
-  "/:id",
+  "/:genreId",
   [authMiddleware, checkRole(["admin"])],
   genreController.deleteGenre
 );

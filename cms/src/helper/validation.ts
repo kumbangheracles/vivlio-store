@@ -21,7 +21,12 @@ export const isValidBookImageArray = (images?: BookImage[]): boolean => {
   );
 };
 
-export const isValidNumber = (val?: number): boolean => {
-  if (val === undefined || val === null) return true;
+export const isValidNumber = (val: unknown): boolean => {
   return typeof val === "number" && Number.isFinite(val);
+};
+
+export const anyFieldsValid = (data?: any): boolean => {
+  return Object.values(data).some(
+    (value) => value === undefined || value === null || value === ""
+  );
 };

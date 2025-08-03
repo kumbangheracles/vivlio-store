@@ -163,7 +163,7 @@ const Books = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (price: number) => `Rp ${price.toLocaleString("id-ID")}`,
+      render: (price: number) => `Rp ${Number(price).toLocaleString("id-ID")}`,
     },
 
     {
@@ -196,7 +196,7 @@ const Books = () => {
       title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (value: Date) => `${dayjs(value).format("DD MMMM YYYY")}`,
+      render: (value: string) => dayjs(value).format("YYYY-MM-DD HH:mm"),
     },
     {
       title: "Action",

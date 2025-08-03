@@ -8,7 +8,7 @@ interface PropTypes {
 
 const DetailItem = ({ label, value }: PropTypes) => {
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div>
       <Label>{label}</Label>
       {value ? (
         <Value>{value}</Value>
@@ -23,7 +23,7 @@ const DetailItem = ({ label, value }: PropTypes) => {
 
 export default DetailItem;
 
-const Label = styled.h1`
+export const Label = styled.h1`
   font-size: 16px;
   font-weight: 600;
 

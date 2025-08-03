@@ -1,9 +1,8 @@
-import { Col, Dropdown, Menu, message, Modal, Row, Space, Switch } from "antd";
+import { Col, Dropdown, Menu, message, Modal, Row, Space } from "antd";
 import HeaderPage from "../../components/HeaderPage";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { CategoryProps } from "../../types/category.types";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
@@ -12,10 +11,12 @@ import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
+import { GenreProperties, GenreStatusType } from "../../types/genre.type";
+import AppStatusSelect from "../../components/AppStatusSelect";
 
-const Category = () => {
+const GenreIndex = () => {
   const navigate = useNavigate();
-  const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
+  const [dataGenre, setDataGenre] = useState<GenreProperties[]>([]);
   const [loading, setloading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -24,32 +25,32 @@ const Category = () => {
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const [filteredData, setFilteredData] = useState<CategoryProps[]>([]);
-  const fetchCategory = async (page: number, limit: number) => {
+  const [filteredData, setFilteredData] = useState<GenreProperties[]>([]);
+  const fetchGenre = async (page: number, limit: number) => {
     try {
       setloading(true);
-      const res = await myAxios.get("/book-category", {
+      const res = await myAxios.get("/genres", {
         params: { page, limit },
       });
-      setDataCategory(res.data.results);
+      setDataGenre(res.data.results);
       setTotalItems(res.data.total);
     } catch (error) {
-      console.log("error fetch category: ", error);
+      ErrorHandler(error);
     } finally {
       setloading(false);
     }
   };
   useEffect(() => {
-    fetchCategory(page, limit);
+    fetchGenre(page, limit);
   }, [page, limit]);
 
-  const handleStatusChange = async (id: string, status: boolean) => {
+  const handleStatusChange = async (id: string, status: string) => {
     try {
       setloading(true);
 
-      const res = await myAxios.patch(`/book-category/${id}`, { status });
-      setDataCategory((prev) =>
-        prev.map((item) => (item?.categoryId === id ? res.data.result : item))
+      const res = await myAxios.patch(`/genres/${id}`, { status });
+      setDataGenre((prev) =>
+        prev.map((item) => (item?.genreId === id ? res.data.result : item))
       );
 
       message.success("Success update status");
@@ -58,49 +59,48 @@ const Category = () => {
       ErrorHandler(error);
     } finally {
       setloading(false);
-      await fetchCategory(page, limit);
+      await fetchGenre(page, limit);
     }
   };
 
   const handleDelete = async () => {
     try {
       setloading(true);
-      await myAxios.delete(`book-category/${selectedId}`);
-      const record = dataCategory.find(
-        (item) => item.categoryId === selectedId
-      );
+      await myAxios.delete(`/genres/${selectedId}`);
+      const record = dataGenre.find((item) => item.genreId === selectedId);
 
-      message.success(`Successfully delete category ${record?.name}`);
+      message.success(`Successfully delete genre ${record?.genre_title}`);
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      await fetchCategory(page, limit);
+      await fetchGenre(page, limit);
       setIsModalOpen(false);
       setSelectedId("");
       setloading(false);
     }
   };
 
-  const handleModalOpen = (categoryId: string) => {
+  const handleModalOpen = (genreId: string) => {
     setIsModalOpen(true);
-    setSelectedId(categoryId);
+    setSelectedId(genreId);
   };
 
+  console.log("Genre id: ", selectedId);
   useEffect(() => {
     if (debouncedSearch) {
-      const filtered = dataCategory.filter((item: CategoryProps) =>
-        item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      const filtered = dataGenre.filter((item: GenreProperties) =>
+        item.genre_title.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
       setFilteredData(filtered);
     } else {
-      setFilteredData(dataCategory);
+      setFilteredData(dataGenre);
     }
-  }, [debouncedSearch, dataCategory]);
-  const categoryColumns: ColumnsType<CategoryProps> = [
+  }, [debouncedSearch, dataGenre]);
+  const genreColumns: ColumnsType<GenreProperties> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Title",
+      dataIndex: "genre_title",
+      key: "genre_title",
     },
     {
       title: "Description",
@@ -115,14 +115,24 @@ const Category = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (_: any, record: CategoryProps) => {
+      render: (_: any, record: GenreProperties) => {
         return (
-          <Switch
-            value={record.status!}
+          <AppStatusSelect
+            value={record.status}
             onChange={(value) => {
-              handleStatusChange(record.categoryId, value);
+              const newStatus = value as GenreStatusType;
+              handleStatusChange(record.genreId!, newStatus);
             }}
-            style={{ backgroundColor: record.status ? "lightgreen" : "gray" }}
+            options={Object.values(GenreStatusType).map((i) => ({
+              value: i,
+              label: i,
+              color:
+                i === GenreStatusType.PUBLISH
+                  ? "success"
+                  : i === GenreStatusType.UNPUBLISH
+                  ? "normal"
+                  : "",
+            }))}
           />
         );
       },
@@ -136,24 +146,24 @@ const Category = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: CategoryProps) => {
+      render: (_: any, record: GenreProperties) => {
         const menu = (
           <Menu
             items={[
               {
                 key: "detail",
                 label: "Detail",
-                onClick: () => navigate(`${record.categoryId}/detail`),
+                onClick: () => navigate(`${record.genreId}/detail`),
               },
               {
                 key: "edit",
                 label: "Edit",
-                onClick: () => navigate(`${record.categoryId}/edit`),
+                onClick: () => navigate(`${record.genreId}/edit`),
               },
               {
                 key: "delete",
                 label: "Delete",
-                onClick: () => handleModalOpen(record.categoryId),
+                onClick: () => handleModalOpen(record.genreId),
                 danger: true,
               },
             ]}
@@ -170,15 +180,15 @@ const Category = () => {
   return (
     <>
       <HeaderPage
-        title="Category"
-        breadcrumb="Home / Category"
+        title="Genres"
+        breadcrumb="Home / Genre"
         rightAction={
           <>
             <Space>
               <AppButton
                 customColor="primary"
-                label="Create New Category"
-                onClick={() => navigate("/category/add")}
+                label="Create New Genre"
+                onClick={() => navigate("/genre/add")}
               />
             </Space>
           </>
@@ -189,7 +199,7 @@ const Category = () => {
         <Col>
           <AppInput
             icon={<SearchOutlined />}
-            placeholder="Search by category name"
+            placeholder="Search by genre name"
             onChange={(e) => setSearch(e.target.value)}
           />
         </Col>
@@ -197,10 +207,10 @@ const Category = () => {
 
       <AppTable
         style={{ marginTop: 20 }}
-        columns={categoryColumns}
+        columns={genreColumns}
         dataSource={filteredData}
         loading={loading}
-        rowKey={"categoryId"}
+        rowKey={"genreId"}
         pagination={{
           current: page,
           pageSize: limit,
@@ -216,8 +226,8 @@ const Category = () => {
       />
 
       <Modal
-        title={"Delete Category"}
-        children={"Are you sure want to delete this category?"}
+        title={"Delete Genre"}
+        children={"Are you sure want to delete this genre?"}
         open={isModalOpen}
         okText="Yes"
         cancelText={"No"}
@@ -228,4 +238,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default GenreIndex;

@@ -4,6 +4,8 @@ const { Book, BookImage, Genre } = require("../models/index");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
+const { Op } = require("sequelize");
+
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
