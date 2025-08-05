@@ -5,7 +5,7 @@ const { Book, BookImage, Genre } = require("../models/index");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
 const { Op } = require("sequelize");
-const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
+
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
@@ -29,7 +29,7 @@ module.exports = {
           {
             model: BookImage,
             as: "images",
-            attributes: ["id", "imageUrl", "public_id"],
+            attributes: ["id", "imageUrl"],
           },
           {
             model: Genre,
@@ -66,7 +66,7 @@ module.exports = {
           {
             model: BookImage,
             as: "images",
-            attributes: ["id", "imageUrl", "public_id"],
+            attributes: ["id", "imageUrl"],
           },
           {
             model: Genre,
@@ -120,7 +120,6 @@ module.exports = {
       const bookImagesData = parsedImages.map((img) => ({
         bookId: newBook.id,
         imageUrl: img.imageUrl,
-        public_id: img.public_id,
       }));
       await BookImage.bulkCreate(bookImagesData, { transaction: t });
 
@@ -156,7 +155,6 @@ module.exports = {
         await t.rollback();
         return res.status(404).json({ message: "Book not found" });
       }
-
       const { title, author, price, book_type, isPopular, categoryId } =
         req.body;
       let images = req.body.images;
@@ -167,150 +165,66 @@ module.exports = {
         where: { id },
         transaction: t,
       });
-
-      // === Update genre relasi ===
-      if (req.body.genres !== undefined) {
-        let genreIds = req.body.genres;
-
-        // Handle different input formats
-        if (typeof genreIds === "string") {
-          try {
-            // Try to parse as JSON first
-            genreIds = JSON.parse(genreIds);
-          } catch {
-            // If not JSON, treat as single ID
-            genreIds = [genreIds];
-          }
-        }
-
-        // Ensure it's an array and contains valid IDs
-        if (Array.isArray(genreIds)) {
-          // Convert to integers and filter invalid ones
-          const validGenreIds = genreIds
-            .map((id) => {
-              if (typeof id === "object" && id.id) return parseInt(id.id);
-              return parseInt(id);
-            })
-            .filter((id) => !isNaN(id) && id > 0);
-
-          console.log("Valid genre IDs:", validGenreIds);
-
-          // Update the association
-          await book.setGenres(validGenreIds, { transaction: t });
-        } else if (genreIds === null || genreIds === "") {
-          // Clear all genres if empty
-          await book.setGenres([], { transaction: t });
-        }
+      if (typeof genreIds === "string") {
+        genreIds = [genreIds];
       }
-      // === Proses images dengan debugging ===
-      console.log("=== DEBUG IMAGES ===");
-      console.log("Raw images:", req.body.images);
-      console.log("Images type:", typeof images);
-
+      if (Array.isArray(genreIds)) {
+        await book.setGenres(genreIds, { transaction: t });
+      }
+      console.log("typeof images:", typeof images);
       if (typeof images === "string") {
         try {
           images = JSON.parse(images);
-          console.log("Parsed images:", images);
         } catch (err) {
           console.error("Gagal parse images:", err.message);
           images = [];
         }
       }
-
       if (Array.isArray(images)) {
-        console.log("Images array:", images);
-
         const sentImageIds = images
           .filter((img) => img.id)
           .map((img) => img.id);
         console.log("sentImageIds:", sentImageIds);
 
-        // Cek gambar yang ada di database sebelum update
-        const existingImagesInDB = await BookImage.findAll({
-          where: { bookId: id },
-          attributes: ["id", "imageUrl", "public_id"],
-          transaction: t,
-        });
-        console.log(
-          "Existing images in DB:",
-          existingImagesInDB.map((img) => img.id)
-        );
-
-        // Update gambar yang sudah ada
+        // update gambar yang sudah ada
         const existingImages = images.filter((img) => img.id && img.imageUrl);
-        console.log(
-          "Images to update:",
-          existingImages.map((img) => img.id)
-        );
-
         for (const img of existingImages) {
           await BookImage.update(
-            {
-              imageUrl: img.imageUrl,
-              public_id: img.public_id || null,
-            },
-            {
-              where: { id: img.id, bookId: id },
-              transaction: t,
-            }
+            { imageUrl: img.imageUrl },
+            { where: { id: img.id, bookId: id }, transaction: t }
           );
         }
 
-        // Hapus gambar yang tidak dikirim
-        const imagesToDelete = existingImagesInDB.filter(
-          (existingImg) => !sentImageIds.includes(existingImg.id)
-        );
-
-        console.log(
-          "Images to delete:",
-          imagesToDelete.map((img) => img.id)
-        );
-
-        if (imagesToDelete.length > 0) {
-          // Delete dari Cloudinary
-          console.log("Deleting from Cloudinary...");
-          await Promise.all(
-            imagesToDelete.map((img) => deleteFromCloudinary(img.imageUrl))
-          );
-          const deleteResult = await BookImage.destroy({
+        // hapus gambar yang tidak dikirim dari frontend
+        if (sentImageIds.length > 0) {
+          await BookImage.destroy({
             where: {
               bookId: id,
-              id: imagesToDelete.map((img) => img.id),
+              id: { [Op.notIn]: sentImageIds },
             },
             transaction: t,
           });
-          console.log("Delete result:", deleteResult);
         }
-        // Tambah gambar baru
-        const newImages = images.filter((img) => !img.id && img.imageUrl);
-        console.log("New images to add:", newImages.length);
 
+        // tambahkan gambar baru
+        const newImages = images.filter((img) => !img.id && img.imageUrl);
         if (newImages.length > 0) {
           const imageData = newImages.map((img) => ({
             bookId: id,
             imageUrl: img.imageUrl,
-            public_id: img.public_id || null,
           }));
           await BookImage.bulkCreate(imageData, { transaction: t });
         }
       }
 
-      console.log("=== END DEBUG IMAGES ===");
-
       await t.commit();
-      return res.status(200).json({
-        message: "Book and images updated successfully",
-      });
+      res.status(200).json({ message: "Book and images updated successfully" });
     } catch (error) {
       await t.rollback();
-      console.log("Error: ", error);
-      res.status(500).json({
-        status: 500,
-        message: error.message || "Internal server error",
-        data: [],
-      });
+      res.status(500).json({ error: error.message });
     }
   },
+
   async deleteBook(req, res) {
     try {
       const { id } = req.params;
@@ -324,20 +238,12 @@ module.exports = {
 
       const bookImages = await BookImage.findAll({ where: { bookId: id } });
 
-      const imagesToDelete = bookImages.filter(
-        (existingImg) => !sentImageIds.includes(existingImg.id)
-      );
-
-      if (imagesToDelete.length > 0) {
-        const deleteResult = await BookImage.destroy({
-          where: {
-            bookId: id,
-            id: imagesToDelete.map((img) => img.id),
-          },
-          transaction: t,
-        });
-        console.log("Delete result:", deleteResult);
+      for (const image of bookImages) {
+        if (image.publicId) {
+          await uploader.remove(image.publicId);
+        }
       }
+
       await BookImage.destroy({ where: { bookId: id } });
 
       const result = await Book.destroy({ where: { id } });

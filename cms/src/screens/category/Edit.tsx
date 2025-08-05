@@ -59,12 +59,12 @@ const CategoryEdit = () => {
 
       navigate(-1);
     } catch (error) {
-      console.log("error created category: ", error);
+      console.log("error submit category: ", error);
 
       if (!id) {
-        message.success("Failed created category");
+        message.error("Failed created category");
       } else {
-        message.success("Failed updated category");
+        message.error("Failed updated category");
       }
     } finally {
       setIsLoading(false);

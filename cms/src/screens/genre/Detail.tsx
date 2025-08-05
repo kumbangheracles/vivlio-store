@@ -9,34 +9,35 @@ import { useEffect, useState } from "react";
 import { CategoryProps } from "../../types/category.types";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
+import { GenreProperties } from "../../types/genre.type";
 
-const CategoryDetail = () => {
+const GenreDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [dataCategory, setDataCategory] = useState<CategoryProps | undefined>(
+  const [dataGenre, setDataGenre] = useState<GenreProperties | undefined>(
     undefined
   );
 
-  const fetchCategory = async () => {
+  const fetchGenre = async () => {
     if (!id) return;
     try {
-      const res = await myAxios.get(`book-category/${id}`);
-      setDataCategory(res.data);
+      const res = await myAxios.get(`genres/${id}`);
+      setDataGenre(res.data.result);
     } catch (error) {
       ErrorHandler(error);
     }
   };
 
   useEffect(() => {
-    fetchCategory();
+    fetchGenre();
   }, [id]);
   return (
     <>
       {" "}
       <HeaderPage
         icon="back"
-        title="Create New Category"
-        breadcrumb={`Home / Category / ${
+        title="Genre Detail"
+        breadcrumb={`Home / Genre / ${
           id?.length! > 20 ? id?.slice(0, 20) + "..." : id
         } / Detail`}
         rightAction={
@@ -45,30 +46,27 @@ const CategoryDetail = () => {
               <AppButton
                 customColor="primary"
                 label="Edit"
-                onClick={() => navigate(`/category/${id}/edit`)}
+                onClick={() => navigate(`/genre/${id}/edit`)}
               />
             </Space>
           </>
         }
       />
       <HeaderSection
-        sectionTitle="Category Information"
+        sectionTitle="Genre Information"
         sectionSubTitle="this section is for displaying detail information"
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
-          <DetailItem label="Name" value={dataCategory?.name || "No Content"} />
+          <DetailItem label="Title" value={dataGenre?.genre_title} />
           <DetailItem
             label="Status"
-            value={<Tag>{dataCategory?.status ? "Active" : "Inactive"}</Tag>}
+            value={<Tag>{dataGenre?.status ? "Active" : "Inactive"}</Tag>}
           />
-          <DetailItem
-            label="Description"
-            value={dataCategory?.description || "No Content"}
-          />
+          <DetailItem label="Description" value={dataGenre?.description} />
         </div>
       </HeaderSection>
     </>
   );
 };
 
-export default CategoryDetail;
+export default GenreDetail;

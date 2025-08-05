@@ -9,4 +9,5 @@ const upload = multer({
 module.exports = {
   single: (fieldName) => upload.single(fieldName),
   multiple: (fieldName) => upload.array(fieldName),
+  destroy: (fieldName) => upload.array(fieldName),
 };

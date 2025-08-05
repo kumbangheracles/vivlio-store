@@ -1,27 +1,26 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
-const BookImage = sequelize.define(
-  "BookImages",
+const UserImage = sequelize.define(
+  "UserImage",
   {
     id: {
-      type: DataTypes.STRING,
-
-      primaryKey: true,
+      type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
     },
-    bookId: {
+    userId: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: "Books",
+        model: "Users",
         key: "id",
       },
       onDelete: "CASCADE",
     },
     imageUrl: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     public_id: {
       type: DataTypes.STRING,
@@ -29,9 +28,9 @@ const BookImage = sequelize.define(
     },
   },
   {
-    tableName: "BookImages",
+    tableName: "UserImages",
     timestamps: true,
   }
 );
 
-module.exports = BookImage;
+module.exports = UserImage;

@@ -2,7 +2,7 @@ import { Card, Image, Space, Tag } from "antd";
 import category from ".";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
-import { useNavigate, useParams } from "react-router-dom";
+import { data, useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../../components/HeaderSection";
 import DetailItem, { Label } from "../../components/DetailItem";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { BookImage, BookProps } from "../../types/books.type";
 import { styled } from "styled-components";
+import { GenreProperties } from "../../types/genre.type";
 
 const BookDetail = () => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const BookDetail = () => {
       {" "}
       <HeaderPage
         icon="back"
-        title="Create New Book"
+        title="Detail Book"
         breadcrumb={`Home / Book / ${
           id?.length! > 20 ? id?.slice(0, 20) + "..." : id
         } / Detail`}
@@ -118,19 +119,31 @@ const BookDetail = () => {
             />
             <DetailItem
               label="Genre"
-              value={<Tag>{dataBook?.genre || "No Content"} </Tag>}
+              value={
+                <div>
+                  {Array.isArray(dataBook?.genres) ? (
+                    <>
+                      {dataBook.genres.map((item: any, index: any) => (
+                        <Tag key={index}>{item.genre_title}</Tag>
+                      ))}
+                    </>
+                  ) : (
+                    <Tag>No Content</Tag>
+                  )}
+                </div>
+              }
             />
             <DetailItem label="Status" value={<Tag>{dataBook?.status}</Tag>} />
-            <div>
-              <Label>Description</Label>
-              <div
-                className="prose max-w-none prose-h1:text-black prose-h1:text-xl"
-                dangerouslySetInnerHTML={{
-                  __html: dataBook?.description!,
-                }}
-              />
-            </div>
           </GridContainer>
+          <div>
+            <Label>Description</Label>
+            <div
+              className="prose max-w-none prose-h1:text-black prose-h1:text-xl"
+              dangerouslySetInnerHTML={{
+                __html: dataBook?.description!,
+              }}
+            />
+          </div>
         </div>
       </HeaderSection>
     </>
@@ -140,7 +153,7 @@ const BookDetail = () => {
 export default BookDetail;
 const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(250px, auto));
   gap: 16px;
   width: 100%;
   max-width: 1200px;

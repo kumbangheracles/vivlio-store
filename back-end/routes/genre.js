@@ -3,11 +3,11 @@ const router = express.Router();
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const genreController = require("../controller/genre.controller");
 // Get all Genres
-router.get("/", [authMiddleware, checkRole(["admin"])], genreController.getAll);
+router.get("/", genreController.getAll);
 
 router.get(
   "/:genreId",
-  [authMiddleware, checkRole(["admin"])],
+
   genreController.getOne
 );
 

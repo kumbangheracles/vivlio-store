@@ -61,9 +61,9 @@ const GenreEdit = () => {
       console.log("error created genre: ", error);
 
       if (!id) {
-        message.success("Failed created genre");
+        message.error("Failed created genre");
       } else {
-        message.success("Failed updated genre");
+        message.error("Failed updated genre");
       }
     } finally {
       setIsLoading(false);

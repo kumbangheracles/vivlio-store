@@ -5,7 +5,7 @@ const Role = require("./role");
 const BookImage = require("./bookImage");
 const BookGenres = require("./bookgenres");
 const Genre = require("./genre");
-
+const UserImage = require("./UserImage");
 // Book ↔ Category
 BookCategory.hasMany(Book, {
   foreignKey: "categoryId",
@@ -45,6 +45,16 @@ Genre.belongsToMany(Book, {
   as: "books",
 });
 
+// Users ↔ UserImage
+User.hasOne(UserImage, {
+  foreignKey: "userId",
+  as: "profileImage",
+});
+
+UserImage.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
 module.exports = {
   Book,
   BookCategory,
@@ -53,4 +63,5 @@ module.exports = {
   Role,
   Genre,
   BookGenres,
+  UserImage,
 };

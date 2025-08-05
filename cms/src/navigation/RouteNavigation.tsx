@@ -32,6 +32,7 @@ const RouteNavigation = () => {
   const BookDetail = React.lazy(() => import("../screens/books/Detail"));
   const GenreIndex = React.lazy(() => import("../screens/genre/index"));
   const GenreEdit = React.lazy(() => import("../screens/genre/Edit"));
+  const GenreDetail = React.lazy(() => import("../screens/genre/Detail"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -177,6 +178,16 @@ const RouteNavigation = () => {
               <ProtectedRoute roles={[EUserRole.ADMIN]}>
                 <AppLayout>
                   <GenreEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/genre/:id/detail"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <GenreDetail />
                 </AppLayout>
               </ProtectedRoute>
             }

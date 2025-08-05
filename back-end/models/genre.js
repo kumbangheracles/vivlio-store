@@ -20,7 +20,7 @@ const Genre = sequelize.define(
       defaultValue: "UNPUBLISHED",
     },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },

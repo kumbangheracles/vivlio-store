@@ -34,6 +34,9 @@ import { PlusOutlined } from "@ant-design/icons";
 import { CategoryProps } from "../../types/category.types";
 import { v4 as uuidv4 } from "uuid";
 import FormEditor from "../../components/FormEditor";
+import { GenreProperties, GenreStatusType } from "../../types/genre.type";
+import { useDebounce } from "../../hooks/useDebounce";
+import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
 const BookEdit = () => {
   const navigate = useNavigate();
   const [dataBook, setDataBook] = useState<BookProps>(initialBookProps);
@@ -44,6 +47,8 @@ const BookEdit = () => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
+  const [dataGenre, setDataGenre] = useState<GenreProperties[]>([]);
+  const [search, setSearch] = useState("");
 
   const getBase64 = (file: File | Blob): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -70,9 +75,27 @@ const BookEdit = () => {
       ErrorHandler(error);
     }
   };
+  const fetchGenre = async () => {
+    try {
+      const res = await myAxios.get("/genres");
+      console.log("Fetched genres:", res.data.results);
+      const activeGenres = res.data.results.filter(
+        (cat: GenreProperties) => cat.status === GenreStatusType.PUBLISH
+      );
+
+      const options = activeGenres.map((cat: GenreProperties) => ({
+        label: cat.genre_title,
+        value: cat.genreId!,
+      }));
+      setDataGenre(options);
+    } catch (error) {
+      ErrorHandler(error);
+    }
+  };
 
   useEffect(() => {
     fetchCategory();
+    fetchGenre();
   }, []);
   const handleSubmit = async (data: BookProps, status: BookProps["status"]) => {
     form.validateFields();
@@ -116,11 +139,10 @@ const BookEdit = () => {
       return;
     }
 
-    // Jika ingin validasi genre (jika aktif):
-    // if (isEmptyArray(data.genre)) {
-    //   message.error("At least one genre is required");
-    //   return;
-    // }
+    if (isEmptyArray(data.genres)) {
+      message.error("At least one genre is required");
+      return;
+    }
 
     if (isValidNumber(data.price)) {
       message.error("Price is required");
@@ -140,7 +162,7 @@ const BookEdit = () => {
         author: data.author,
         price: data.price as unknown as number,
         description: data.description,
-        // genre: data.genre,
+        genres: data.genres,
 
         status: status,
         book_type: data.book_type,
@@ -158,7 +180,7 @@ const BookEdit = () => {
 
       navigate(-1);
     } catch (error) {
-      console.log("error created Book: ", error);
+      console.log("error submit: ", error);
 
       if (!id) {
         ErrorHandler(error);
@@ -177,17 +199,27 @@ const BookEdit = () => {
       setIsLoading(true);
       const res = await myAxios.get(`books/${id}`);
       console.log("Data Book: ", res.data);
-      setDataBook(res.data.result);
-      form.setFieldsValue(res.data.result);
+      const data = res.data.result;
+      setDataBook(data);
+      form.setFieldsValue({
+        ...data,
+        genres: Array.isArray(data.genres)
+          ? data.genres.map((item: GenreProperties) => item.genreId)
+          : [],
+      });
       const imagePrev = res.data.result.images.map(
         (item: any, index: number) => ({
           uid: String(item.id || index),
           name: `image-${index + 1}.jpg`,
           status: "done",
           url: item.imageUrl,
+          response: {
+            secure_url: item.imageUrl,
+            public_id: item.public_id,
+          },
         })
       );
-
+      // setDataGenre(res.data.result.genres);
       setFileList(imagePrev);
       setPreviewImage(imagePrev);
     } catch (error) {
@@ -238,6 +270,7 @@ const BookEdit = () => {
       .map((file) => ({
         bookId: uuidv4(),
         imageUrl: file.response.secure_url,
+        public_id: file.response.public_id,
       }));
 
     setDataBook((prev) => ({
@@ -369,6 +402,12 @@ const BookEdit = () => {
                   value: i,
                   label: i,
                 }))}
+                filterOption={(input, option) =>
+                  (option?.label as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                showSearch
                 placeholder={"Choose Book Type"}
                 onChange={(e) => {
                   setDataBook({
@@ -384,12 +423,42 @@ const BookEdit = () => {
               rules={[{ required: true, message: "Category are required" }]}
             >
               <AppSelect
+                showSearch
                 options={dataCategory}
                 placeholder={"Choose Category"}
+                filterOption={(input, option) =>
+                  (option?.label as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
                 onChange={(e) => {
                   setDataBook({
                     ...dataBook,
                     categoryId: e,
+                  });
+                }}
+              />
+            </Form.Item>
+            <Form.Item
+              name={"genres"}
+              label="Genre"
+              rules={[{ required: true, message: "Genre are required" }]}
+            >
+              <AppSelect
+                showSearch
+                allowClear
+                mode="multiple"
+                filterOption={(input, option) =>
+                  (option?.label as string)
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={dataGenre}
+                placeholder={"Input Genre"}
+                onChange={(e) => {
+                  setDataBook({
+                    ...dataBook,
+                    genres: e,
                   });
                 }}
               />
@@ -425,17 +494,6 @@ const BookEdit = () => {
                   }))
                 }
               />
-              {/* <Input.TextArea
-              required
-              placeholder="Description about this Book"
-              style={{ padding: 16, minHeight: 200, border: "1px solid gray" }}
-              onChange={(e) =>
-              setDataBook({
-                ...dataBook,
-                description: e.target.value,
-                })
-                }
-                /> */}
             </Form.Item>
           </Form>
         </HeaderSection>

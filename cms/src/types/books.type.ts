@@ -9,7 +9,7 @@ export type BookProps = {
   book_type: BookType;
   book_cover?: string;
   categoryId?: string;
-  genre?: string[];
+  genres?: string[];
   images?: BookImage[];
   description?: string;
   categories?: CategoryProps;
@@ -17,6 +17,7 @@ export type BookProps = {
 export type BookImage = {
   bookId?: string;
   imageUrl?: string;
+  public_id?: string;
 };
 
 export enum BookType {
