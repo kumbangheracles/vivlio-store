@@ -5,9 +5,11 @@ export type UserProperties = {
   password?: string;
   email?: string;
   roleId?: string;
+  roleName?: string;
   confirmPassword?: string;
   verificationCode?: string;
   token?: string;
+  isActive?: boolean;
 };
 
 export const ERole = {
@@ -36,4 +38,6 @@ export const initialUser: UserProperties = {
   password: "",
   confirmPassword: "",
   roleId: "",
+  isActive: false,
+  roleName: "",
 };

@@ -15,6 +15,7 @@ const BookCategory = sequelize.define(
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
+      unique: true,
     },
     description: {
       type: DataTypes.TEXT,

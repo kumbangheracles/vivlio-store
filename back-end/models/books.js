@@ -13,6 +13,7 @@ const Book = sequelize.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     author: {
       type: DataTypes.STRING,

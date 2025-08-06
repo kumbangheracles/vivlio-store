@@ -41,8 +41,8 @@ module.exports = {
         offset,
       });
       res.status(200).json({
-        status: "Success",
-        message: "Book retrieved successfully",
+        status: 200,
+        message: "Success",
         results: rows,
         total: count,
         currentPage: parseInt(page),
@@ -312,35 +312,43 @@ module.exports = {
     }
   },
   async deleteBook(req, res) {
+    const t = await sequelize.transaction();
     try {
       const { id } = req.params;
 
-      const book = await Book.findByPk(id);
+      const book = await Book.findByPk(id, { transaction: t });
       if (!book) {
+        await t.rollback();
         return res.status(404).json({ message: "Book not found" });
       }
+      await book.setGenres([], { transaction: t });
+      const bookImages = await BookImage.findAll({
+        where: { bookId: id },
+        attributes: ["id", "public_id", "imageUrl"],
+        transaction: t,
+      });
 
-      await book.setGenres([]);
+      console.log(`Found ${bookImages.length} images to delete`);
+      if (bookImages.length > 0) {
+        console.log("Deleting from Cloudinary...");
+        await Promise.all(
+          bookImages.map((img) => deleteFromCloudinary(img.imageUrl))
+        );
 
-      const bookImages = await BookImage.findAll({ where: { bookId: id } });
-
-      const imagesToDelete = bookImages.filter(
-        (existingImg) => !sentImageIds.includes(existingImg.id)
-      );
-
-      if (imagesToDelete.length > 0) {
-        const deleteResult = await BookImage.destroy({
-          where: {
-            bookId: id,
-            id: imagesToDelete.map((img) => img.id),
-          },
+        console.log("Deleting images from database...");
+        await BookImage.destroy({
+          where: { bookId: id },
           transaction: t,
         });
-        console.log("Delete result:", deleteResult);
       }
-      await BookImage.destroy({ where: { bookId: id } });
 
-      const result = await Book.destroy({ where: { id } });
+      console.log("Deleting book from database...");
+      const result = await Book.destroy({
+        where: { id },
+        transaction: t,
+      });
+
+      await t.commit();
 
       res.status(200).json({
         status: 200,
@@ -348,6 +356,8 @@ module.exports = {
         result,
       });
     } catch (error) {
+      await t.rollback();
+      console.error("Delete book error:", error);
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",

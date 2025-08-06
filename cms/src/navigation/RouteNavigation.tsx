@@ -33,6 +33,9 @@ const RouteNavigation = () => {
   const GenreIndex = React.lazy(() => import("../screens/genre/index"));
   const GenreEdit = React.lazy(() => import("../screens/genre/Edit"));
   const GenreDetail = React.lazy(() => import("../screens/genre/Detail"));
+  const UserIndex = React.lazy(() => import("../screens/users/index"));
+  const UserEdit = React.lazy(() => import("../screens/users/Edit"));
+  const UserDetail = React.lazy(() => import("../screens/users/Detail"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -188,6 +191,46 @@ const RouteNavigation = () => {
               <ProtectedRoute roles={[EUserRole.ADMIN]}>
                 <AppLayout>
                   <GenreDetail />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <UserIndex />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/add"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <UserEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/:id/edit"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <UserEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/:id/detail"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+                <AppLayout>
+                  <UserDetail />
                 </AppLayout>
               </ProtectedRoute>
             }

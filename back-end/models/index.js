@@ -53,7 +53,7 @@ User.hasOne(UserImage, {
 
 UserImage.belongsTo(User, {
   foreignKey: "userId",
-  as: "user",
+  as: "Users",
 });
 module.exports = {
   Book,

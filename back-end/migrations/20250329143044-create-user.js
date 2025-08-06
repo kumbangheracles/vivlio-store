@@ -16,6 +16,7 @@ module.exports = {
       username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       roleId: {
         type: Sequelize.STRING,
@@ -38,6 +39,11 @@ module.exports = {
       verificationCode: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
       },
       verificationCodeCreatedAt: {
         type: Sequelize.DATE,
