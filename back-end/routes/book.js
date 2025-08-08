@@ -16,21 +16,29 @@ router.get(
 // Create book
 router.post(
   "/",
-  [authMiddleware, checkRole(["admin"]), uploadMiddleware.multiple("images")],
+  [
+    authMiddleware,
+    checkRole(["admin", "super_admin"]),
+    uploadMiddleware.multiple("images"),
+  ],
   bookController.createBook
 );
 
 // Update book
 router.patch(
   "/:id",
-  [authMiddleware, checkRole(["admin"]), uploadMiddleware.multiple("images")],
+  [
+    authMiddleware,
+    checkRole(["admin", "super_admin"]),
+    uploadMiddleware.multiple("images"),
+  ],
   bookController.updateBook
 );
 
 // Delete book
 router.delete(
   "/:id",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   bookController.deleteBook
 );
 

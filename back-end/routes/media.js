@@ -9,7 +9,7 @@ router.post(
   "/upload-single",
   [
     authMiddleware,
-    checkRole(["admin", "customer"]),
+    checkRole(["admin", "customer", "super_admin"]),
     uploadMiddleware.single("file"),
   ],
 
@@ -19,7 +19,7 @@ router.post(
   "/upload-multiple",
   [
     authMiddleware,
-    checkRole(["admin", "customer"]),
+    checkRole(["admin", "customer", "super_admin"]),
     uploadMiddleware.multiple("files"),
   ],
   mediaController.multiple
@@ -27,7 +27,7 @@ router.post(
 router.delete(
   "/remove",
   authMiddleware,
-  checkRole(["admin", "customer"]),
+  checkRole(["admin", "customer", "super_admin"]),
   mediaController.remove
 );
 

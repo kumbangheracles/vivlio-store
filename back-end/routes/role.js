@@ -9,24 +9,24 @@ router.get("/", roleController.getAll);
 router.get("/:id", roleController.getOne);
 
 // Create role
-// router.post(
-//   "/",
-//   [authMiddleware, checkRole(["admin"])],
-//   roleController.createRole
-// );
+router.post(
+  "/",
+  [authMiddleware, checkRole(["super_admin"])],
+  roleController.createRole
+);
 
 // Update role
-// router.patch(
-//   "/:id",
-//   [authMiddleware, checkRole(["admin"])],
-//   roleController.updateRole
-// );
+router.patch(
+  "/:id",
+  [authMiddleware, checkRole(["super_admin"])],
+  roleController.updateRole
+);
 
 // Delete role
-// router.delete(
-//   "/:id",
-//   [authMiddleware, checkRole(["admin"])],
-//   roleController.deleteRole
-// );
+router.delete(
+  "/:id",
+  [authMiddleware, checkRole(["super_admin"])],
+  roleController.deleteRole
+);
 
 module.exports = router;

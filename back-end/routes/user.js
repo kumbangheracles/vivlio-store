@@ -1,15 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 const { User, UserImage } = require("../models/index");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
+const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 router.get(
   "/",
   authMiddleware,
-  checkRole(["admin", "customer"]),
+  checkRole(["admin", "super_admin"]),
   async (req, res) => {
     const { page = 1, limit = 10, id } = req.query;
     const offset = (page - 1) * limit;
@@ -48,16 +50,25 @@ router.get(
 router.get(
   "/:id",
   authMiddleware,
-
-  checkRole(["admin", "customer"]),
+  checkRole(["admin", "customer", "super_admin"]),
   async (req, res) => {
     try {
       const { id } = req.params;
-      const user = await User.findOne({ where: { id } });
+      const user = await User.findOne({
+        where: { id },
+        include: [
+          {
+            model: UserImage,
+            as: "profileImage",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+        ],
+      });
+
       res.status(200).json({
         status: 200,
         message: "Success",
-        result: user,
+        result: user, // user sudah include profileImage di dalamnya
       });
     } catch (error) {
       res.status(500).json({
@@ -68,103 +79,120 @@ router.get(
     }
   }
 );
+
+// router.post(
+//   "/",
+//   [
+//     authMiddleware,
+//     checkRole(["admin", "super_admin"]),
+//     uploadMiddleware.single("profileImage"),
+//   ],
+//   async (req, res) => {
+//     const t = await sequelize.transaction();
+//     try {
+//       const { fullName, username, email, password, roleId } = req.body;
+
+//       // Ambil files dari multer
+//       const file = req.file;
+
+//       if (!file) {
+//         return res.status(400).json({
+//           message: "Profile image must be uploaded.",
+//         });
+//       }
+
+//       // Upload ke Cloudinary
+//       const uploadedImage = await uploader.uploadSingle(file);
+
+//       const user = await User.create(
+//         {
+//           fullName,
+//           username,
+//           email,
+//           password,
+//           roleId,
+//         },
+//         { transaction: t }
+//       );
+//       await UserImage.bulkCreate(
+//         {
+//           userId: user.id,
+//           imageUrl: uploadedImage.secure_url,
+//           public_id: uploadedImage.public_id,
+//         },
+//         { transaction: t }
+//       );
+
+//       await t.commit();
+
+//       res.status(201).json({
+//         status: 201,
+//         message: "Success create user",
+//         result: {
+//           ...user.toJSON(),
+//           profileImage: {
+//             userId: user.id,
+//             imageUrl: uploadedImage.secure_url,
+//             public_id: uploadedImage.public_id,
+//           },
+//         },
+//       });
+//     } catch (error) {
+//       await t.rollback();
+//       res.status(500).json({
+//         status: 500,
+//         message: error.message || "Internal server error",
+//         data: [],
+//       });
+//     }
+//   }
+// );
 
 router.post(
   "/",
-  [authMiddleware, checkRole("admin"), uploadMiddleware.single("profileImage")],
+  [
+    authMiddleware,
+    checkRole(["admin", "super_admin"]),
+    uploadMiddleware.single("profileImage"),
+  ],
   async (req, res) => {
     const t = await sequelize.transaction();
     try {
-      const { fullName, username, email, password, roleId } = req.body;
+      const { fullName, username, email, password, roleId, profileImage } =
+        req.body;
 
-      // Ambil files dari multer
-      const file = req.file;
+      const parsedImages =
+        typeof profileImage === "string"
+          ? JSON.parse(profileImage)
+          : profileImage;
 
-      if (!file) {
+      const imageArray = [].concat(parsedImages || []);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      if (username === "herkalsuperadmin") {
         return res.status(400).json({
-          message: "Profile image must be uploaded.",
+          status: 400,
+          message: "This user cannot be inactivated",
         });
       }
-
-      // Upload ke Cloudinary
-      const uploadedImage = await uploader.uploadSingle(file);
-
+      if (username.length > 10) {
+        return res.status(400).json({
+          status: 400,
+          message: "Username cannot be more than 10 characters",
+        });
+      }
       const user = await User.create(
         {
           fullName,
           username,
           email,
-          password,
+          password: hashedPassword,
           roleId,
-        },
-        { transaction: t }
-      );
-      await UserImage.bulkCreate(
-        {
-          userId: user.id,
-          imageUrl: uploadedImage.secure_url,
-          public_id: uploadedImage.public_id,
+          isVerified: true,
         },
         { transaction: t }
       );
 
-      await t.commit();
-
-      res.status(201).json({
-        status: 201,
-        message: "Success create user",
-        result: {
-          ...user.toJSON(),
-          profileImage: {
-            userId: user.id,
-            imageUrl: uploadedImage.secure_url,
-            public_id: uploadedImage.public_id,
-          },
-        },
-      });
-    } catch (error) {
-      await t.rollback();
-      res.status(500).json({
-        status: 500,
-        message: error.message || "Internal server error",
-        data: [],
-      });
-    }
-  }
-);
-
-/** case untuk handle dari front-end
- * 
- * 
- * router.post(
-  "/",
-  [authMiddleware, checkRole("admin")],
-  async (req, res) => {
-    const t = await sequelize.transaction();
-    try {
-      const { fullName, username, email, password, roleId, profileImage } = req.body;
-
-      // Pastikan profileImage valid
-      const parsedImages = typeof profileImage === "string" ? JSON.parse(profileImage) : profileImage;
-
-      if (!Array.isArray(parsedImages) || parsedImages.length !== 1) {
-        return res.status(400).json({
-          message: "Exactly one profile image must be provided.",
-        });
-      }
-
-      const user = await User.create(
-        {
-          fullName,
-          username,
-          email,
-          password,
-          roleId,
-        },
-        { transaction: t }
-      );
-
-      const profileImageData = parsedImages.map((img) => ({
+      const profileImageData = imageArray.map((img) => ({
         userId: user.id,
         imageUrl: img.imageUrl,
         public_id: img.public_id,
@@ -193,28 +221,104 @@ router.post(
   }
 );
 
- * 
- * 
- */
-
 router.patch(
   "/:id",
-  [authMiddleware, checkRole("admin"), uploadMiddleware.single("profileImage")],
+  [
+    authMiddleware,
+    checkRole(["admin", "super_admin", "customer"]),
+    uploadMiddleware.single("profileImage"),
+  ],
   async (req, res) => {
+    const t = await sequelize.transaction();
     try {
-      const t = await sequelize.transaction();
       const { id } = req.params;
+      let profileImage = req.body.profileImage;
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const user = await User.findByPk(id, { transaction: t });
 
+      if (req.body.username === "herkalsuperadmin") {
+        return res.status(400).json({
+          status: 400,
+          message: "This user cannot be inactivated",
+        });
+      }
       if (!user) {
         await t.rollback();
         return res.status(404).json({ message: "User not found" });
       }
-      await User.update(req.body, { where: { id }, transaction: t });
+      await User.update(
+        {
+          ...req.body,
+          // password: hashedPassword // sementara gini dlu
+        },
+        { where: { id } }
+      );
+
+      if (typeof profileImage === "string") {
+        try {
+          profileImage = JSON.parse(profileImage);
+          console.log("Parsed profileImage:", profileImage);
+        } catch (err) {
+          console.error("Gagal parse profileImage:", err.message);
+          profileImage = null;
+        }
+      }
+
+      // Ambil object tunggal dari array jika hanya berisi satu
+      if (Array.isArray(profileImage) && profileImage.length === 1) {
+        profileImage = profileImage[0];
+      }
+
+      if (typeof profileImage === "object" && profileImage !== null) {
+        const existingImage = await UserImage.findOne({
+          where: { userId: id },
+          attributes: ["id", "imageUrl", "public_id"],
+          transaction: t,
+        });
+
+        if (profileImage.id && profileImage.imageUrl) {
+          console.log("Updating existing image:", profileImage.id);
+          await UserImage.update(
+            {
+              imageUrl: profileImage.imageUrl,
+              public_id: profileImage.public_id || null,
+            },
+            {
+              where: { id: profileImage.id, userId: id },
+              transaction: t,
+            }
+          );
+        } else if (!profileImage.id && profileImage.imageUrl) {
+          console.log("Adding new profile image");
+          await UserImage.create(
+            {
+              userId: id,
+              imageUrl: profileImage.imageUrl,
+              public_id: profileImage.public_id || null,
+            },
+            { transaction: t }
+          );
+
+          if (existingImage) {
+            console.log("Deleting old image:", existingImage.id);
+            await deleteFromCloudinary(existingImage.imageUrl);
+            await UserImage.destroy({
+              where: { id: existingImage.id },
+              transaction: t,
+            });
+          }
+        } else {
+          console.warn("Image tidak valid, tidak diproses.");
+        }
+      } else {
+        console.warn("profileImage is null or not an object.");
+      }
+      await t.commit();
       res
         .status(200)
         .json({ status: 200, message: "User updated successfully" });
     } catch (error) {
+      await t.rollback();
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",
@@ -226,7 +330,11 @@ router.patch(
 
 router.delete(
   "/:id",
-  [authMiddleware, checkRole("admin"), uploadMiddleware.single("profileImage")],
+  [
+    authMiddleware,
+    checkRole(["admin", "super_admin", "customer"]),
+    // uploadMiddleware.destroy("profileImage"),
+  ],
   async (req, res) => {
     try {
       const { id } = req.params;

@@ -14,21 +14,21 @@ router.get(
 // Create Genre
 router.post(
   "/",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   genreController.createGenre
 );
 
 // Update Genre
 router.patch(
   "/:genreId",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   genreController.updateGenre
 );
 
 // Delete Genre
 router.delete(
   "/:genreId",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   genreController.deleteGenre
 );
 

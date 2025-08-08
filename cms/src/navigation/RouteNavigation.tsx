@@ -66,7 +66,7 @@ const RouteNavigation = () => {
           <Route
             path="/"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <DashboardIndex />
                 </AppLayout>
@@ -76,7 +76,7 @@ const RouteNavigation = () => {
           <Route
             path="/category"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <CategoryIndex />
                 </AppLayout>
@@ -86,7 +86,7 @@ const RouteNavigation = () => {
           <Route
             path="/category/add"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <CategoryEdit />
                 </AppLayout>
@@ -96,7 +96,7 @@ const RouteNavigation = () => {
           <Route
             path="/category/:id/edit"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <CategoryEdit />
                 </AppLayout>
@@ -106,7 +106,7 @@ const RouteNavigation = () => {
           <Route
             path="/category/:id/detail"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <CategoryDetail />
                 </AppLayout>
@@ -117,7 +117,7 @@ const RouteNavigation = () => {
           <Route
             path="/book"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <BookIndex />
                 </AppLayout>
@@ -127,7 +127,7 @@ const RouteNavigation = () => {
           <Route
             path="/book/add"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <BookEdit />
                 </AppLayout>
@@ -137,7 +137,7 @@ const RouteNavigation = () => {
           <Route
             path="/book/:id/edit"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <BookEdit />
                 </AppLayout>
@@ -147,7 +147,7 @@ const RouteNavigation = () => {
           <Route
             path="/book/:id/detail"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <BookDetail />
                 </AppLayout>
@@ -158,7 +158,7 @@ const RouteNavigation = () => {
           <Route
             path="/genre"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <GenreIndex />
                 </AppLayout>
@@ -168,7 +168,7 @@ const RouteNavigation = () => {
           <Route
             path="/genre/add"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <GenreEdit />
                 </AppLayout>
@@ -178,7 +178,7 @@ const RouteNavigation = () => {
           <Route
             path="/genre/:id/edit"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <GenreEdit />
                 </AppLayout>
@@ -188,7 +188,7 @@ const RouteNavigation = () => {
           <Route
             path="/genre/:id/detail"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <GenreDetail />
                 </AppLayout>
@@ -198,7 +198,7 @@ const RouteNavigation = () => {
           <Route
             path="/user"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <UserIndex />
                 </AppLayout>
@@ -208,7 +208,7 @@ const RouteNavigation = () => {
           <Route
             path="/user/add"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <UserEdit />
                 </AppLayout>
@@ -218,7 +218,7 @@ const RouteNavigation = () => {
           <Route
             path="/user/:id/edit"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <UserEdit />
                 </AppLayout>
@@ -228,7 +228,7 @@ const RouteNavigation = () => {
           <Route
             path="/user/:id/detail"
             element={
-              <ProtectedRoute roles={[EUserRole.ADMIN]}>
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <UserDetail />
                 </AppLayout>

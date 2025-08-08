@@ -234,10 +234,13 @@ module.exports = {
       }
 
       // validasi password
-      const validatePassword = await bcrypt.compare(
-        password,
-        userByIdentifier.password
-      );
+      // const validatePassword = await bcrypt.compare(
+      //   password,
+      //   userByIdentifier.password
+      // );
+
+      //untuk sementara
+      const validatePassword = password === userByIdentifier.password;
 
       if (!validatePassword) {
         return res.status(403).json({

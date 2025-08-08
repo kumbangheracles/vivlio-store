@@ -5,8 +5,15 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const adminRoleId = uuidv4();
     const customerRoleId = uuidv4();
+    const superAdminRoleId = uuidv4();
 
     await queryInterface.bulkInsert("Roles", [
+      {
+        id: superAdminRoleId,
+        name: "super_admin",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
       {
         id: adminRoleId,
         name: "admin",
@@ -22,6 +29,20 @@ module.exports = {
     ]);
 
     await queryInterface.bulkInsert("Users", [
+      {
+        id: uuidv4(),
+        username: "herkalsuperadmin",
+        fullName: "Ahmad Herkal Taqyudin",
+        email: "herkalsuper@admin.com",
+        password: await bcrypt.hash("superadmin123", 10),
+        roleId: superAdminRoleId,
+        isVerified: true,
+        isActive: true,
+        verificationCode: null,
+        verificationCodeCreatedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
       {
         id: uuidv4(),
         username: "herkaladmin",

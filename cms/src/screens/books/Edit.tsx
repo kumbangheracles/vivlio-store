@@ -356,7 +356,7 @@ const BookEdit = () => {
                     afterOpenChange: (visible) =>
                       !visible && setPreviewImage(""),
                   }}
-                  src={previewImage}
+                  src={`${previewImage}?v=${Date.now()}`}
                 />
               </>
             </Form.Item>

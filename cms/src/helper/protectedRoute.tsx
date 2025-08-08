@@ -14,6 +14,8 @@ const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
   const isAuthenticated = useIsAuthenticated();
   const auth = useAuthUser<UserProperties>();
 
+  // console.log("auth: ", auth);
+
   // if (typeof isAuthenticated !== "boolean" || auth === null) {
   //   return <Navigate to="/login" replace />;
   // }

@@ -49,18 +49,22 @@ router.get("/:categoryId", async (req, res) => {
   }
 });
 
-router.post("/", [authMiddleware, checkRole(["admin"])], async (req, res) => {
-  try {
-    const book_category = await BookCategory.create(req.body);
-    res.status(200).json(book_category);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+router.post(
+  "/",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  async (req, res) => {
+    try {
+      const book_category = await BookCategory.create(req.body);
+      res.status(200).json(book_category);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 router.patch(
   "/:categoryId",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   async (req, res) => {
     try {
       const { categoryId } = req.params;
@@ -84,7 +88,7 @@ router.patch(
 
 router.delete(
   "/:categoryId",
-  [authMiddleware, checkRole(["admin"])],
+  [authMiddleware, checkRole(["admin", "super_admin"])],
   async (req, res) => {
     try {
       const { categoryId } = req.params;
