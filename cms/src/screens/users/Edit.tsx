@@ -84,21 +84,22 @@ const UserEdit = () => {
   ) => {
     form.validateFields();
 
-    // if (isEmpty(data.genre_title) || isEmpty(data.description)) {
-    //   message.error("All fields are required");
+    if (
+      isEmpty(data.fullName) ||
+      isEmpty(data.username) ||
+      isEmpty(data.password) ||
+      isEmpty(data.email) ||
+      isEmpty(data.roleId)
+    ) {
+      message.error("All field is required");
+      return;
+    }
+    // if (isEmpty(data.username)) {
+    //   message.error("Username is required");
     //   return;
     // }
-    // if (isEmpty(data.genre_title)) {
-    //   message.error("Title is required");
-    //   return;
-    // }
-    // if (isEmpty(data.status)) {
-    //   message.error("Status is required");
-    //   return;
-    // }
-
-    // if (isEmpty(data.description)) {
-    //   message.error("description is required");
+    // if (isEmpty(data.email)) {
+    //   message.error("Email is required");
     //   return;
     // }
     try {
@@ -124,8 +125,8 @@ const UserEdit = () => {
 
       navigate(-1);
     } catch (error) {
-      ErrorHandler(error);
-
+      // ErrorHandler(error);
+      console.log("error created user: ", error);
       if (!id) {
         message.error("Failed created user");
       } else {
