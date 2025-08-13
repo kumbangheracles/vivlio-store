@@ -13,6 +13,7 @@ export type BookProps = {
   images?: BookImage[];
   description?: string;
   categories?: CategoryProps;
+  createdByAdminId?: string;
 };
 export type BookImage = {
   bookId?: string;

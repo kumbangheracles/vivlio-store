@@ -9,7 +9,7 @@ import createRefresh from "react-auth-kit/createRefresh";
 import myAxios from "./helper/myAxios";
 import { UserProvider } from "./context/UserContext";
 import { useEffect } from "react";
-
+import "react-image-crop/dist/ReactCrop.css";
 function App() {
   const refresh = createRefresh({
     interval: 10,

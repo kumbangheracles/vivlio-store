@@ -2,7 +2,7 @@ const express = require("express");
 const BookCategory = require("../models/book_category");
 const router = express.Router();
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
-router.get("/", async (req, res) => {
+router.get("/public", async (req, res) => {
   const { isPopular, title, page = 1, limit = 10 } = req.query;
 
   const filters = {};
@@ -37,6 +37,47 @@ router.get("/", async (req, res) => {
     });
   }
 });
+router.get(
+  "/",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  async (req, res) => {
+    const { isPopular, title, page = 1, limit = 10 } = req.query;
+
+    const filters = {};
+    if (isPopular !== undefined) {
+      filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
+    const whereCondition = req.id
+      ? { ...filters, createdByAdminId: req.id }
+      : filters;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    try {
+      const { count, rows } = await BookCategory.findAndCountAll({
+        where: whereCondition,
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        offset,
+      });
+
+      res.status(200).json({
+        status: "Success",
+        results: rows,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  }
+);
 
 router.get("/:categoryId", async (req, res) => {
   try {
@@ -54,7 +95,10 @@ router.post(
   [authMiddleware, checkRole(["admin", "super_admin"])],
   async (req, res) => {
     try {
-      const book_category = await BookCategory.create(req.body);
+      const book_category = await BookCategory.create({
+        ...req.body,
+        createdByAdminId: req.id,
+      });
       res.status(200).json(book_category);
     } catch (error) {
       res.status(500).json({ error: error.message });

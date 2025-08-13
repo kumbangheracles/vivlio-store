@@ -1,4 +1,4 @@
-const { Book, BookImage, Genre } = require("../models/index");
+const { Book, BookImage, Genre, User } = require("../models/index");
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
@@ -23,6 +23,59 @@ module.exports = {
     try {
       const { count, rows } = await Book.findAndCountAll({
         where: filters,
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        include: [
+          {
+            model: BookImage,
+            as: "images",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+          {
+            model: Genre,
+            as: "genres",
+            through: { attributes: [] },
+            attributes: ["genreid", "genre_title"],
+          },
+        ],
+        offset,
+      });
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: rows,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+  async cmsGetAll(req, res) {
+    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+
+    const filters = {};
+    if (isPopular !== undefined) {
+      filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+    if (categoryId) filters.categoryId = categoryId;
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
+
+    const whereCondition = req.id
+      ? { ...filters, createdByAdminId: req.id }
+      : filters;
+
+    const offset = (page - 1) * limit;
+    try {
+      const { count, rows } = await Book.findAndCountAll({
+        where: whereCondition,
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
         include: [
@@ -113,6 +166,7 @@ module.exports = {
           description: req.body.description,
           isPopular: req.body.isPopular || false,
           categoryId: req.body.categoryId || null,
+          createdByAdminId: req.id,
         },
         { transaction: t }
       );

@@ -14,6 +14,10 @@ const Genre = sequelize.define(
       unique: true,
       allowNull: false,
     },
+    createdByAdminId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED"),
       allowNull: false,

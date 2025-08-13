@@ -55,6 +55,39 @@ UserImage.belongsTo(User, {
   foreignKey: "userId",
   as: "Users",
 });
+
+// Users ↔ Books
+User.hasMany(Book, {
+  foreignKey: "createdByAdminId",
+});
+
+Book.belongsTo(User, {
+  foreignKey: "createdByAdminId",
+});
+
+// Users ↔ Genre
+User.hasMany(Genre, {
+  foreignKey: "createdByAdminId",
+});
+Genre.belongsTo(User, {
+  foreignKey: "createdByAdminId",
+});
+
+// Users ↔ BookCategory
+User.hasMany(BookCategory, {
+  foreignKey: "createdByAdminId",
+});
+BookCategory.belongsTo(User, {
+  foreignKey: "createdByAdminId",
+});
+// Users ↔ Users
+User.hasMany(User, {
+  foreignKey: "createdByAdminId",
+});
+User.belongsTo(User, {
+  foreignKey: "createdByAdminId",
+});
+
 module.exports = {
   Book,
   BookCategory,

@@ -7,6 +7,13 @@ const bookController = require("../controller/book.controller");
 // Get all books
 router.get("/", bookController.getAll);
 
+// Cms get All Books
+router.get(
+  "/admin",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  bookController.cmsGetAll
+);
+
 router.get(
   "/:id",
 

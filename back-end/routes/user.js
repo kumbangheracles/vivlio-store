@@ -4,12 +4,12 @@ const bcrypt = require("bcryptjs");
 const { User, UserImage } = require("../models/index");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 router.get(
-  "/",
+  "/public",
   authMiddleware,
   checkRole(["admin", "super_admin"]),
   async (req, res) => {
@@ -35,6 +35,49 @@ router.get(
         results: rows,
         total: count,
         currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  }
+);
+router.get(
+  "/",
+  authMiddleware,
+  checkRole(["admin", "super_admin"]),
+  async (req, res) => {
+    const { page = 1, limit = 10, id } = req.query;
+    const offset = (page - 1) * limit;
+    try {
+      const { count, rows } = await User.findAndCountAll({
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        include: [
+          {
+            model: UserImage,
+            as: "profileImage",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+        ],
+        offset,
+      });
+
+      const filtersWithAdminId = req.id
+        ? rows.filter((item) => item.createdByAdminId === req.id)
+        : rows;
+
+      res.status(200).json({
+        where: !!req.id,
+        status: 200,
+        message: "Success",
+        results: filtersWithAdminId,
+        total: count,
+        currentPage: parseInt(page, 10),
         totalPages: Math.ceil(count / limit),
       });
     } catch (error) {
@@ -185,9 +228,10 @@ router.post(
           fullName,
           username,
           email,
-          password: hashedPassword,
+          password,
           roleId,
           isVerified: true,
+          createdByAdminId: req.id,
         },
         { transaction: t }
       );
@@ -336,10 +380,50 @@ router.delete(
     // uploadMiddleware.destroy("profileImage"),
   ],
   async (req, res) => {
+    const t = await sequelize.transaction();
     try {
       const { id } = req.params;
-      await Book.destroy({ where: { id } });
-      res.json({ message: "User deleted successfully" });
+      const user = await User.findByPk(id, { transaction: t });
+
+      if (!user) {
+        await t.rollback();
+        return res.status(404).json({
+          status: 404,
+          message: "User not found",
+          result: null,
+        });
+      }
+
+      const userImage = await UserImage.findAll({
+        where: { userId: id },
+        attributes: ["id", "public_id", "imageUrl"],
+        transaction: t,
+      });
+
+      console.log(`Found ${userImage.length} images to delete`);
+
+      if (userImage.length > 0) {
+        console.log("Deleting from Cloudinary...");
+        await Promise.all(
+          userImage.map((img) => deleteFromCloudinary(img.imageUrl))
+        );
+
+        console.log("Deleting images from database...");
+        await UserImage.destroy({
+          where: { userId: id },
+          transaction: t,
+        });
+      }
+      console.log("Deleting user from database...");
+      const result = await User.destroy({ where: { id }, transaction: t });
+
+      await t.commit();
+
+      res.status(200).json({
+        status: 200,
+        message: "User deleted successfully",
+        result,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

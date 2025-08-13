@@ -30,6 +30,11 @@ const Book = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    createdByAdminId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+
     status: {
       type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED"),
       allowNull: false,

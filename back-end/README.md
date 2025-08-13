@@ -250,7 +250,7 @@ npx sequelize-cli db:migrate
 - Use environment variables instead of hardcoded database credentials.
 - Regularly backup your database before running migrations.
 
-This guide provides a structured way to use Sequelize in the Book Store API project efficiently. 🚀
+This guide provides a structured way to use Sequelize in the Vivlio Store API project efficiently. 🚀
 
 # Flow jwt cookie 2 secret keys
 

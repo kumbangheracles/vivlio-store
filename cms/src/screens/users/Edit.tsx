@@ -9,14 +9,16 @@ import {
   Image,
   UploadFile,
   UploadProps,
+  Modal,
 } from "antd";
+import Cropper from "react-easy-crop";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
-import DefaultImage from "../../assets/images/default-img.png";
+import DefaultImage from "../../assets/images/profile-default.jpg";
 import { useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { isEmpty, isBooleanUndefined } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
@@ -28,6 +30,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import { UploadFileStatus } from "antd/es/upload/interface";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import getCroppedImg from "../../helper/getCroppedImage";
 const UserEdit = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProperties>(initialUser);
@@ -39,17 +43,31 @@ const UserEdit = () => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const [form] = Form.useForm();
   const { id } = useParams();
+  const auth = useAuthUser<UserProperties>();
 
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const fetchRoles = async () => {
     try {
       const res = await myAxios.get("/roles");
       console.log("Fetched categories:", res.data.results);
-      const data = res.data.results;
+
+      let data = res.data.results;
+
+      if (auth?.role === "admin") {
+        data = data.filter(
+          (cat: RoleProperties) => cat.name.toLowerCase() === "customer"
+        );
+      }
 
       const options = data.map((cat: RoleProperties) => ({
         label: cat.name,
         value: cat.id,
       }));
+
       setDataRoles(options);
     } catch (error) {
       ErrorHandler(error);
@@ -152,17 +170,28 @@ const UserEdit = () => {
       setFileList(imagePrev);
       setPreviewImage(profileImage.imageUrl);
     } catch (error) {
-      ErrorHandler(error);
+      // ErrorHandler(error);
     } finally {
       setIsLoading(false);
     }
   };
-  const handleCustomUpload = async ({ file, onSuccess, onError }: any) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "vivlio-store");
 
+  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+  const handleCropSave = async () => {
     try {
+      const croppedImage = await getCroppedImg(
+        selectedImage,
+        croppedAreaPixels
+      );
+      setCropModalOpen(false);
+
+      // Upload hasil cropping ke Cloudinary
+      const formData = new FormData();
+      formData.append("file", croppedImage);
+      formData.append("upload_preset", "vivlio-store");
+
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/don5olb8f/image/upload",
         {
@@ -173,9 +202,28 @@ const UserEdit = () => {
 
       const data = await res.json();
 
-      onSuccess(data, file);
-    } catch (err) {
-      onError(err);
+      const mappedImage = [
+        {
+          userId: uuidv4(),
+          imageUrl: data.secure_url,
+          public_id: data.public_id,
+        },
+      ];
+
+      setPreviewImage(data.secure_url);
+      setUser((prev) => ({ ...prev, profileImage: mappedImage }));
+      setFileList([
+        {
+          uid: uuidv4(),
+          name: "profile.jpg",
+          status: "done",
+          url: data.secure_url,
+          response: data,
+        },
+      ]);
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to crop image");
     }
   };
   const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
@@ -193,6 +241,8 @@ const UserEdit = () => {
     if (latestFile) {
       const imageUrl = await getBase64(latestFile as RcFile);
       setPreviewImage(imageUrl);
+      setCropModalOpen(true);
+      setSelectedImage(imageUrl);
       setUser((prev) => ({
         ...prev,
         profileImage: mappedImages,
@@ -233,6 +283,7 @@ const UserEdit = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        height: 10,
         gap: 10,
       }}
       type="button"
@@ -287,15 +338,27 @@ const UserEdit = () => {
         sectionSubTitle="this section is for creating new genre"
       >
         <Form layout="vertical" form={form}>
-          <Form.Item
-            name={"profileImage"}
-            label="Profile Image"
-            // rules={[{ required: true, message: "Profile Image are required" }]}
-          >
+          <Form.Item name="profileImage" label="Profile Image">
             <>
-              <div style={{ width: "100%", height: "auto" }}>
+              <div
+                style={{
+                  width: "300px",
+                  height: "300px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "5px solid gray",
+                }}
+              >
                 <Image
-                  style={{ cursor: "pointer", width: "200px", height: "200px" }}
+                  style={{
+                    cursor: "pointer",
+                    width: "100%",
+                    height: "100%",
+                    // transform: "scale(1.2)",
+                  }}
                   src={previewImage || DefaultImage}
                 />
               </div>
@@ -303,10 +366,7 @@ const UserEdit = () => {
                 listType="picture-card"
                 fileList={fileList}
                 showUploadList={false}
-                onChange={(info) => {
-                  handleUpload(info);
-                }}
-                customRequest={handleCustomUpload}
+                onChange={handleUpload}
                 maxCount={1}
                 beforeUpload={beforeUpload}
                 style={{ cursor: "pointer", width: 100, height: 30 }}
@@ -408,6 +468,32 @@ const UserEdit = () => {
           </Form.Item>
         </Form>
       </HeaderSection>
+
+      <Modal
+        open={cropModalOpen}
+        onCancel={() => setCropModalOpen(false)}
+        onOk={handleCropSave}
+        okText="Save"
+      >
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            height: 400,
+          }}
+        >
+          <Cropper
+            image={selectedImage}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            cropShape="round"
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={onCropComplete}
+          />
+        </div>
+      </Modal>
     </>
   );
 };

@@ -3,8 +3,17 @@ const router = express.Router();
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const genreController = require("../controller/genre.controller");
 // Get all Genres
-router.get("/", genreController.getAll);
+router.get(
+  "/",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  genreController.getAll
+);
 
+router.get(
+  "/public",
+
+  genreController.publicGetAll
+);
 router.get(
   "/:genreId",
 

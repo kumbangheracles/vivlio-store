@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Role = require("../models/role");
+const { User } = require("../models");
 exports.authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
@@ -14,12 +15,15 @@ exports.authMiddleware = (req, res, next) => {
 
     if (err) return res.status(403).json({ message: "Forbidden" });
 
-    const { username, role } = decoded.UserInfo;
+    const { username, role, id } = decoded.UserInfo;
 
     const roleData = await Role.findOne({ where: { name: role } });
 
     if (!roleData) return res.status(403).json({ message: "Invalid Role" });
 
+    const userData = await User.findOne({ where: { username } });
+    if (!userData) return res.status(404).json({ message: "Admin not found" });
+    req.id = userData.id;
     req.user = username;
     req.role = role;
     next();

@@ -37,6 +37,8 @@ import FormEditor from "../../components/FormEditor";
 import { GenreProperties, GenreStatusType } from "../../types/genre.type";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
+import { UserProperties } from "../../types/user.type";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 const BookEdit = () => {
   const navigate = useNavigate();
   const [dataBook, setDataBook] = useState<BookProps>(initialBookProps);
@@ -49,7 +51,7 @@ const BookEdit = () => {
   const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
   const [dataGenre, setDataGenre] = useState<GenreProperties[]>([]);
   const [search, setSearch] = useState("");
-
+  const auth = useAuthUser<UserProperties>();
   const getBase64 = (file: File | Blob): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -167,6 +169,7 @@ const BookEdit = () => {
         status: status,
         book_type: data.book_type,
         categoryId: data.categoryId,
+        createdByAdminId: auth?.id,
       };
 
       console.log("Data payload: ", payload);

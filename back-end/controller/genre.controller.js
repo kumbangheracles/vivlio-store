@@ -1,7 +1,8 @@
+const { where } = require("sequelize");
 const Genre = require("../models/genre");
 
 module.exports = {
-  async getAll(req, res) {
+  async publicGetAll(req, res) {
     const { page = 1, limit = 10, genreId } = req.query;
 
     const offset = (page - 1) * limit;
@@ -17,6 +18,41 @@ module.exports = {
         status: 200,
         message: "Success",
         results: rows,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+  async getAll(req, res) {
+    const { page = 1, limit = 10, genreId } = req.query;
+
+    const offset = (page - 1) * limit;
+    // const whereCondition = req.id
+    //   ? { ...filters, createdByAdminId: req.id }
+    //   : filters;
+    try {
+      const { count, rows } = await Genre.findAndCountAll({
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        offset,
+      });
+
+      const rowsWithAdminId = rows.filter(
+        (item) => item.createdByAdminId === req.id
+      );
+
+      res.status(200).json({
+        where: req.id.length > 0,
+        status: 200,
+        message: "Success",
+        results: rowsWithAdminId,
         total: count,
         currentPage: parseInt(page),
         totalPages: Math.ceil(count / limit),
@@ -60,7 +96,10 @@ module.exports = {
 
   async createGenre(req, res) {
     try {
-      const genre = await Genre.create(req.body);
+      const genre = await Genre.create({
+        ...req.body,
+        createdByAdminId: req.id,
+      });
       res.status(200).json({
         status: 200,
         message: "Success",

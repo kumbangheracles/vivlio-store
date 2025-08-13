@@ -31,6 +31,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      createdByAdminId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
       status: {
         type: Sequelize.ENUM("PUBLISHED", "UNPUBLISHED"),

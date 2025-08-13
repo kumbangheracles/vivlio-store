@@ -43,7 +43,7 @@ const GenreIndex = () => {
   useEffect(() => {
     fetchGenre(page, limit);
   }, [page, limit]);
-
+  console.log(dataGenre);
   const handleStatusChange = async (id: string, status: string) => {
     try {
       setloading(true);

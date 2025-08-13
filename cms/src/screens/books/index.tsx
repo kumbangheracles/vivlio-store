@@ -46,7 +46,7 @@ const Books = () => {
   const fetchBooks = async (page: number, limit: number) => {
     try {
       setloading(true);
-      const res = await myAxios.get("/books", {
+      const res = await myAxios.get("/books/admin", {
         params: { page, limit },
       });
       setDataBooks(res.data.results);

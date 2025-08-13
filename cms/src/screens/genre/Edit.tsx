@@ -15,10 +15,15 @@ import {
   GenreStatusType,
 } from "../../types/genre.type";
 
+import { UserProperties } from "../../types/user.type";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+
 const GenreEdit = () => {
   const navigate = useNavigate();
   const [genre, setGenre] = useState<GenreProperties>(genreInitialValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const auth = useAuthUser<UserProperties>();
+  console.log("admin id: ", auth?.id);
   const [form] = Form.useForm();
   const { id } = useParams();
   const handleSubmit = async (data: GenreProperties) => {
@@ -46,6 +51,7 @@ const GenreEdit = () => {
         genre_title: data.genre_title,
         status: data.status,
         description: data.description,
+        // createdByAdminId: auth?.id,
       };
 
       if (!id) {

@@ -31,6 +31,7 @@ const Category = () => {
       const res = await myAxios.get("/book-category", {
         params: { page, limit },
       });
+      console.log(res.data.results);
       setDataCategory(res.data.results);
       setTotalItems(res.data.total);
     } catch (error) {

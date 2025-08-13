@@ -18,6 +18,10 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      createdByAdminId: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       roleId: {
         type: Sequelize.STRING,
         allowNull: true,

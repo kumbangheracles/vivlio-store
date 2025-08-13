@@ -3,12 +3,21 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const [admins] = await queryInterface.sequelize.query(
+      `SELECT id FROM users WHERE username = 'herkalsuperadmin' LIMIT 1;`
+    );
+    if (admins.length === 0) {
+      throw new Error("No admin found. Please seed admin user first.");
+    }
+
+    const adminId = admins[0].id;
     const { v4: uuidv4 } = require("uuid");
     return queryInterface.bulkInsert("genre", [
       {
         genreId: uuidv4(),
         genre_title: "Sci-fi",
         status: "UNPUBLISHED",
+        createdByAdminId: adminId,
         description: `1. Definisi dan Ruang Lingkup
 Science fiction, atau sci-fi, adalah genre fiksi spekulatif yang berfokus pada konsep-konsep ilmiah, teknologi masa depan, eksplorasi ruang angkasa, perjalanan waktu, kehidupan di planet lain, dan konsekuensi sosial atau biologis dari inovasi ilmiah. Genre ini sering menggabungkan pengetahuan ilmiah yang ada dengan imajinasi penulis untuk menciptakan dunia atau skenario yang belum terjadi, namun mungkin dapat terjadi di masa depan.
 
@@ -30,6 +39,7 @@ Sci-fi memiliki daya tarik lintas budaya dan generasi karena menawarkan petualan
         genreId: uuidv4(),
         genre_title: "Fantasy",
         status: "UNPUBLISHED",
+        createdByAdminId: adminId,
         description: `Fantasy Cuy seru nich 😊😊`,
         createdAt: new Date(),
         updatedAt: new Date(),
