@@ -1,3 +1,4 @@
+"use clienr";
 type RichTextRendererProps = {
   html: string;
 };

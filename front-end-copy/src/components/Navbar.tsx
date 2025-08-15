@@ -6,55 +6,51 @@ import { styled } from "styled-components";
 import { Modal } from "antd";
 import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
+import NextAuth from "next-auth";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppInput from "./AppInput";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "next-auth/react";
+import { SearchOutlined } from "@ant-design/icons";
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const navigate = useRouter();
-
+  const auth = useAuth();
+  const router = useRouter();
+  console.log("Auth: ", auth);
   const [isHover, setIshover] = useState<boolean>(false);
-
+  const [isLoading, setIsloading] = useState<boolean>(false);
   const handleLogout = async () => {
-    try {
-      await myAxios.post("/auth/logout");
-      message.info("Logout Success");
-      // localStorage.removeItem("user");
-
-      navigate.push("/login");
-    } catch (error) {
-      console.log("Error Logout: ", error);
-      ErrorHandler(error);
-    } finally {
-      // signOut();
-    }
+    signOut({
+      callbackUrl: "/auth/login", // redirect setelah logout
+    });
   };
 
-  // const items = isAuthenticated
-  //   ? [
-  //       {
-  //         key: isAuthenticated ? "profile" : "",
-  //         label: isAuthenticated ? "Profile" : "",
-  //         // onClick: () => handleEdit(record.articleId),
-  //       },
-  //       {
-  //         key: isAuthenticated ? "logout" : "login",
-  //         label: isAuthenticated ? "Logout" : "Login",
-  //         onClick: () => {
-  //           isAuthenticated ? setIsOpen(true) : navigate.push("/login");
-  //         },
-  //       },
-  //     ]
-  //   : [
-  //       {
-  //         key: isAuthenticated ? "logout" : "login",
-  //         label: isAuthenticated ? "Logout" : "Login",
-  //         onClick: () => {
-  //           isAuthenticated ? setIsOpen(true) : navigate.push("/login");
-  //         },
-  //       },
-  //     ];
+  const items = auth.authenticated
+    ? [
+        {
+          key: auth.authenticated ? "profile" : "",
+          label: auth.authenticated ? "Profile" : "",
+          // onClick: () => handleEdit(record.articleId),
+        },
+        {
+          key: auth.authenticated ? "logout" : "login",
+          label: auth.authenticated ? "Logout" : "Login",
+          onClick: () => {
+            auth.authenticated ? setIsOpen(true) : router.push("/auth/login");
+          },
+        },
+      ]
+    : [
+        {
+          key: auth.authenticated ? "logout" : "login",
+          label: auth.authenticated ? "Logout" : "Login",
+          onClick: () => {
+            auth.authenticated ? setIsOpen(true) : router.push("/auth/login");
+          },
+        },
+      ];
 
   return (
     <nav className="fixed top-0 w-full h-[auto] bg-white">
@@ -64,6 +60,7 @@ export default function Navbar() {
           justifyContent: "space-between",
           alignItems: "center",
           marginInline: "100px",
+          paddingBlock: 5,
         }}
       >
         <span className="font-extrabold tracking-widest logo ">
@@ -72,16 +69,19 @@ export default function Navbar() {
 
         <div
           style={{ width: "357px" }}
-          className="flex justify-around navbar-option"
+          className="flex justify-around navbar-option items-center "
         >
-          <div className="input-search-navbar ">
-            <AppInput />
+          <div className="input-search-navbar  ">
+            <AppInput
+              icon={<SearchOutlined />}
+              style={{ width: "200px", height: "30px" }}
+            />
           </div>
           <div
             onMouseEnter={() => setIshover(true)}
             onMouseLeave={() => setIshover(false)}
           >
-            {/* <Dropdown
+            <Dropdown
               trigger={["click"]}
               menu={{
                 items: items,
@@ -94,7 +94,7 @@ export default function Navbar() {
                   alt="account-icon"
                 />
               </AccountIcon>
-            </Dropdown> */}
+            </Dropdown>
           </div>
           <img
             style={{ width: "24px" }}
@@ -128,6 +128,7 @@ export default function Navbar() {
         okText={"Yes"}
         cancelText={"Cancel"}
         onCancel={() => setIsOpen(false)}
+        loading={isLoading}
         onOk={() => handleLogout()}
         title={
           <>
@@ -194,7 +195,7 @@ const AccountIcon = styled.div<IconProps>`
   border-radius: 50%;
   padding: 3px;
   display: flex;
-  margin-top: 10px;
+  /* margin-top: 10px; */
   align-items: center;
   justify-content: center;
   transition: 0.3s all ease;

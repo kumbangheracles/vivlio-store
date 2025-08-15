@@ -1,3 +1,4 @@
+"use client";
 import { Select, SelectProps } from "antd";
 import { ReactNode } from "react";
 import { styled } from "styled-components";

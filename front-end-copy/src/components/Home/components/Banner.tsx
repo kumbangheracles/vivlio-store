@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import bannerImage from "../../../assets/banner.jpg";
 import styled from "styled-components";

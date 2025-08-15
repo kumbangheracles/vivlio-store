@@ -1,10 +1,11 @@
 import axios, { AxiosError } from "axios";
 
 const myAxios = axios.create({
-  baseURL: process.env.API_BASE_URL || "http://localhost:3002",
+  baseURL: process.env.API_BASE_URL || "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
   timeout: 10000,
 });
 

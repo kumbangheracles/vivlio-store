@@ -1,3 +1,4 @@
+"use client";
 import { Button, Row, Space, Typography } from "antd";
 import React, { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";

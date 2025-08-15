@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "antd";
 import { ReactNode } from "react";
 import { styled } from "styled-components";

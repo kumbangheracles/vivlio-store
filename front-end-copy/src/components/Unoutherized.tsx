@@ -1,3 +1,4 @@
+"use client";
 import { Result, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 

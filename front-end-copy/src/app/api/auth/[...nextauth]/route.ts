@@ -21,6 +21,7 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials): Promise<any> {
         if (!credentials?.identifier || !credentials?.password) {
+          console.error("Missing credentials");
           return null;
         }
 
@@ -30,17 +31,17 @@ const authOptions: NextAuthOptions = {
             password: credentials.password,
           };
 
-          // Kirim request ke backend API login endpoint menggunakan axios
           const response = await myAxios.post<LoginResponse>(
             "/auth/login",
             loginData
           );
 
+          console.log("Backend response data:", response.data);
+
           const data = response.data;
 
-          // Jika login berhasil
           if (response.status === 200 && data.results) {
-            return {
+            const userObj = {
               id: data.results.username,
               name: data.results.username,
               email: credentials.identifier.includes("@")
@@ -50,15 +51,37 @@ const authOptions: NextAuthOptions = {
               token: data.results.token,
               isVerified: data.results.isVerified,
             };
+
+            console.log("Login successful, returning user:", userObj);
+            return userObj;
           }
 
+          console.error("Login failed: Invalid response structure");
+          console.log("Response data:", data);
           return null;
         } catch (error) {
+          console.error("🚨 Login error occurred:");
+
           if (error instanceof AxiosError) {
             const errorData = error.response?.data as ApiError;
-            console.error("Login failed:", errorData?.message || error.message);
+            console.error("Status:", error.response?.status);
+            console.error("Response data:", errorData);
+            console.error(
+              "Error message:",
+              errorData?.message || error.message
+            );
+
+            // Log full error untuk debugging
+            if (error.response?.status === 403) {
+              console.error("403 Error - Possible causes:");
+              console.error("1. Wrong credentials");
+              console.error("2. User not verified");
+              console.error("3. User not found");
+            } else if (error.response?.status === 500) {
+              console.error("500 Error - Server side issue");
+            }
           } else {
-            console.error("Login error:", error);
+            console.error("Non-Axios error:", error);
           }
           return null;
         }
@@ -69,23 +92,35 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     // JWT callback - dipanggil saat token dibuat atau diupdate
     async jwt({ token, user }) {
+      console.log("🔑 JWT callback called:");
+      console.log("User:", user);
+      console.log("Token before:", token);
+
       // Saat pertama login, user object tersedia
       if (user) {
         token.role = user.role;
         token.accessToken = user.token;
         token.isVerified = user.isVerified;
       }
+
+      console.log("Token after:", token);
       return token;
     },
 
     // Session callback - menentukan data apa yang akan dikirim ke client
     async session({ session, token }) {
+      console.log("📱 Session callback called:");
+      console.log("Session before:", session);
+      console.log("Token:", token);
+
       if (token) {
         session.user.id = token.sub as string;
         session.user.role = token.role;
         session.user.isVerified = token.isVerified;
         session.accessToken = token.accessToken;
       }
+
+      console.log("Session after:", session);
       return session;
     },
   },
@@ -93,7 +128,6 @@ const authOptions: NextAuthOptions = {
   // Custom pages (optional)
   pages: {
     signIn: "/auth/login", // Custom login page
-    // signUp: '/auth/register', // Custom register page
   },
 
   // Session strategy
