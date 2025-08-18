@@ -1,22 +1,43 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
+import { getSession } from "next-auth/react";
+import { config } from "process";
 const myAxios = axios.create({
   baseURL: process.env.API_BASE_URL || "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
+
   withCredentials: true,
   timeout: 10000,
 });
 
 myAxios.interceptors.request.use(
-  (config) => {
-    console.log(
-      `Making ${config.method?.toUpperCase()} request to:`,
-      config.url
-    );
+  async (config: InternalAxiosRequestConfig) => {
+    const session = await getSession();
+
+    if (session?.accessToken) {
+      config.headers.Authorization = `Bearer ${session.accessToken}`;
+      console.log("Added Bearer token to request");
+    } else {
+      console.log("No access token found in session");
+    }
+
     return config;
   },
+
+  // (config) => {
+  //   console.log(
+  //     `Making ${config.method?.toUpperCase()} request to:`,
+  //     config.url
+  //   );
+  //   return config;
+  // },
+  // (error: AxiosError) => {
+  //   console.error("Request error:", error);
+  //   return Promise.reject(error);
+  // }
+
   (error: AxiosError) => {
     console.error("Request error:", error);
     return Promise.reject(error);

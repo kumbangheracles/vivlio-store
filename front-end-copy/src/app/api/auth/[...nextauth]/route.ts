@@ -1,9 +1,16 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { LoginResponse, LoginCredentials, ApiError } from "@/types/api";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import myAxios from "@/libs/myAxios";
-
+import { ErrorHandler } from "@/helpers/handleError";
+const authAxios = axios.create({
+  baseURL: process.env.API_BASE_URL || "http://localhost:3000",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000,
+});
 const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -31,7 +38,7 @@ const authOptions: NextAuthOptions = {
             password: credentials.password,
           };
 
-          const response = await myAxios.post<LoginResponse>(
+          const response = await authAxios.post<LoginResponse>(
             "/auth/login",
             loginData
           );
@@ -42,7 +49,7 @@ const authOptions: NextAuthOptions = {
 
           if (response.status === 200 && data.results) {
             const userObj = {
-              id: data.results.username,
+              id: data.results.id,
               name: data.results.username,
               email: credentials.identifier.includes("@")
                 ? credentials.identifier
@@ -91,19 +98,35 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     // JWT callback - dipanggil saat token dibuat atau diupdate
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       console.log("🔑 JWT callback called:");
+      console.log("🔑 JWT callback triggered:", trigger);
       console.log("User:", user);
       console.log("Token before:", token);
 
       // Saat pertama login, user object tersedia
       if (user) {
+        token.id = user.id;
         token.role = user.role;
         token.accessToken = user.token;
         token.isVerified = user.isVerified;
+        token.tokenExpiry = Date.now() + 60 * 60 * 1000;
       }
 
       console.log("Token after:", token);
+
+      if (token.tokenExpiry && Date.now() > Number(token.tokenExpiry)) {
+        console.log("Token expired, need to refresh");
+
+        try {
+          const res = await authAxios.get("/auth/refresh");
+          token.accessToken = res.data.token;
+          console.log("Success refresh token!!");
+        } catch (error) {
+          // ErrorHandler(error);
+          console.log("Failed refresh token: ", error);
+        }
+      }
       return token;
     },
 
@@ -114,7 +137,7 @@ const authOptions: NextAuthOptions = {
       console.log("Token:", token);
 
       if (token) {
-        session.user.id = token.sub as string;
+        session.user.id = token.id as string;
         session.user.role = token.role;
         session.user.isVerified = token.isVerified;
         session.accessToken = token.accessToken;

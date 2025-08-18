@@ -5,9 +5,11 @@ import Banner from "./components/Banner";
 import ListBook from "./components/ListBook";
 import { styled } from "styled-components";
 import ListCategory from "./components/ListCategory";
+import { BookProps } from "@/types/books.type";
 
 interface PropTypes {
   titleSection?: string;
+  dataBooks?: BookProps[];
 }
 
 export default function HomePage(prop: PropTypes) {
@@ -22,7 +24,7 @@ export default function HomePage(prop: PropTypes) {
         <TitleList>Popular Category</TitleList>
         <ListCategory />
       </div>
-      <ListBook titleSection={"Recently Popular"} />
+      <ListBook dataBooks={prop.dataBooks} titleSection={"Recently Popular"} />
       <ListBook titleSection={"Best Seller"} />
       <ListBook titleSection={"Latest Popular"} />
     </>

@@ -30,9 +30,9 @@ export default function Navbar() {
   const items = auth.authenticated
     ? [
         {
-          key: auth.authenticated ? "profile" : "",
-          label: auth.authenticated ? "Profile" : "",
-          // onClick: () => handleEdit(record.articleId),
+          key: auth.authenticated ? "Account" : "",
+          label: auth.authenticated ? "Account" : "",
+          onClick: () => router.push("/account"),
         },
         {
           key: auth.authenticated ? "logout" : "login",
@@ -53,7 +53,7 @@ export default function Navbar() {
       ];
 
   return (
-    <nav className="fixed top-0 w-full h-[auto] bg-white">
+    <nav className="fixed top-0 w-full h-[auto] bg-white z-[999]">
       <div
         style={{
           display: "flex",
@@ -202,4 +202,6 @@ const AccountIcon = styled.div<IconProps>`
   &:hover {
     border-color: black;
   }
+
+  z-index: 99999999999999999;
 `;

@@ -286,6 +286,7 @@ module.exports = {
         status: 200,
         message: "Login success",
         results: {
+          id: userByIdentifier?.id,
           isVerified: userByIdentifier?.isVerified,
           role: role.name,
           username: userByIdentifier.username,

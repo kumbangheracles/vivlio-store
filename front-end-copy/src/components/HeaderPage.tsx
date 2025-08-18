@@ -1,7 +1,7 @@
 "use client";
 import { Button, Row, Space, Typography } from "antd";
+import { useRouter } from "next/navigation";
 import React, { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 
 interface Props {
   title: string;
@@ -17,7 +17,7 @@ export default function HeaderPage({
   icon,
   goBack,
 }: Props) {
-  const navigate = useNavigate();
+  const navigate = useRouter();
   return (
     <Row
       style={{
@@ -37,7 +37,7 @@ export default function HeaderPage({
               if (goBack) {
                 goBack();
               } else {
-                navigate(-1);
+                navigate.back();
               }
             }}
           >

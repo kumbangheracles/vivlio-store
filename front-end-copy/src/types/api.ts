@@ -5,6 +5,7 @@ export interface LoginResponse {
     role: string;
     username: string;
     token: string;
+    id?: string;
   };
 }
 

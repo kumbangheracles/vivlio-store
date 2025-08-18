@@ -26,13 +26,13 @@ export default DetailItem;
 
 export const Label = styled.h1`
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
 
-  color: black;
+  color: #898989;
 `;
 
 const Value = styled.span`
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   color: black;
 `;

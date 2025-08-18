@@ -40,3 +40,7 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
+label {
+  font-weight: 700;
+}

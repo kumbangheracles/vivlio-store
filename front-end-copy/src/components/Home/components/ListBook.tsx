@@ -10,33 +10,18 @@ import { Empty } from "antd";
 
 interface BookTypes {
   titleSection?: string;
+  dataBooks?: BookProps[];
 }
 
-const ListBook: React.FC<BookTypes> = ({ titleSection }) => {
-  const [dataBook, setDataBook] = useState<BookProps[]>([]);
-  const fetchBook = async () => {
-    try {
-      const res = await axios.get<BaseMultipleResponse<BookProps>>(
-        "http://localhost:3000/books"
-      );
-      console.log("data book: ", res.data.payload);
-      setDataBook(res.data.payload);
-    } catch (error) {
-      console.log("error fetch data book: ", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchBook();
-  }, []);
+const ListBook: React.FC<BookTypes> = ({ titleSection, dataBooks }) => {
   return (
     <>
       <div style={{ marginTop: "50px" }}>
-        {dataBook?.length > 0 ? (
+        {dataBooks!?.length > 0 ? (
           <>
             <TitleList>{titleSection}</TitleList>
             <ListBookWrapper className="grid gap-[10px] p-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-3">
-              {dataBook?.map((item) => (
+              {dataBooks?.map((item) => (
                 <CardBook
                   key={item?.id}
                   title={item?.title}
@@ -45,7 +30,10 @@ const ListBook: React.FC<BookTypes> = ({ titleSection }) => {
                   categoryId={item?.categoryId}
                   book_type={item?.book_type}
                   book_cover={item?.book_cover || "/images/no-image.png"}
-                  status={""}
+                  description={item?.description}
+                  status={item?.status}
+                  genres={item?.genres}
+                  images={item?.images}
                 />
               ))}
             </ListBookWrapper>
