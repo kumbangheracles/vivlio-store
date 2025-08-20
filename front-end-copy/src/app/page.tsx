@@ -9,7 +9,7 @@ async function fetchBooks(): Promise<BookProps[]> {
   const dataBooks = response.data.results;
   return dataBooks;
 }
-
+export const revalidate = 60;
 export default async function Home() {
   const books = await fetchBooks();
   console.log("Data books: ", books);

@@ -111,7 +111,7 @@ router.get(
       res.status(200).json({
         status: 200,
         message: "Success",
-        result: user, // user sudah include profileImage di dalamnya
+        result: user,
       });
     } catch (error) {
       res.status(500).json({
@@ -204,6 +204,14 @@ router.post(
       const { fullName, username, email, password, roleId, profileImage } =
         req.body;
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!email || !emailRegex.test(email)) {
+        return res.status(400).json({
+          status: 400,
+          message: "Email tidak valid",
+        });
+      }
       const parsedImages =
         typeof profileImage === "string"
           ? JSON.parse(profileImage)
@@ -280,7 +288,10 @@ router.patch(
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const user = await User.findByPk(id, { transaction: t });
 
-      if (req.body.username === "herkalsuperadmin") {
+      if (
+        req.body.username === "herkalsuperadmin" &&
+        req.body.isActivated === false
+      ) {
         return res.status(400).json({
           status: 400,
           message: "This user cannot be inactivated",

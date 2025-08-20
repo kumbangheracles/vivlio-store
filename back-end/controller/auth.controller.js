@@ -291,6 +291,7 @@ module.exports = {
           role: role.name,
           username: userByIdentifier.username,
           token: accessToken,
+          refreshToken: refreshToken,
         },
       });
 
@@ -329,7 +330,7 @@ module.exports = {
           }
 
           const foundUser = await User.findOne({
-            where: { username: decoded.UserInfo.username },
+            where: { id: decoded.UserInfo.id },
           });
 
           if (!foundUser) {
@@ -341,7 +342,7 @@ module.exports = {
           const accessToken = jwt.sign(
             {
               UserInfo: {
-                username: foundUser.username,
+                id: foundUser.id,
                 role: foundUser.role,
               },
             },

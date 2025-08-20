@@ -1,5 +1,4 @@
 "use client";
-
 import { Card, Row, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";

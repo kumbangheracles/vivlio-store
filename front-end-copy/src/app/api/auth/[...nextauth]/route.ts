@@ -115,6 +115,7 @@ const authOptions: NextAuthOptions = {
 
       console.log("Token after:", token);
 
+      // Jika token expired
       if (token.tokenExpiry && Date.now() > Number(token.tokenExpiry)) {
         console.log("Token expired, need to refresh");
 
@@ -132,7 +133,7 @@ const authOptions: NextAuthOptions = {
 
     // Session callback - menentukan data apa yang akan dikirim ke client
     async session({ session, token }) {
-      console.log("📱 Session callback called:");
+      console.log("Session callback called:");
       console.log("Session before:", session);
       console.log("Token:", token);
 

@@ -8,7 +8,7 @@ const AccountPage = async () => {
   const dataUser = await fetchUser();
   return (
     <AppLayout>
-      <AccountIndex dataUser={dataUser!} />
+      <AccountIndex dataUser={dataUser as UserProperties} />
     </AppLayout>
   );
 };

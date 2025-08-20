@@ -12,6 +12,8 @@ export type UserProperties = {
   isActive?: boolean;
   profileImage?: any;
   role?: string;
+  oldPassword?: string;
+  newPassword?: string;
 };
 
 export type UserImage = {
