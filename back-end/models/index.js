@@ -6,6 +6,11 @@ const BookImage = require("./bookImage");
 const BookGenres = require("./bookgenres");
 const Genre = require("./genre");
 const UserImage = require("./UserImage");
+const BookStats = require("./bookStats");
+const UserWishlist = require("./userWishlist");
+const UserCart = require("./userCart");
+const UserPurchases = require("./userPurchases");
+
 // Book ↔ Category
 BookCategory.hasMany(Book, {
   foreignKey: "categoryId",
@@ -88,6 +93,50 @@ User.belongsTo(User, {
   foreignKey: "createdByAdminId",
 });
 
+// Books ↔ BookStats
+Book.hasOne(BookStats, { foreignKey: "bookId", as: "stats" });
+BookStats.belongsTo(Book, { foreignKey: "bookId", as: "book" });
+
+// User ↔ UserWishlist ↔ Book (Many-to-Many via join table)
+User.belongsToMany(Book, {
+  through: UserWishlist,
+  foreignKey: "userId",
+  as: "wishlistBooks",
+});
+
+Book.belongsToMany(User, {
+  through: UserWishlist,
+  foreignKey: "bookId",
+  as: "wishlistUsers",
+});
+
+// User ↔ UserPurchases ↔ Book (Many-to-Many via join table)
+User.belongsToMany(Book, {
+  through: UserPurchases,
+  foreignKey: "userId",
+  as: "purchasesBooks",
+});
+
+Book.belongsToMany(User, {
+  through: UserPurchases,
+  foreignKey: "bookId",
+  as: "purchasesUsers",
+});
+
+// User ↔ UserCart ↔ Book (Many-to-Many via join table)
+
+User.belongsToMany(Book, {
+  through: UserCart,
+  foreignKey: "userId",
+  as: "cartBooks",
+});
+
+Book.belongsToMany(User, {
+  through: UserCart,
+  foreignKey: "bookId",
+  as: "cartUsers",
+});
+
 module.exports = {
   Book,
   BookCategory,
@@ -97,4 +146,5 @@ module.exports = {
   Genre,
   BookGenres,
   UserImage,
+  BookStats,
 };

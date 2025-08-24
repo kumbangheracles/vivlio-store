@@ -1,11 +1,12 @@
-const { Book, BookImage, Genre, User } = require("../models/index");
+const { Book, BookImage, Genre, User, BookStats } = require("../models/index");
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
+const { updateBookStats } = require("../helpers/updateBookStats");
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
@@ -37,8 +38,14 @@ module.exports = {
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
           },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: ["purchaseCount", "wishlistCount", "popularityScore"],
+          },
         ],
         offset,
+        // logging: console.log,
       });
       res.status(200).json({
         status: 200,
@@ -89,6 +96,11 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: ["purchaseCount", "wishlistCount", "popularityScore"],
           },
         ],
         offset,
@@ -171,6 +183,15 @@ module.exports = {
         { transaction: t }
       );
 
+      await BookStats.create(
+        {
+          bookId: newBook.id,
+          purchaseCount: 0,
+          wishlistCount: 0,
+          popularityScore: 0,
+        },
+        { transaction: t }
+      );
       const bookImagesData = parsedImages.map((img) => ({
         bookId: newBook.id,
         imageUrl: img.imageUrl,
@@ -362,6 +383,58 @@ module.exports = {
         status: 500,
         message: error.message || "Internal server error",
         data: [],
+      });
+    }
+  },
+
+  async addToWishlist(req, res) {
+    const t = await sequelize.transaction();
+    try {
+      const { id } = req.params;
+      const book = await Book.findByPk(id, { transaction: t });
+      if (!book) {
+        await t.rollback();
+        return res.status(404).json({ message: "Book not found" });
+      }
+
+      await updateBookStats(book.id, "wishlist", "add");
+
+      await t.commit();
+      return res.status(200).json({
+        status: 200,
+        message: "Added to wishlist successfully",
+      });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+      });
+    }
+  },
+
+  async removeFromWishlist(req, res) {
+    const t = await sequelize.transaction();
+    try {
+      const { id } = req.params;
+      const book = await Book.findByPk(id, { transaction: t });
+      if (!book) {
+        await t.rollback();
+        return res.status(404).json({ message: "Book not found" });
+      }
+
+      await updateBookStats(book.id, "wishlist", "remove");
+
+      await t.commit();
+      return res.status(200).json({
+        status: 200,
+        message: "Removed from wishlist successfully",
+      });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
       });
     }
   },

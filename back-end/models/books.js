@@ -34,7 +34,7 @@ const Book = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-
+    //tinggal nambahin ENUM "Out of stock" dan field stock
     status: {
       type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED"),
       allowNull: false,

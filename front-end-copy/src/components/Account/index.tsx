@@ -11,7 +11,7 @@ interface AccountProps {
 
 const AccountIndex: React.FC<AccountProps> = ({ dataUser }) => {
   const LOCAL_STORAGE_KEY = "lastActiveTabKey";
-  const [activeTab, setActiveTab] = useState("transaction");
+  const [activeTab, setActiveTab] = useState("account");
   useEffect(() => {
     const savedTab = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedTab) {

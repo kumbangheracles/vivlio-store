@@ -11,6 +11,8 @@ import DefaultImage from "../../../assets/images/bookDefault.png";
 import Image from "next/image";
 import { CarouselRef } from "antd/es/carousel";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import useStats from "@/hooks/useStats";
+
 const dataDummy = [
   {
     title: "My Book",
@@ -30,10 +32,12 @@ const CardBook: React.FC<BookProps> = ({
   id,
   images,
   description,
+  stats,
 }) => {
   const carouselRef = useRef<CarouselRef>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [wishes, setWishes] = useState<boolean>(false);
+  const [wishes, setIsWishes] = useState<boolean>(false);
+  const { isWishlisted, setBookId, toggleWishlist, addPurchase } = useStats();
   const slides: string[] = ["Slide 1", "Slide 2", "Slide 3"];
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
@@ -48,6 +52,19 @@ const CardBook: React.FC<BookProps> = ({
       setCurrentSlide((prev) => prev - 1);
     }
   };
+
+  useEffect(() => {
+    setBookId(id as string);
+  }, [id]);
+
+  const handleWishlistToggle = () => {
+    toggleWishlist();
+  };
+
+  const handlePurchase = () => {
+    addPurchase();
+  };
+
   return (
     <Card key={id}>
       <div
@@ -58,9 +75,9 @@ const CardBook: React.FC<BookProps> = ({
           top: "10px",
           cursor: "pointer",
         }}
-        onClick={() => setWishes((prev) => !prev)}
+        onClick={handleWishlistToggle}
       >
-        {wishes ? (
+        {(stats?.wishlistCount ?? 0) > 0 ? (
           <IoMdHeart style={{ fontSize: "20px" }} />
         ) : (
           <IoMdHeartEmpty style={{ fontSize: "20px" }} />

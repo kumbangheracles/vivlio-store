@@ -42,6 +42,14 @@ router.patch(
   bookController.updateBook
 );
 
+// add and remove wishlist
+router.post("/update-stats/:id", authMiddleware, bookController.addToWishlist);
+router.delete(
+  "/update-stats/:id",
+  authMiddleware,
+  bookController.removeFromWishlist
+);
+
 // Delete book
 router.delete(
   "/:id",

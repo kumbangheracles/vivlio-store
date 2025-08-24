@@ -14,6 +14,11 @@ export type BookProps = {
   description?: string;
   categories?: CategoryProps;
   createdByAdminId?: string;
+  stats?: {
+    popularityScore?: number;
+    purchaseCount?: number;
+    wishlistCount?: number;
+  };
 };
 export type BookImage = {
   bookId?: string;

@@ -49,14 +49,14 @@ myAxios.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    console.error("Response error:", error.response?.data || error.message);
+    console.log("Response error:", error.response?.data || error.message);
 
     if (error.response?.status === 401) {
-      console.error("Unauthorized access");
+      console.log("Unauthorized access");
     } else if (error.response?.status === 403) {
-      console.error("Forbidden access");
+      console.log("Forbidden access");
     } else if (error.response?.status === 500) {
-      console.error("Server error");
+      console.log("Server error");
     }
 
     return Promise.reject(error);

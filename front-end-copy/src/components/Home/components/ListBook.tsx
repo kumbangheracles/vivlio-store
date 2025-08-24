@@ -25,6 +25,7 @@ const ListBook: React.FC<BookTypes> = ({ titleSection, dataBooks }) => {
                 <CardBook
                   key={item?.id}
                   title={item?.title}
+                  id={item.id}
                   price={item?.price}
                   author={item?.author}
                   categoryId={item?.categoryId}
@@ -34,6 +35,7 @@ const ListBook: React.FC<BookTypes> = ({ titleSection, dataBooks }) => {
                   status={item?.status}
                   genres={item?.genres}
                   images={item?.images}
+                  stats={item.stats}
                 />
               ))}
             </ListBookWrapper>
