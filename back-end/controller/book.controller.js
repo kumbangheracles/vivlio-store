@@ -6,7 +6,7 @@ const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
 const { Op, where } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
-const { updateBookStats } = require("../helpers/updateBookStats");
+
 module.exports = {
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
@@ -37,11 +37,6 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
-          },
-          {
-            model: BookStats,
-            as: "stats",
-            attributes: ["purchaseCount", "wishlistCount", "popularityScore"],
           },
         ],
         offset,
@@ -387,57 +382,6 @@ module.exports = {
     }
   },
 
-  async addToWishlist(req, res) {
-    const t = await sequelize.transaction();
-    try {
-      const { id } = req.params;
-      const book = await Book.findByPk(id, { transaction: t });
-      if (!book) {
-        await t.rollback();
-        return res.status(404).json({ message: "Book not found" });
-      }
-
-      await updateBookStats(book.id, "wishlist", "add");
-
-      await t.commit();
-      return res.status(200).json({
-        status: 200,
-        message: "Added to wishlist successfully",
-      });
-    } catch (error) {
-      await t.rollback();
-      return res.status(500).json({
-        status: 500,
-        message: error.message || "Internal server error",
-      });
-    }
-  },
-
-  async removeFromWishlist(req, res) {
-    const t = await sequelize.transaction();
-    try {
-      const { id } = req.params;
-      const book = await Book.findByPk(id, { transaction: t });
-      if (!book) {
-        await t.rollback();
-        return res.status(404).json({ message: "Book not found" });
-      }
-
-      await updateBookStats(book.id, "wishlist", "remove");
-
-      await t.commit();
-      return res.status(200).json({
-        status: 200,
-        message: "Removed from wishlist successfully",
-      });
-    } catch (error) {
-      await t.rollback();
-      return res.status(500).json({
-        status: 500,
-        message: error.message || "Internal server error",
-      });
-    }
-  },
   async deleteBook(req, res) {
     const t = await sequelize.transaction();
     try {

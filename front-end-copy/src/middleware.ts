@@ -6,10 +6,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
     if (!token) {
-      new URL(
-        `/auth/login?callbackUrl=${encodeURIComponent(req.nextUrl.pathname)}`,
-        req.url
-      );
+      return NextResponse.redirect(new URL("/unoutherized", req.url));
     }
     if (pathname === "/auth/login" || pathname === "/auth/register") {
       if (token) {
@@ -29,7 +26,7 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/profile/:path*",
-    "/",
+    "/account",
     "/auth/login",
     "/auth/register",
   ],
