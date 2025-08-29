@@ -1,62 +1,51 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-
 import { getSession } from "next-auth/react";
-import { config } from "process";
+
 const myAxios = axios.create({
   baseURL: process.env.API_BASE_URL || "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
-
-  withCredentials: true,
   timeout: 10000,
 });
 
+// Request Interceptor
 myAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const session = await getSession();
 
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
-      console.log("Added Bearer token to request");
+      console.log("✅ Added Bearer token to request");
+      console.log("token: ", session.accessToken);
     } else {
-      console.log("No access token found in session");
+      console.log("⚠️ No access token found in session");
     }
 
     return config;
   },
-
-  // (config) => {
-  //   console.log(
-  //     `Making ${config.method?.toUpperCase()} request to:`,
-  //     config.url
-  //   );
-  //   return config;
-  // },
-  // (error: AxiosError) => {
-  //   console.error("Request error:", error);
-  //   return Promise.reject(error);
-  // }
-
   (error: AxiosError) => {
-    console.error("Request error:", error);
+    console.log("🚨 Request error:", error);
     return Promise.reject(error);
   }
 );
 
+// Response Interceptor
 myAxios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error: AxiosError) => {
-    console.log("Response error:", error.response?.data || error.message);
+    console.log("🚨 Response error:", error.response?.data || error.message);
 
-    if (error.response?.status === 401) {
-      console.log("Unauthorized access");
-    } else if (error.response?.status === 403) {
-      console.log("Forbidden access");
-    } else if (error.response?.status === 500) {
-      console.log("Server error");
+    switch (error.response?.status) {
+      case 401:
+        console.log("🔒 Unauthorized access");
+        break;
+      case 403:
+        console.log("⛔ Forbidden access");
+        break;
+      case 500:
+        console.log("💥 Server error");
+        break;
     }
 
     return Promise.reject(error);

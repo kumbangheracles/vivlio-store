@@ -1,4 +1,11 @@
-const { Book, BookImage, Genre, User, BookStats } = require("../models/index");
+const {
+  Book,
+  BookImage,
+  Genre,
+  User,
+  BookStats,
+  UserWishlist,
+} = require("../models/index");
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
@@ -8,7 +15,7 @@ const { Op, where } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 
 module.exports = {
-  async getAll(req, res) {
+  async getAllCommon(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
 
     const filters = {};
@@ -19,12 +26,9 @@ module.exports = {
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
     }
-
     const offset = (page - 1) * limit;
     try {
       const { count, rows } = await Book.findAndCountAll({
-        where: filters,
-        order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
         include: [
           {
@@ -38,14 +42,123 @@ module.exports = {
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
           },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: [
+              "id",
+              "views",
+              "wishlistCount",
+              "cartCount",
+              "purchases",
+            ],
+          },
         ],
+
         offset,
         // logging: console.log,
       });
+
       res.status(200).json({
         status: 200,
         message: "Success",
         results: rows,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+
+  async getAll(req, res) {
+    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+
+    const filters = {};
+    if (isPopular !== undefined) {
+      filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+    if (categoryId) filters.categoryId = categoryId;
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
+
+    const userId = req.id;
+
+    const offset = (page - 1) * limit;
+    console.log(">>> req.id:", req.id);
+    console.log(">>> req.user:", req.user);
+
+    try {
+      console.log("Login as user");
+      const { count, rows } = await Book.findAndCountAll({
+        where: filters,
+        order: isPopular
+          ? [[{ model: BookStats, as: "stats" }, "views", "DESC"]]
+          : [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        include: [
+          {
+            model: BookImage,
+            as: "images",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+          {
+            model: Genre,
+            as: "genres",
+            through: { attributes: [] },
+            attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: [
+              "id",
+              "views",
+              "wishlistCount",
+              "cartCount",
+              "purchases",
+            ],
+          },
+
+          ...(req.id
+            ? [
+                {
+                  model: User,
+                  as: "wishlistUsers",
+                  through: {
+                    model: UserWishlist,
+                    where: { userId },
+                    attributes: [],
+                  },
+                  required: false,
+                  attributes: ["id"],
+                },
+              ]
+            : []),
+        ],
+
+        offset,
+        // logging: console.log,
+      });
+
+      const results = rows.map((book) => {
+        const bookJson = book.toJSON();
+        return {
+          ...bookJson,
+          isWishlisted:
+            bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+        };
+      });
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: results,
         total: count,
         currentPage: parseInt(page),
         totalPages: Math.ceil(count / limit),
@@ -76,6 +189,7 @@ module.exports = {
 
     const offset = (page - 1) * limit;
     try {
+      console.log("userId logined: ", req.id);
       const { count, rows } = await Book.findAndCountAll({
         where: whereCondition,
         order: [["createdAt", "DESC"]],
@@ -95,15 +209,45 @@ module.exports = {
           {
             model: BookStats,
             as: "stats",
-            attributes: ["purchaseCount", "wishlistCount", "popularityScore"],
+            attributes: [
+              "id",
+              "views",
+              "wishlistCount",
+              "cartCount",
+              "purchases",
+            ],
           },
+          // ...(req.id
+          //   ? [
+          //       {
+          //         model: User,
+          //         as: "wishlistUsers",
+          //         through: {
+          //           model: UserWishlist,
+          //           attributes: [],
+          //         },
+          //         where: { id: req.id },
+          //         required: false,
+          //         attributes: ["id", "username"],
+          //       },
+          //     ]
+          //   : []),
         ],
         offset,
+      });
+
+      const results = rows.map((book) => {
+        const bookJson = book.toJSON();
+        return {
+          ...bookJson,
+          isWishlisted:
+            bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+        };
       });
       res.status(200).json({
         status: 200,
         message: "Success",
-        results: rows,
+        results: results,
         total: count,
         currentPage: parseInt(page),
         totalPages: Math.ceil(count / limit),

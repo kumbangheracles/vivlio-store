@@ -25,7 +25,7 @@ const Loader = styled.div`
   border-radius: 50%;
   position: relative;
   text-indent: -9999em;
-  animation: mulShdSpin 1.3s infinite linear;
+  animation: 1.3s infinite linear;
   transform: translateZ(0);
 `;
 export default GlobalLoading;

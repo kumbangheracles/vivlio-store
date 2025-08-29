@@ -285,6 +285,8 @@ const Books = () => {
         children={"Are you sure want to delete this book?"}
         open={isModalOpen}
         okText="Yes"
+        // loading={loading}
+        confirmLoading={loading}
         cancelText={"No"}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => handleDelete()}

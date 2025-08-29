@@ -11,14 +11,15 @@ import GlobalLoading from "@/components/GlobalLoading";
 import { ConfigProvider } from "antd";
 import { StyleSheetManager } from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
+import { Loading3QuartersOutlined } from "@ant-design/icons";
 interface RootLayoutProps {
   children: ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  // useEffect(() => {
-  //   AOS.init();
-  // }, []);
+  useEffect(() => {
+    AOS.init();
+  }, []);
   return (
     <html lang="en">
       <body>

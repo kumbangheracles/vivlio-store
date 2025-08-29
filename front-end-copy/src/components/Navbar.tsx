@@ -110,16 +110,16 @@ export default function Navbar() {
             <StyledLink href="/">HOME</StyledLink>
           </li>
           <li>
-            <StyledLink href="">BLOG</StyledLink>
+            <StyledLink href="/blog">BLOG</StyledLink>
           </li>
           <li>
-            <StyledLink href="">SHOP</StyledLink>
+            <StyledLink href="/shop">SHOP</StyledLink>
           </li>
           <li>
-            <StyledLink href="">ABOUT US</StyledLink>
+            <StyledLink href="/about-us">ABOUT US</StyledLink>
           </li>
           <li>
-            <StyledLink href="">CONTACT US</StyledLink>
+            <StyledLink href="/contact-us">CONTACT US</StyledLink>
           </li>
         </BottomNavbar>
       </div>

@@ -50,30 +50,6 @@ const Account = ({ dataUser }: PropsType) => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-  // const fetchUser = async () => {
-  //   if (!auth.session) return;
-
-  //   try {
-  //     setLoading(true);
-  //     const res = await myAxios.get(`/users/${auth.user?.id}`);
-  //     // console.log("Data user: ", res.data.result);
-
-  //     setDataUser(res.data.result);
-  //   } catch (error) {
-  //     ErrorHandler(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   form.setFieldsValue({
-  //     ...dataUser,
-  //   });
-  // }, [dataUser]);
-  // useEffect(() => {
-  //   fetchUser();
-  // }, [auth.user?.id]);
 
   const handleModalOpen = (key: FieldKey) => {
     setModalOpen(true);
@@ -162,6 +138,8 @@ const Account = ({ dataUser }: PropsType) => {
           password: payload.password,
         });
       }
+
+      setPreviewImage("");
       router.refresh();
     } catch (error) {
       if (!dataUser?.id) {

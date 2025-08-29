@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import Account from "./Account";
 import { UserProperties } from "@/types/user.type";
+import Wishlist from "./Wishlist";
+import { BookWithWishlist } from "@/types/wishlist.type";
 
 interface AccountProps {
   dataUser?: UserProperties;
+  dataWishlist?: BookWithWishlist[];
+  fetchWishlist: () => void;
 }
 
-const AccountIndex: React.FC<AccountProps> = ({ dataUser }) => {
+const AccountIndex: React.FC<AccountProps> = ({
+  dataUser,
+  dataWishlist,
+  fetchWishlist,
+}) => {
   const LOCAL_STORAGE_KEY = "lastActiveTabKey";
   const [activeTab, setActiveTab] = useState("account");
   useEffect(() => {
@@ -48,7 +56,7 @@ const AccountIndex: React.FC<AccountProps> = ({ dataUser }) => {
       key: "wishlist",
       children: (
         <>
-          <h1>Wishlist Page</h1>
+          <Wishlist dataWish={dataWishlist} fetchWishlist={fetchWishlist} />
         </>
       ),
     },

@@ -10,6 +10,7 @@ import { BookProps } from "@/types/books.type";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
+  fetchBooks?: any;
 }
 
 export default function HomePage(prop: PropTypes) {
@@ -24,7 +25,11 @@ export default function HomePage(prop: PropTypes) {
         <TitleList>Popular Category</TitleList>
         <ListCategory />
       </div>
-      <ListBook dataBooks={prop.dataBooks} titleSection={"Recently Popular"} />
+      <ListBook
+        dataBooks={prop.dataBooks}
+        titleSection={"Recently Popular"}
+        fetchBooks={prop.fetchBooks}
+      />
       <ListBook titleSection={"Best Seller"} />
       <ListBook titleSection={"Latest Popular"} />
     </>

@@ -53,6 +53,7 @@ const AppButton: React.FC<PropTypes> = ({
       style={{ ...getColor(customColor), ...style }}
       {...rest}
     >
+      {icon}
       {label}
     </MyButton>
   );

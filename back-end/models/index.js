@@ -137,6 +137,11 @@ Book.belongsToMany(User, {
   as: "cartUsers",
 });
 
+//UserWishlist ↔ Book
+
+UserWishlist.belongsTo(Book, { foreignKey: "bookId", as: "book" });
+Book.hasMany(UserWishlist, { foreignKey: "bookId", as: "wishlistEntries" });
+
 module.exports = {
   Book,
   BookCategory,
@@ -147,4 +152,7 @@ module.exports = {
   BookGenres,
   UserImage,
   BookStats,
+  UserWishlist,
+  UserCart,
+  UserPurchases,
 };

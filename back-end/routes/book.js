@@ -5,7 +5,9 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const bookController = require("../controller/book.controller");
 // Get all books
-router.get("/", bookController.getAll);
+router.get("/", authMiddleware, bookController.getAll);
+
+router.get("/common-all", bookController.getAllCommon);
 
 // Cms get All Books
 router.get(

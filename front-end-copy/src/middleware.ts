@@ -5,14 +5,25 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
-    if (!token) {
+
+    const isProtectedRoute =
+      pathname === "/account" ||
+      pathname === "/blog" ||
+      pathname === "/shop" ||
+      pathname === "/about-us" ||
+      pathname === "/contact-us";
+
+    if (!token && isProtectedRoute) {
       return NextResponse.redirect(new URL("/unoutherized", req.url));
     }
-    if (pathname === "/auth/login" || pathname === "/auth/register") {
-      if (token) {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
+
+    const isAuthPage =
+      pathname === "/auth/login" || pathname === "/auth/register";
+
+    if (token && isAuthPage) {
+      return NextResponse.redirect(new URL("/", req.url));
     }
+
     return NextResponse.next();
   },
   {
@@ -24,8 +35,11 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/profile/:path*",
+    // "/",
+    "/blog/:path*",
+    "/shop/:path*",
+    "/about-us/:path*",
+    "/contact-us/:path*",
     "/account",
     "/auth/login",
     "/auth/register",

@@ -19,7 +19,16 @@ export type BookProps = {
     purchaseCount?: number;
     wishlistCount?: number;
   };
+  wishlistUsers?: WishlistUser[];
+  fetchBooks?: any;
+  createdAt?: Date;
+  updateAt?: Date;
 };
+
+export interface WishlistUser {
+  id: string;
+  username: string;
+}
 export type BookImage = {
   bookId?: string;
   imageUrl?: string;
