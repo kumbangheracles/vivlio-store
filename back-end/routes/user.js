@@ -98,7 +98,7 @@ router.get(
     try {
       const { id } = req.params;
       const user = await User.findOne({
-        where: { id },
+        where: { id: id },
         include: [
           {
             model: UserImage,

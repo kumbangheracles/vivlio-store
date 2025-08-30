@@ -94,7 +94,7 @@ const AppLayout = ({ children }: PropTypes) => {
         {
           key: isAuthenticated ? "profile" : "",
           label: isAuthenticated ? "Profile" : "",
-          // onClick: () => handleEdit(record.articleId),
+          onClick: () => navigate(`/user/${auth?.id}/detail`),
         },
         {
           key: isAuthenticated ? "logout" : "login",

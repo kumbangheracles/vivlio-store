@@ -41,7 +41,7 @@ module.exports = {
       const role = await Role.findOne({
         where: { id },
       });
-      req.status(200).json({
+      res.status(200).json({
         status: 200,
         message: "Success",
         result: role,

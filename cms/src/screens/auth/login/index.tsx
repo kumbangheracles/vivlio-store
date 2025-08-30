@@ -60,6 +60,7 @@ const LoginForm: React.FC = () => {
         refresh: user.token,
 
         userState: {
+          id: user.id,
           identifier: body.identifier,
           password: body.password,
           role: user.role,
@@ -69,7 +70,11 @@ const LoginForm: React.FC = () => {
       });
       setUser(user);
       message.success("Login Success");
-      navigate("/");
+
+      window.location.reload();
+      setTimeout(() => {
+        navigate("/");
+      }, 5000);
     } catch (error: any) {
       ErrorHandler(error);
       console.log("Error login: ", error);
@@ -191,7 +196,7 @@ const LoginForm: React.FC = () => {
               style={{ color: "#7badff", cursor: "pointer" }}
               onClick={() => navigate("/register")}
             >
-              Sign In
+              Sign Up
             </p>
           </WrapperSignIn>
         </CardRegister>

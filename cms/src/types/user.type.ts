@@ -34,6 +34,7 @@ export enum EUserRole {
 
 export type LoginProps = Pick<UserProperties, "password"> & {
   identifier?: string;
+  id?: string;
 };
 
 export const initialLogin: LoginProps = {

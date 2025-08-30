@@ -84,6 +84,10 @@ async function init() {
         docs: "",
       });
     });
+    app.use((err, req, res, next) => {
+      console.error("Unhandled error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    });
 
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
     app.use((req, res) => {

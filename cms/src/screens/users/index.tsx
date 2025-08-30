@@ -26,6 +26,7 @@ import DefaultImage from "../../assets/images/profile-default.jpg";
 import { UserProperties } from "../../types/user.type";
 import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
 import { RoleProperties } from "../../types/role.type";
+import { useDebounce } from "../../hooks/useDebounce";
 const { Text } = Typography;
 const UserIndex = () => {
   const navigate = useNavigate();
@@ -38,6 +39,9 @@ const UserIndex = () => {
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [dataRole, setDataRole] = useState<RoleProperties[]>([]);
+  const debouncedSearch = useDebounce(search, 500);
+  const [filteredData, setFilteredData] = useState<UserProperties[]>([]);
+
   const fetchUsers = async (page: number, limit: number) => {
     try {
       setloading(true);
@@ -233,17 +237,27 @@ const UserIndex = () => {
     },
   ];
 
-  const filterUser = (user: UserProperties, key: string) => {
-    return user.username!.toLowerCase().includes(key.toLowerCase());
-  };
+  // const filterUser = (user: UserProperties, key: string) => {
+  //   return user.username!.toLowerCase().includes(key.toLowerCase());
+  // };
 
-  const filteredUsers = useDebouncedFilter<UserProperties>(
-    dataUser,
-    search,
-    filterUser,
-    500,
-    setloading
-  );
+  // const filteredUsers = useDebouncedFilter<UserProperties>(
+  //   dataUser,
+  //   search,
+  //   filterUser,
+  //   500,
+  //   setloading
+  // );
+  useEffect(() => {
+    if (debouncedSearch) {
+      const filtered = dataUser.filter((item: UserProperties) =>
+        item.username?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(dataUser);
+    }
+  }, [debouncedSearch, dataUser]);
   return (
     <>
       <HeaderPage
@@ -275,7 +289,7 @@ const UserIndex = () => {
       <AppTable
         style={{ marginTop: 20 }}
         columns={userColumn}
-        dataSource={filteredUsers}
+        dataSource={filteredData}
         loading={loading}
         rowKey={"id"}
         pagination={{

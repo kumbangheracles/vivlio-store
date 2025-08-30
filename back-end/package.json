@@ -13,6 +13,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon",
+    "prod": "pm2 start app.js --watch",
+    "stop:prod": "pm2 stop app",
     "docs": "node docs/swagger.js"
   },
   "dependencies": {
