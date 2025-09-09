@@ -10,6 +10,7 @@ const BookStats = require("./bookStats");
 const UserWishlist = require("./userWishlist");
 const UserCart = require("./userCart");
 const UserPurchases = require("./userPurchases");
+const CategoryImage = require("./categoryImage");
 
 // Book ↔ Category
 BookCategory.hasMany(Book, {
@@ -142,6 +143,17 @@ Book.belongsToMany(User, {
 UserWishlist.belongsTo(Book, { foreignKey: "bookId", as: "book" });
 Book.hasMany(UserWishlist, { foreignKey: "bookId", as: "wishlistEntries" });
 
+// book_category ↔ categoryImage
+BookCategory.hasOne(CategoryImage, {
+  foreignKey: "categoryId",
+  as: "categoryImage",
+});
+
+CategoryImage.belongsTo(BookCategory, {
+  foreignKey: "categoryId",
+  as: "book_category",
+});
+
 module.exports = {
   Book,
   BookCategory,
@@ -155,4 +167,5 @@ module.exports = {
   UserWishlist,
   UserCart,
   UserPurchases,
+  CategoryImage,
 };

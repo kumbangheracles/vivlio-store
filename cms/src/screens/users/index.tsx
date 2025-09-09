@@ -312,6 +312,7 @@ const UserIndex = () => {
         open={isModalOpen}
         okText="Yes"
         cancelText={"No"}
+        confirmLoading={loading}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => handleDelete()}
       />

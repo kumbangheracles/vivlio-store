@@ -35,7 +35,7 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // "/",
+    "/",
     "/blog/:path*",
     "/shop/:path*",
     "/about-us/:path*",
@@ -43,5 +43,6 @@ export const config = {
     "/account",
     "/auth/login",
     "/auth/register",
+    "/unoutherized",
   ],
 };

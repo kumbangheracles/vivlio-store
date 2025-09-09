@@ -6,31 +6,41 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import { authOptions } from "./api/auth/[...nextauth]/route";
+import { CategoryProps } from "@/types/category.types";
+import fetchBooksHome from "./actions/fetchBooksHome";
 
-async function fetchBooks(): Promise<BookProps[]> {
+async function fetchCategory(): Promise<CategoryProps[]> {
   try {
     const session = await getServerSession(authOptions);
 
-    const accessToken = session?.accessToken;
+    if (!session) {
+      window.location.href = "/unoutherized";
+    }
 
-    const url = accessToken ? "/books" : "/books/common-all";
-    const response = await myAxios.get(url, {
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-    });
+    const url = "/book-category/public";
+    const response = await myAxios.get(url);
 
     return response.data.results;
   } catch (err: any) {
-    console.log("❌ fetchBooks error:", err.message || err);
+    console.log("fetchBooks error:", err.message || err);
     return [];
   }
 }
+
+// export const metadata = {
+//   title: "Vivlio - Home",
+//   description: "Home page",
+// };
+
 export const revalidate = 60;
 export default async function Home() {
-  const books = await fetchBooks();
+  const books = await fetchBooksHome();
+  const categories = await fetchCategory();
   console.log("Data books: ", books);
+  console.log("Data categories: ", categories);
   return (
     <AppLayout>
-      <HomePage dataBooks={books} />
+      <HomePage dataBooks={books} dataCategories={categories} />
     </AppLayout>
   );
 }

@@ -6,10 +6,12 @@ import ListBook from "./components/ListBook";
 import { styled } from "styled-components";
 import ListCategory from "./components/ListCategory";
 import { BookProps } from "@/types/books.type";
+import { CategoryProps } from "@/types/category.types";
 
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
+  dataCategories?: CategoryProps[];
   fetchBooks?: any;
 }
 
@@ -21,9 +23,9 @@ export default function HomePage(prop: PropTypes) {
         <Banner />
       </div>
 
-      <div>
+      <div className="mt-7">
         <TitleList>Popular Category</TitleList>
-        <ListCategory />
+        <ListCategory dataCategories={prop.dataCategories} />
       </div>
       <ListBook
         dataBooks={prop.dataBooks}
@@ -39,7 +41,9 @@ export default function HomePage(prop: PropTypes) {
 export const ListCardWrapper = styled.div`
   padding: 1rem;
   display: flex;
-  width: 2000px;
+  width: 100%;
+  margin: auto;
+  justify-content: center;
 
   gap: 20px;
 `;
@@ -48,6 +52,7 @@ export const TitleList = styled.h4`
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 2px;
-  text-align: center;
+  text-align: start;
   margin-bottom: 10px;
+  margin-left: 50px;
 `;

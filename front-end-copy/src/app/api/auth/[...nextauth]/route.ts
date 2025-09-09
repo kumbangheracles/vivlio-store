@@ -110,7 +110,7 @@ const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.accessToken = user.token;
         token.isVerified = user.isVerified;
-        token.tokenExpiry = Date.now() + 60 * 60 * 1000;
+        token.tokenExpiry = Date.now() + 60 * 60 * 1000 * 12;
       }
 
       console.log("Token after:", token);
@@ -124,8 +124,10 @@ const authOptions: NextAuthOptions = {
           token.accessToken = res.data.token;
           console.log("Success refresh token!!");
         } catch (error) {
-          // ErrorHandler(error);
+          ErrorHandler(error);
           console.log("Failed refresh token: ", error);
+        } finally {
+          window.location.reload;
         }
       }
       return token;
@@ -163,7 +165,6 @@ const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development",
 };
 
-// Export untuk App Router
 export { authOptions };
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

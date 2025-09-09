@@ -8,6 +8,7 @@ import "./globals.css";
 import AppLayout from "@/components/Layout";
 import { Suspense } from "react";
 import GlobalLoading from "@/components/GlobalLoading";
+import { StyleProvider } from "@ant-design/cssinjs";
 import { ConfigProvider } from "antd";
 import { StyleSheetManager } from "styled-components";
 import isPropValid from "@emotion/is-prop-valid";
@@ -24,11 +25,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body>
         <StyleSheetManager shouldForwardProp={isPropValid}>
-          <ConfigProvider>
-            <AuthProvider>
-              <Suspense fallback={<GlobalLoading />}>{children}</Suspense>
-            </AuthProvider>
-          </ConfigProvider>
+          <StyleProvider>
+            <ConfigProvider>
+              <AuthProvider>
+                <Suspense fallback={<GlobalLoading />}>{children}</Suspense>
+              </AuthProvider>
+            </ConfigProvider>
+          </StyleProvider>
         </StyleSheetManager>
       </body>
     </html>

@@ -268,7 +268,7 @@ module.exports = {
       };
 
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN, {
-        expiresIn: "1h",
+        expiresIn: "12h",
       });
 
       const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, {
@@ -347,7 +347,7 @@ module.exports = {
               },
             },
             process.env.ACCESS_TOKEN,
-            { expiresIn: "1h" }
+            { expiresIn: "12h" }
           );
 
           console.log("Cookies:", req.cookies);

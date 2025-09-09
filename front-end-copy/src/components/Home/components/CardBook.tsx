@@ -6,7 +6,7 @@ import axios from "axios";
 import type { BookImage, BookProps } from "../../../types/books.type";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { FaRegTrashAlt, FaTrash } from "react-icons/fa";
-import { Carousel, Flex, message, Modal, Spin } from "antd";
+import { Card, Carousel, Flex, message, Modal, Spin } from "antd";
 import type { BaseMultipleResponse } from "../../../types/base.type";
 import DefaultImage from "../../../assets/images/bookDefault.png";
 import Image from "next/image";
@@ -23,53 +23,40 @@ import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppModal from "@/components/AppModal";
 import AppButton from "@/components/AppButton";
+import fetchWishlist from "@/components/Account/fetchWishlist";
+import { useWishlistStore } from "@/zustand/wishlist.store";
+import { useIsWishlistStore } from "@/zustand/isWishlist.store";
+// import { fetchBooks } from "@/app/page";
 type CardBookProps = BookProps & {
   showIcon?: "trash" | "wish";
   showStats?: boolean;
-  fetchWishlist: () => void;
+  fetchWishlist?: () => void;
+  fetchBooks?: () => void;
 };
 
 const CardBook: React.FC<CardBookProps> = React.memo(
   ({
     author,
-    book_type,
+
     price,
     title,
-    book_cover,
-    categoryId,
+
     id,
     images,
-    description,
-    stats,
+
     wishlistUsers,
-    fetchBooks,
-    showIcon = "wish",
-    fetchWishlist,
   }) => {
-    const carouselRef = useRef<CarouselRef>(null);
-    const [currentSlide, setCurrentSlide] = useState<number>(0);
     const [isInWishlist, setIsInWishlist] = useState(
       wishlistUsers?.length! > 0
     );
+    const { setIsWishlist, wishlist, isWishlist } = useIsWishlistStore();
+    const { fetchBooksHome } = useWishlistStore();
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const auth = useAuth();
     const router = useRouter();
-    const slides: string[] = ["Slide 1", "Slide 2", "Slide 3"];
-    const bookId = id;
-    const nextSlide = () => {
-      if (currentSlide < slides.length - 1) {
-        carouselRef.current?.next();
-        setCurrentSlide((prev) => prev + 1);
-      }
-    };
 
-    const prevSlide = () => {
-      if (currentSlide > 0) {
-        carouselRef.current?.prev();
-        setCurrentSlide((prev) => prev - 1);
-      }
-    };
+    const bookId = id;
 
     const handleWishlist = async () => {
       if (!auth.accessToken) {
@@ -82,310 +69,115 @@ const CardBook: React.FC<CardBookProps> = React.memo(
       try {
         setLoading(true);
 
-        if (showIcon === "trash") {
+        if (isInWishlist === false) {
+          await myAxios.post(`/userWishlist`, { bookId: id });
+          message.success("Success add to wishlist");
+          setIsInWishlist(true);
+          setIsWishlist(bookId as string, true);
+        } else {
           await myAxios.delete(`/userWishlist/${bookId}`);
           message.success("Success remove from wishlist");
-          await fetchWishlist();
-          // router.refresh();
-          window.location.reload();
-          setIsInWishlist(false);
-        } else {
-          if (isInWishlist === false) {
-            await myAxios.post(`/userWishlist`, { bookId: id });
-            message.success("Success add to wishlist");
-            setIsInWishlist(true);
-          } else {
-            await myAxios.delete(`/userWishlist/${bookId}`);
-            message.success("Success remove from wishlist");
 
-            setIsInWishlist(false);
-          }
+          setIsInWishlist(false);
+          setIsWishlist(bookId as string, false);
         }
       } catch (error) {
         ErrorHandler(error);
       } finally {
         setLoading(false);
         setModalOpen(false);
-        fetchWishlist();
+
+        await fetchBooksHome();
       }
     };
     useEffect(() => {
       setIsInWishlist(wishlistUsers?.length! > 0);
+      setIsWishlist?.(bookId as string, isInWishlist);
     }, [wishlistUsers]);
-
-    // useEffect(() => {
-    //   setBookId(id as string);
-    // }, [id]);
-
-    // const handleWishlistToggle = () => {
-    //   toggleWishlist();
-    // };
-
-    // const handlePurchase = () => {
-    //   addPurchase();
-    // };
-
+    const stringPrice = price as number;
     return (
-      <Card key={id}>
-        {showIcon === "wish" ? (
-          <>
-            {loading ? (
-              <Spin />
-            ) : (
-              <>
-                <div
-                  style={{
-                    position: "absolute",
-                    zIndex: "50",
-                    right: "10px",
-                    top: "10px",
-                    cursor: "pointer",
-                  }}
-                  onClick={handleWishlist}
-                >
-                  {isInWishlist ? (
-                    <IoMdHeart style={{ fontSize: "20px" }} />
-                  ) : (
-                    <IoMdHeartEmpty style={{ fontSize: "20px" }} />
-                  )}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {loading ? (
-              <Spin />
-            ) : (
-              <>
-                <div
-                  style={{
-                    position: "absolute",
-                    zIndex: "50",
-                    right: "10px",
-                    top: "10px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setModalOpen(true)}
-                >
-                  <FaRegTrashAlt style={{ fontSize: "20px" }} />
-                </div>
-              </>
-            )}
-          </>
-        )}
-
-        <div className="absolute top-0 h-full w-full">
-          <div className="relative w-full">
-            {(images?.length as number) > 1 && (
-              <Flex
-                justify="space-between"
-                style={{
-                  position: "absolute",
-                  zIndex: 10,
-                  top: "50%",
-                  width: "100%",
-                  padding: "0 20px",
-                }}
-              >
-                <div
-                  className="rounded-full w-[30px] h-[30px] flex items-center justify-center  bg-white shadow-2xl border-1 cursor-pointer border-black hover:bg-gray-100"
-                  onClick={prevSlide}
-                >
-                  <ArrowLeftOutlined />
-                </div>
-                <div
-                  className="rounded-full w-[30px] h-[30px] flex items-center justify-center  bg-white shadow-2xl border-1 cursor-pointer border-black hover:bg-gray-100"
-                  onClick={nextSlide}
-                >
-                  <ArrowRightOutlined />
-                </div>
-              </Flex>
-            )}
-
-            <Carousel style={{ backgroundColor: "white" }} ref={carouselRef}>
-              {images && images.length > 0 ? (
-                images.map((img, index) => (
-                  <WrapperImage key={img?.public_id || index}>
-                    <StyledImage
-                      src={img?.imageUrl || DefaultImage}
-                      alt={`book-${index}`}
-                      width={100}
-                      height={100}
-                    />
-                  </WrapperImage>
-                ))
+      <StyledCard>
+        <div
+          className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
+          onClick={() => handleWishlist()}
+        >
+          {loading ? (
+            <Spin size="small" />
+          ) : (
+            <>
+              {isWishlist(bookId as string) ? (
+                <IoMdHeart className="text-sm text-red-400 " />
               ) : (
-                <WrapperImage>
+                <IoMdHeartEmpty className="text-sm text-red-400 " />
+              )}
+            </>
+          )}
+        </div>
+        <div className="top-card w-full">
+          {/* <div className="top-content relative">
+       
+        </div> */}
+
+          <div className="relative w-full">
+            <div className="mid-content flex items-center justify-center w-[120px] h-full overflow-hidden z-50">
+              {images?.[0] && (
+                <WrapperImage key={images[0].bookId || images[0].public_id}>
                   <StyledImage
+                    src={images[0].imageUrl || DefaultImage}
+                    alt={`book-${title}`}
                     width={100}
                     height={100}
-                    src={DefaultImage}
-                    alt="default-book"
                   />
                 </WrapperImage>
               )}
-            </Carousel>
+            </div>
           </div>
         </div>
-        <BottomContainer>
-          <AuthorText>{author || "No Content"}</AuthorText>
-          <h2 style={{ fontWeight: "500", textAlign: "center" }}>
-            {title || "No Content"}
-          </h2>
-          <PriceText>
-            Rp {Number(price).toLocaleString("id-ID") || "No Content"}
-          </PriceText>
-          {/* <BaseDescription
-          dangerouslySetInnerHTML={{
-            __html:
-              description!?.length > 50
-                ? description!.slice(0, 50) + " . . . . ."
-                : description || "No Content",
-          }}
-        /> */}
-
-          <ButtonReadMore>{loading ? <Spin /> : "More"}</ButtonReadMore>
-        </BottomContainer>
-
-        <Modal
-          open={modalOpen}
-          confirmLoading={loading}
-          // okText="Delete"
-          // cancelText="Cancel"
-          // onCancel={() => setModalOpen(false)}
-          // onOk={handleWishlist}
-          closable={false}
-          // title={"Are you sure want to remove this book from wishlist?"}
-          footer={
-            <div className="flex gap-3.5 items-center justify-end w-full">
-              <AppButton label="Cancel" onClick={() => setModalOpen(false)} />
-              <AppButton
-                label="Delete"
-                customColor="danger"
-                onClick={handleWishlist}
-                icon={<DeleteOutlined />}
-              />
-            </div>
-          }
+        <div
+          className="bottom-content flex flex-col items-center justify-center "
+          style={{ marginTop: 8 }}
         >
-          <div
-            style={{
-              padding: "1rem",
-              textAlign: "center",
-              fontSize: "17px",
-              fontWeight: 500,
-            }}
-          >
-            Are you sure want to remove this book from wishlist?
+          <div className="flex flex-col leading-[17px] w-full">
+            <p className="text-gray-500 text-center">{author}</p>
+            <p className="font-medium text-start text-xs">
+              {title.length > 50
+                ? title.slice(0, 50) + " . . . . ."
+                : title || "No Content"}
+            </p>
           </div>
-        </Modal>
-      </Card>
+        </div>
+        <span className="font-bold tracking-wide absolute bottom-5">
+          {Number(price).toLocaleString("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+          })}
+        </span>
+      </StyledCard>
     );
   }
 );
 
-const Card = styled.div`
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  /* box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.5); */
-  border: 1px solid #63666b;
-  border-radius: 12px;
-  overflow: hidden;
-  width: 250px;
-  height: 320px;
-  position: relative;
-  cursor: pointer;
-  transition: 0.5s all ease;
-  &:hover {
-    box-shadow: 0px 4px 8px 0px rgba(155, 152, 152, 0.5);
+const StyledCard = styled(Card)`
+  .ant-card-body {
+    position: relative;
+    height: 100%;
+    width: 100%;
   }
-`;
-
-const BottomContainer = styled.div`
-  position: absolute;
-  bottom: 0;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  padding-block: 10px;
-  width: 100%;
-  padding-inline: 10px;
-  text-align: center;
-`;
-
-const BookWrapper = styled.div`
-  width: 100%;
-  height: 120px;
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-  overflow: hidden;
-`;
-
-const AuthorText = styled.p`
-  font-size: 13px;
-  color: gray;
-  font-weight: 500;
-`;
-
-const BookImages = styled(Image)`
-  width: 100%;
-  height: 100%;
-`;
-
-const BaseDescription = styled.div`
-  padding: 10px;
-  max-height: 90px;
-  overflow-y: hidden;
-  font-size: 15px;
-`;
-
-const ImageContainer = styled.div`
-  overflow: hidden;
-`;
-
-const ButtonReadMore = styled.button`
-  border-radius: 8px;
-  width: 100%;
-  padding: 5px;
-  background-color: #7badff;
-  color: white;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
-  transition: 0.5s ease;
+
+  border: 1px solid #cacaca;
+
+  transition: all ease 0.3s;
+
   &:hover {
-    opacity: 0.5;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
-
-  margin-top: 10px;
+  height: 300px;
+  width: 170px;
+  overflow: hidden;
 `;
 
-const PriceText = styled.p`
-  font-size: 14px;
-  color: black;
-  font-weight: 700;
-`;
-
-const StyledImage = styled(Image)`
-  transition: transform 0.3s ease-in-out;
-  width: 150px;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  margin: auto;
-  padding: 1em;
-  /* border: 1px solid gray; */
-`;
 const WrapperImage = styled.div`
   background-color: white;
 
@@ -396,8 +188,20 @@ const WrapperImage = styled.div`
   width: 100%;
 
   max-width: 328px;
-  height: 200px;
+  height: 170px;
   overflow: hidden;
+  border-radius: 4px;
+`;
+
+const StyledImage = styled(Image)`
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+
+  /* border: 1px solid gray; */
 `;
 
 export default CardBook;

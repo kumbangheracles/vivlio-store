@@ -1,10 +1,12 @@
-import { Space, Form, Input, Radio, message } from "antd";
+import { Space, Form, Input, Radio, message, Upload, Image } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 import {
+  CategoryImage,
   CategoryProps,
   initialCategoryValue,
 } from "../../types/category.types";
+import DefaultImg from "../../assets/images/default-img.png";
 import { useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
@@ -12,12 +14,20 @@ import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { isEmpty, isBooleanUndefined } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
-
+import { PlusOutlined } from "@ant-design/icons";
+import { RcFile, UploadChangeParam, UploadFile } from "antd/es/upload";
+import { v4 as uuidv4 } from "uuid";
+import { UploadFileStatus } from "antd/es/upload/interface";
 const CategoryEdit = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryProps>(initialCategoryValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [image, setImage] = useState<CategoryImage | null>(null);
+  const [previewImage, setPreviewImage] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const { id } = useParams();
   const handleSubmit = async (data: CategoryProps) => {
     form.validateFields();
@@ -47,13 +57,16 @@ const CategoryEdit = () => {
         name: data.name,
         status: data.status,
         description: data.description,
+        categoryImage: JSON.stringify(data.categoryImage),
       };
+
+      console.log("Payload: ", payload);
 
       if (!id) {
         await myAxios.post("/book-category", payload);
         message.success("Category created successfully");
       } else {
-        await myAxios.patch("/book-category", payload);
+        await myAxios.patch(`/book-category/${id}`, payload);
         message.success("Category updated successfully");
       }
 
@@ -79,13 +92,138 @@ const CategoryEdit = () => {
       const res = await myAxios.get(`book-category/${id}`);
       console.log("Data category: ", res.data);
       setCategory(res.data);
-      form.setFieldsValue(res.data);
+      const data = res.data;
+      // form.setFieldsValue(res.data);
+      form.setFieldsValue({
+        ...data,
+        category: Array.isArray(data.users)
+          ? data.users.map((item: CategoryProps) => item.categoryId)
+          : [],
+      });
+      console.log("data cat: ", data);
+      const categortImage = res.data.categoryImage;
+      const imagePrev: UploadFile<any>[] = [
+        {
+          uid: "1",
+          name: "image.jpg",
+          status: "done" as UploadFileStatus,
+          url: "https://example.com/image.jpg",
+          response: {
+            secure_url: "https://example.com/image.jpg",
+            public_id: "some-id",
+          },
+        },
+      ];
+
+      // setDataGenre(res.data.result.genres);
+      setFileList(imagePrev || []);
+      setPreviewImage(categortImage.imageUrl || null);
     } catch (error) {
       ErrorHandler(error);
     } finally {
       setIsLoading(false);
     }
   };
+  const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
+    const latestFileList = info.fileList.slice(-1);
+    setFileList(latestFileList);
+
+    const mappedImages: CategoryImage[] = latestFileList
+      .filter((file) => file.status === "done" && !!file.response?.secure_url)
+      .map((file) => ({
+        categoryId: uuidv4() as string,
+        imageUrl: file.response.secure_url as string,
+        public_id: file.response.public_id as string,
+      }));
+    const latestFile = latestFileList[0]?.originFileObj;
+    if (latestFile) {
+      const imageUrl = await getBase64(latestFile as RcFile);
+      setPreviewImage(imageUrl);
+      // setCropModalOpen(true);
+      setSelectedImage(imageUrl);
+      setCategory((prev) => ({
+        ...prev,
+        categoryImage: mappedImages,
+      }));
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+    formData.append("upload_preset", "vivlio-store");
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/don5olb8f/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    const mappedImage = [
+      {
+        categoryId: uuidv4(),
+        imageUrl: data.secure_url,
+        public_id: data.public_id,
+      },
+    ];
+
+    setPreviewImage(data.secure_url);
+    setCategory((prev) => ({ ...prev, categoryImage: mappedImage }));
+    setFileList([
+      {
+        uid: uuidv4(),
+        name: "category-icon.jpg",
+        status: "done",
+        url: data.secure_url,
+        response: data,
+      },
+    ]);
+  };
+
+  const getBase64 = (file: File | Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const beforeUpload = (file: RcFile): boolean => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+
+    if (!isJpgOrPng) {
+      message.error("Invalid image format");
+      return false;
+    }
+
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image size maximum 2MB");
+      return false;
+    }
+
+    return true;
+  };
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: 10,
+        gap: 10,
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div>Upload</div>
+    </button>
+  );
 
   useEffect(() => {
     fetchDataCategory();
@@ -115,6 +253,43 @@ const CategoryEdit = () => {
         sectionSubTitle="this section is for creating new category"
       >
         <Form layout="vertical" form={form}>
+          <Form.Item name="categoryImage" label="Category Image">
+            <>
+              <div
+                style={{
+                  width: "300px",
+                  height: "300px",
+
+                  overflow: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "5px solid gray",
+                }}
+              >
+                <Image
+                  style={{
+                    cursor: "pointer",
+                    width: "100%",
+                    height: "100%",
+                    // transform: "scale(1.2)",
+                  }}
+                  src={previewImage || DefaultImg}
+                />
+              </div>
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                showUploadList={false}
+                onChange={handleUpload}
+                maxCount={1}
+                beforeUpload={beforeUpload}
+                style={{ cursor: "pointer", width: 100, height: 30 }}
+              >
+                {uploadButton}
+              </Upload>
+            </>
+          </Form.Item>
           <Form.Item
             name={"name"}
             label="Name"

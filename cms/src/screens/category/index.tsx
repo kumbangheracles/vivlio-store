@@ -1,4 +1,14 @@
-import { Col, Dropdown, Menu, message, Modal, Row, Space, Switch } from "antd";
+import {
+  Col,
+  Dropdown,
+  Image,
+  Menu,
+  message,
+  Modal,
+  Row,
+  Space,
+  Switch,
+} from "antd";
 import HeaderPage from "../../components/HeaderPage";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
@@ -12,6 +22,7 @@ import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
+import DefaultImg from "../../assets/images/default-img.png";
 
 const Category = () => {
   const navigate = useNavigate();
@@ -25,15 +36,17 @@ const Category = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<CategoryProps[]>([]);
+  const [currentPage, setCurrentPage] = useState<number | null>(0);
   const fetchCategory = async (page: number, limit: number) => {
     try {
       setloading(true);
       const res = await myAxios.get("/book-category", {
         params: { page, limit },
       });
-      console.log(res.data.results);
+      console.log("data category: ", res.data);
       setDataCategory(res.data.results);
       setTotalItems(res.data.total);
+      setCurrentPage(res.data.currentPage);
     } catch (error) {
       console.log("error fetch category: ", error);
     } finally {
@@ -98,6 +111,33 @@ const Category = () => {
     }
   }, [debouncedSearch, dataCategory]);
   const categoryColumns: ColumnsType<CategoryProps> = [
+    {
+      title: "Icon",
+      dataIndex: "categoryImage",
+      key: "categoryImage",
+
+      render: (_: any, record: CategoryProps) => {
+        const src = record?.categoryImage?.imageUrl || DefaultImg;
+        return (
+          <div
+            style={{
+              width: "100px",
+              height: "100px",
+              overflow: "hidden",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src={src}
+              alt={record.name}
+              style={{ objectFit: "cover", width: "100px", height: "100px" }}
+            />
+          </div>
+        );
+      },
+    },
     {
       title: "Name",
       dataIndex: "name",
@@ -221,6 +261,7 @@ const Category = () => {
         children={"Are you sure want to delete this category?"}
         open={isModalOpen}
         okText="Yes"
+        confirmLoading={loading}
         cancelText={"No"}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => handleDelete()}

@@ -1,12 +1,15 @@
 import AccountIndex from "@/components/Account";
 import AppLayout from "@/components/Layout";
-import myAxios from "@/libs/myAxios";
+
 import { UserProperties } from "@/types/user.type";
 import { fetchUser } from "../actions/fetchUser";
-import { BookWithWishlist } from "@/types/wishlist.type";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+
 import fetchWishlist from "../../components/Account/fetchWishlist";
+
+export const metadata = {
+  title: "Vivlio - Profile",
+  description: "Profile page",
+};
 
 const AccountPage = async () => {
   const dataUser = await fetchUser();

@@ -18,7 +18,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuth();
   const router = useRouter();
-  console.log("Auth: ", auth);
+
   const [isHover, setIshover] = useState<boolean>(false);
   const [isLoading, setIsloading] = useState<boolean>(false);
   const handleLogout = async () => {
@@ -27,27 +27,34 @@ export default function Navbar() {
     });
   };
 
+  useEffect(() => {
+    if (!auth.authenticated) {
+      router.push("/auth/login");
+    }
+    console.log("Auth: ", auth);
+  }, [auth]);
+
   const items = auth.authenticated
     ? [
         {
-          key: auth.authenticated ? "Account" : "",
-          label: auth.authenticated ? "Account" : "",
+          key: "Account",
+          label: "Account",
           onClick: () => router.push("/account"),
         },
         {
-          key: auth.authenticated ? "logout" : "login",
-          label: auth.authenticated ? "Logout" : "Login",
+          key: "logout",
+          label: "Logout",
           onClick: () => {
-            auth.authenticated ? setIsOpen(true) : router.push("/auth/login");
+            setIsOpen(true);
           },
         },
       ]
     : [
         {
-          key: auth.authenticated ? "logout" : "login",
-          label: auth.authenticated ? "Logout" : "Login",
+          key: "login",
+          label: "Login",
           onClick: () => {
-            auth.authenticated ? setIsOpen(true) : router.push("/auth/login");
+            router.push("/auth/login");
           },
         },
       ];

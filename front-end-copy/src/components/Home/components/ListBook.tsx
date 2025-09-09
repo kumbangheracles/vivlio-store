@@ -31,9 +31,9 @@ const ListBook: React.FC<BookTypes> = ({
         {dataBooks!?.length > 0 ? (
           <>
             <TitleList>{titleSection}</TitleList>
-            <ListBookWrapper className="grid gap-[10px] p-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-3">
-              <Suspense fallback={<GlobalLoading />}>
-                {dataBooks?.map((item) => (
+            <Suspense fallback={<GlobalLoading />}>
+              <ListBookWrapper className="flex flex-wrap gap-5 justify-center">
+                {dataBooks?.slice(0, 8).map((item) => (
                   <CardBook
                     key={item?.id}
                     title={item?.title}
@@ -52,8 +52,8 @@ const ListBook: React.FC<BookTypes> = ({
                     fetchBooks={fetchBooks}
                   />
                 ))}
-              </Suspense>
-            </ListBookWrapper>
+              </ListBookWrapper>
+            </Suspense>
           </>
         ) : (
           <>
@@ -72,10 +72,12 @@ const TitleList = styled.h4`
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 2px;
-  text-align: center;
+  text-align: start;
   margin-bottom: 10px;
+  margin-left: 50px;
 `;
 
 const ListBookWrapper = styled.div`
   padding: 1rem;
+  margin: 0rem 2rem;
 `;

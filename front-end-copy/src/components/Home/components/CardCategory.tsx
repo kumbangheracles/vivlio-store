@@ -1,21 +1,32 @@
 "use client";
 
-import { Card, Image } from "antd";
+import { CategoryProps } from "@/types/category.types";
+import { Card } from "antd";
+import Image from "next/image";
 import { styled } from "styled-components";
+import DefaultImage from "../../../assets/images/default-img.png";
+type PropTypes = CategoryProps & {
+  index?: number;
+};
 
-const CardCategory = ({ index }: { index: number }) => {
+const CardCategory = (prop: PropTypes) => {
   return (
-    <MyCard key={index}>
-      <div>
-        <div>
-          <Image
-            src="/images/no-image.png"
-            style={{ width: "100%", height: "100%", zIndex: "-20" }}
-            preview={false}
-          />
-        </div>
+    <MyCard key={prop?.index}>
+      <div className="flex flex-col justify-center text-center items-center gap-3">
+        <WrapperImage>
+          {prop?.categoryImage?.[0] ? (
+            <StyledImage
+              src={prop?.categoryImage[0].imageUrl![0]}
+              alt={`category-${prop?.name}`}
+            />
+          ) : (
+            <>
+              <StyledImage src={DefaultImage} alt={`category-${prop?.name}`} />
+            </>
+          )}
+        </WrapperImage>
 
-        <TitleCategory>Category</TitleCategory>
+        <TitleCategory>{prop?.name}</TitleCategory>
       </div>
     </MyCard>
   );
@@ -32,9 +43,32 @@ const TitleCategory = styled.h1`
 
 const MyCard = styled(Card)`
   padding: 1rem;
-
+  .ant-card-body {
+    cursor: pointer;
+  }
   border: 1px solid #cecbcb;
-  width: 500px;
+  width: 200px;
+  height: 200px;
   z-index: -10;
   border-radius: 10px;
+`;
+
+const WrapperImage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  max-width: 100px;
+  max-height: 100px;
+  overflow: hidden;
+`;
+
+const StyledImage = styled(Image)`
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+
+  /* border: 1px solid gray; */
 `;

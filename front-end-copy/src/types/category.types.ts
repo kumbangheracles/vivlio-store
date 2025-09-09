@@ -2,6 +2,7 @@ export type CategoryProps = {
   categoryId: string;
   name: string;
   description?: string;
+  categoryImage?: categoryImage[];
   isPopular?: boolean;
   status?: boolean | null;
   createdAt: Date;
@@ -14,4 +15,10 @@ export const initialCategoryValue: CategoryProps = {
   createdAt: new Date(),
   updatedAt: new Date(),
   status: null,
+};
+
+export type categoryImage = {
+  bookId?: string;
+  imageUrl?: string;
+  public_id?: string;
 };

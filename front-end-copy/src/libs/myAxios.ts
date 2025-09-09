@@ -6,7 +6,7 @@ const myAxios = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 1000 * 60 * 60,
 });
 
 // Request Interceptor
@@ -42,6 +42,7 @@ myAxios.interceptors.response.use(
         break;
       case 403:
         console.log("⛔ Forbidden access");
+
         break;
       case 500:
         console.log("💥 Server error");

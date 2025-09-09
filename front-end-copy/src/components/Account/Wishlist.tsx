@@ -1,11 +1,12 @@
 "use client";
 import myAxios from "@/libs/myAxios";
 import { BookWithWishlist, WishlistProps } from "@/types/wishlist.type";
-import { Card, Typography } from "antd";
+import { Card, Empty, Spin, Typography } from "antd";
 import { Suspense, useEffect, useState } from "react";
 import GlobalLoading from "../GlobalLoading";
 import React from "react";
-
+import CardBookWishlist from "./CardBookWishlist";
+import { useWishlistStore } from "@/zustand/wishlist.store";
 const { Title, Text } = Typography;
 
 type PropTypes = {
@@ -20,38 +21,19 @@ type KeyProps =
   | "highest_price";
 
 const Wishlist = ({ dataWish, fetchWishlist }: PropTypes) => {
-  const [dataWishlist, setDataWishlist] = useState<BookWithWishlist[]>(
-    dataWish!
-  );
-  console.log("Data wish: ", dataWish);
+  const { books, loading, fetchBooks } = useWishlistStore();
+
   const [keyFilter, setKeyFilter] = useState<KeyProps>("newest_saved");
-  // const getAllWishlist = async () => {
-  //   try {
-  //     const res = await myAxios.get("/userWishlist");
-
-  //     const data = res.data.results;
-  //     console.log("Data wishlist: ", data);
-  //     setDataWishlist(data);
-  //   } catch (error) {
-  //     console.log("Error fetch data wishlist: ", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getAllWishlist();
-  // }, [keyFilter]);
-  const refreshWishlist = async () => {
-    await fetchWishlist();
-    setDataWishlist(dataWish as BookWithWishlist[]);
-  };
-
   useEffect(() => {
-    refreshWishlist();
-  }, [dataWish]);
+    if (books.length === 0) {
+      fetchBooks();
+    }
+  }, [books, fetchBooks]);
+
   let filteredData: BookWithWishlist[] = [];
 
-  if (keyFilter && dataWishlist.length > 0) {
-    filteredData = [...dataWishlist].sort((a, b) => {
+  if (keyFilter && books.length > 0) {
+    filteredData = [...books].sort((a, b) => {
       switch (keyFilter) {
         case "newest_saved":
           return (
@@ -74,31 +56,36 @@ const Wishlist = ({ dataWish, fetchWishlist }: PropTypes) => {
       }
     });
   } else {
-    filteredData = dataWishlist;
+    filteredData = books;
   }
 
-  const CardBook = React.lazy(() => import("../Home/components/CardBook"));
   return (
     <>
-      <Card>
+      <Card className="w-full shadow-md">
         <Suspense fallback={<GlobalLoading />}>
           <Title>Wishlist Page</Title>
 
           <div className="flex gap-2.5 flex-wrap">
-            {filteredData.map((item) => (
-              <CardBook
-                fetchWishlist={refreshWishlist}
-                key={item?.id}
-                title={item?.book?.title as string}
-                author={item?.book?.author as string}
-                price={item?.book?.price as number}
-                status={item?.book?.status as string}
-                book_type={item?.book?.book_type!}
-                images={item?.book?.images}
-                showIcon={"trash"}
-                id={item?.bookId}
-              />
-            ))}
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => (
+                <CardBookWishlist
+                  key={item?.id}
+                  id={item?.bookId}
+                  title={String(item?.book?.title)}
+                  author={item?.book?.author as string}
+                  price={Number(item?.book?.price)}
+                  images={item?.book?.images}
+                  categories={item?.book?.categories}
+                  status={""}
+                  book_type={item?.book?.book_type!}
+                  fetchBooks={fetchBooks}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center w-full">
+                <Empty />
+              </div>
+            )}
           </div>
         </Suspense>
       </Card>

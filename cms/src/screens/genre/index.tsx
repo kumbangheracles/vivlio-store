@@ -230,6 +230,7 @@ const GenreIndex = () => {
         children={"Are you sure want to delete this genre?"}
         open={isModalOpen}
         okText="Yes"
+        confirmLoading={loading}
         cancelText={"No"}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => handleDelete()}

@@ -74,6 +74,9 @@ const AccountIndex: React.FC<AccountProps> = ({
   return (
     <CardContainer>
       <Tabs
+        // destroyInactiveTabPane
+        destroyOnHidden
+        key={activeTab}
         tabPosition="left"
         activeKey={activeTab}
         items={tabItems}

@@ -1,4 +1,4 @@
-import { Card, Space, Tag } from "antd";
+import { Card, Space, Tag, Image } from "antd";
 import category from ".";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { CategoryProps } from "../../types/category.types";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
+import DefaultImg from "../../assets/images/default-img.png";
 
 const CategoryDetail = () => {
   const navigate = useNavigate();
@@ -56,6 +57,18 @@ const CategoryDetail = () => {
         sectionSubTitle="this section is for displaying detail information"
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 200,
+              height: 200,
+              overflow: "hidden",
+            }}
+          >
+            <Image src={dataCategory?.categoryImage?.imageUrl || DefaultImg} />
+          </div>
           <DetailItem label="Name" value={dataCategory?.name || "No Content"} />
           <DetailItem
             label="Status"
