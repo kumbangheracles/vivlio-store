@@ -2,7 +2,7 @@ export type CategoryProps = {
   categoryId: string;
   name: string;
   description?: string;
-  categoryImage?: categoryImage[];
+  categoryImage?: categoryImage;
   isPopular?: boolean;
   status?: boolean | null;
   createdAt: Date;

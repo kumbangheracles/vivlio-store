@@ -1,38 +1,31 @@
-"use client";
-import "@ant-design/v5-patch-for-react-19";
-import AOS from "aos";
-import "aos/dist/aos.css";
-import AuthProvider from "@/components/AuthProvider";
-import { ReactNode, useEffect } from "react";
+// "use client";
+
+import { ReactNode } from "react";
 import "./globals.css";
+import fetchUser from "./actions/fetchUser";
 import AppLayout from "@/components/Layout";
-import { Suspense } from "react";
-import GlobalLoading from "@/components/GlobalLoading";
-import { StyleProvider } from "@ant-design/cssinjs";
-import { ConfigProvider } from "antd";
-import { StyleSheetManager } from "styled-components";
-import isPropValid from "@emotion/is-prop-valid";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
+import AuthProvider from "@/context/AuthProvider";
+
 interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  useEffect(() => {
-    AOS.init();
-  }, []);
+export default async function RootLayout({ children }: RootLayoutProps) {
+  // useEffect(() => {
+  //   AOS.init();
+  // }, []);
+  const dataUser = await fetchUser();
+  const isAuthTrue = true;
+
+  console.log("DATA USER RootLayout:", dataUser);
   return (
     <html lang="en">
       <body>
-        <StyleSheetManager shouldForwardProp={isPropValid}>
-          <StyleProvider>
-            <ConfigProvider>
-              <AuthProvider>
-                <Suspense fallback={<GlobalLoading />}>{children}</Suspense>
-              </AuthProvider>
-            </ConfigProvider>
-          </StyleProvider>
-        </StyleSheetManager>
+        <AuthProvider>
+          <AppLayout dataUser={dataUser} isAuthPageTampil={false}>
+            {children}
+          </AppLayout>
+        </AuthProvider>
       </body>
     </html>
   );

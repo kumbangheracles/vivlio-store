@@ -1,3 +1,4 @@
+"use client";
 import styled from "styled-components";
 import { Modal, ModalProps } from "antd";
 import { ReactNode } from "react";

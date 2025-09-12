@@ -13,8 +13,14 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "next-auth/react";
 import { SearchOutlined } from "@ant-design/icons";
+import DropdownProfile from "./DropdownProfile";
+import { UserProperties } from "@/types/user.type";
+import { MdOutlineNavigateNext } from "react-icons/md";
+interface PropTypes {
+  dataUser?: UserProperties;
+}
 
-export default function Navbar() {
+export default function Navbar({ dataUser }: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuth();
   const router = useRouter();
@@ -22,28 +28,59 @@ export default function Navbar() {
   const [isHover, setIshover] = useState<boolean>(false);
   const [isLoading, setIsloading] = useState<boolean>(false);
   const handleLogout = async () => {
-    signOut({
-      callbackUrl: "/auth/login", // redirect setelah logout
-    });
+    try {
+      setIsloading(true);
+      await myAxios.post("/auth/logout");
+      message.info("Logout Success");
+      await signOut({
+        callbackUrl: "/auth/login",
+        // redirect: true,
+      });
+      // router.push("/auth/login");
+    } catch (error) {
+      console.log("Error Logout: ", error);
+      ErrorHandler(error);
+      await signOut({
+        callbackUrl: "/auth/login",
+        // redirect: true,
+      });
+    } finally {
+      setIsloading(false);
+    }
   };
 
-  useEffect(() => {
-    if (!auth.authenticated) {
-      router.push("/auth/login");
-    }
-    console.log("Auth: ", auth);
-  }, [auth]);
-
+  // useEffect(() => {
+  //   // kalau auth masih undefined (belum selesai check), jangan redirect dulu
+  //   if (auth?.authenticated === false) {
+  //     router.push("/auth/login");
+  //   }
+  // }, [auth?.authenticated, router]);
   const items = auth.authenticated
     ? [
         {
-          key: "Account",
-          label: "Account",
+          label: <DropdownProfile dataUser={dataUser} />,
+          key: "header",
+          disabled: true,
+          className: "dropdown-header-nav",
+        },
+        {
+          key: "account",
+          label: (
+            <StyledLabel>
+              <span>Account</span>
+              <MdOutlineNavigateNext />
+            </StyledLabel>
+          ),
           onClick: () => router.push("/account"),
         },
         {
           key: "logout",
-          label: "Logout",
+          label: (
+            <StyledLabel>
+              <span>Logout</span>
+              <MdOutlineNavigateNext />
+            </StyledLabel>
+          ),
           onClick: () => {
             setIsOpen(true);
           },
@@ -52,7 +89,12 @@ export default function Navbar() {
     : [
         {
           key: "login",
-          label: "Login",
+          label: (
+            <StyledLabel>
+              <span>Login</span>
+              <MdOutlineNavigateNext />
+            </StyledLabel>
+          ),
           onClick: () => {
             router.push("/auth/login");
           },
@@ -60,7 +102,7 @@ export default function Navbar() {
       ];
 
   return (
-    <nav className="fixed top-0 w-full h-[auto] bg-white z-[999]">
+    <nav className="fixed top-0 w-full h-[auto] bg-[white] z-[999]">
       <div
         style={{
           display: "flex",
@@ -94,12 +136,18 @@ export default function Navbar() {
                 items: items,
               }}
             >
-              <AccountIcon isTriggered={isHover}>
-                <img
-                  style={{ objectFit: "contain", cursor: "pointer" }}
-                  src="/icons/account.svg"
-                  alt="account-icon"
-                />
+              <AccountIcon isTriggered={isHover} isAuth={auth?.authenticated}>
+                <div className="w-full h-full overflow-hidden rounded-full flex items-center justify-center">
+                  <img
+                    style={{ objectFit: "cover", cursor: "pointer" }}
+                    src={
+                      auth?.authenticated
+                        ? dataUser?.profileImage?.imageUrl
+                        : "/icons/account.svg"
+                    }
+                    alt="account-icon"
+                  />
+                </div>
               </AccountIcon>
             </Dropdown>
           </div>
@@ -135,8 +183,9 @@ export default function Navbar() {
         okText={"Yes"}
         cancelText={"Cancel"}
         onCancel={() => setIsOpen(false)}
-        loading={isLoading}
+        // loading={isLoading}
         onOk={() => handleLogout()}
+        confirmLoading={isLoading}
         title={
           <>
             <h1 className="text-center font-bolf">Logout</h1>
@@ -191,6 +240,7 @@ const StyledLink = styled(Link)`
 
 interface IconProps {
   isTriggered?: boolean;
+  isAuth?: boolean;
 }
 
 const AccountIcon = styled.div<IconProps>`
@@ -200,7 +250,7 @@ const AccountIcon = styled.div<IconProps>`
   border: 1px solid;
   border-color: ${({ isTriggered }) => (isTriggered ? "black" : "white")};
   border-radius: 50%;
-  padding: 3px;
+  padding: ${({ isAuth }) => (isAuth ? "0" : "3px")};
   display: flex;
   /* margin-top: 10px; */
   align-items: center;
@@ -211,4 +261,16 @@ const AccountIcon = styled.div<IconProps>`
   }
 
   z-index: 99999999999999999;
+`;
+
+const StyledLabel = styled.h4`
+  span {
+    padding: 8px;
+    font-weight: normal;
+    font-size: 16px;
+  }
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;

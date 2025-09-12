@@ -9,7 +9,7 @@ const authAxios = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 3000,
 });
 const authOptions: NextAuthOptions = {
   providers: [
@@ -126,10 +126,14 @@ const authOptions: NextAuthOptions = {
         } catch (error) {
           ErrorHandler(error);
           console.log("Failed refresh token: ", error);
-        } finally {
-          window.location.reload;
+          token.accessToken = "";
+          token.tokenExpiry = 0;
         }
+        // finally {
+        //   window.location.reload();
+        // }
       }
+
       return token;
     },
 

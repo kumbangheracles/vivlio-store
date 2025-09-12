@@ -63,6 +63,7 @@ async function init() {
     await sequelize.sync().then(() => console.log("Database synced"));
 
     // Routes
+    app.use("/auth", authRoutes);
     app.use("/books", bookRoutes);
     app.use("/userWishlist", userWishlistRoutes);
 
@@ -75,8 +76,6 @@ async function init() {
     app.use("/roles", rolesRoutes);
 
     app.use("/media", mediaRoutes);
-
-    app.use("/auth", authRoutes);
 
     app.get("/", (req, res) => {
       res.json({

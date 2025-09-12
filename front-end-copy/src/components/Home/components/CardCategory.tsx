@@ -13,11 +13,13 @@ const CardCategory = (prop: PropTypes) => {
   return (
     <MyCard key={prop?.index}>
       <div className="flex flex-col justify-center text-center items-center gap-3">
-        <WrapperImage>
-          {prop?.categoryImage?.[0] ? (
+        <WrapperImage className="wrapper-img-category">
+          {prop?.categoryImage ? (
             <StyledImage
-              src={prop?.categoryImage[0].imageUrl![0]}
+              src={prop?.categoryImage.imageUrl!}
               alt={`category-${prop?.name}`}
+              width={100}
+              height={100}
             />
           ) : (
             <>
@@ -43,14 +45,21 @@ const TitleCategory = styled.h1`
 
 const MyCard = styled(Card)`
   padding: 1rem;
-  .ant-card-body {
-    cursor: pointer;
-  }
+  cursor: pointer;
+
   border: 1px solid #cecbcb;
   width: 200px;
   height: 200px;
   z-index: -10;
   border-radius: 10px;
+
+  transition: 0.5s;
+
+  &:hover {
+    transform: scale(1.05);
+
+    padding: 0;
+  }
 `;
 
 const WrapperImage = styled.div`
@@ -58,9 +67,14 @@ const WrapperImage = styled.div`
   justify-content: center;
   align-items: center;
 
-  max-width: 100px;
-  max-height: 100px;
+  width: 100px;
+  height: 100px;
   overflow: hidden;
+  border: 2px solid #cecbcb;
+
+  border-radius: 50%;
+
+  transition: transform 0.5s ease;
 `;
 
 const StyledImage = styled(Image)`

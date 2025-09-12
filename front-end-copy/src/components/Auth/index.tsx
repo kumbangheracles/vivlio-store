@@ -71,6 +71,7 @@ const LoginForm: React.FC = () => {
       message.error("An error occurred during login");
     } finally {
       setLoading(false);
+      navigate.refresh();
     }
   };
 

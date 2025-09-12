@@ -8,14 +8,18 @@ import Image from "next/image";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { CategoryProps } from "@/types/category.types";
 import fetchBooksHome from "./actions/fetchBooksHome";
+import { resolve } from "path";
+import GlobalLoading from "@/components/GlobalLoading";
+import { FaSpinner } from "react-icons/fa";
+import { Spin } from "antd";
 
 async function fetchCategory(): Promise<CategoryProps[]> {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session) {
-      window.location.href = "/unoutherized";
-    }
+    // if (!session) {
+    //   window.location.href = "/unoutherized";
+    // }
 
     const url = "/book-category/public";
     const response = await myAxios.get(url);
@@ -27,20 +31,28 @@ async function fetchCategory(): Promise<CategoryProps[]> {
   }
 }
 
-// export const metadata = {
-//   title: "Vivlio - Home",
-//   description: "Home page",
-// };
+export const metadata = {
+  title: "Vivlio - Home",
+  description: "Home page",
+};
 
 export const revalidate = 60;
 export default async function Home() {
   const books = await fetchBooksHome();
   const categories = await fetchCategory();
-  console.log("Data books: ", books);
-  console.log("Data categories: ", categories);
+  console.log("Books: ", books);
+
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("intentional delay");
+    }, 2000);
+  });
   return (
-    <AppLayout>
+    <>
+      {/* <AppLayout isAuthPageTampil={false}> */}
       <HomePage dataBooks={books} dataCategories={categories} />
-    </AppLayout>
+
+      {/* </AppLayout> */}
+    </>
   );
 }

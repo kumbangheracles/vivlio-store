@@ -59,7 +59,7 @@ const Footer = () => {
           </div>
         </Container>
         <hr />
-        <div style={{ padding: "10px 20px", backgroundColor: "#303438" }}>
+        <div style={{ padding: "10px 20px", backgroundColor: "#cacaca" }}>
           <div className="flex justify-between p-4 text-[white]">
             <p>© 2025 PT Vivlio Jaya Media</p>
             <div className="text-3xl flex gap-[10px] items-center">

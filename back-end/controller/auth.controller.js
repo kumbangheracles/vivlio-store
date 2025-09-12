@@ -362,7 +362,7 @@ module.exports = {
         }
       );
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         message: error.message,
         data: null,
       });
@@ -413,7 +413,7 @@ module.exports = {
         sameSite: "None",
         secure: false,
       });
-
+      console.log("Logout success, cookie cleared ==================");
       return res.status(200).json({
         message: "Logout success, cookie cleared",
       });

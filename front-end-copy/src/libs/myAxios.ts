@@ -7,6 +7,7 @@ const myAxios = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 1000 * 60 * 60,
+  withCredentials: true,
 });
 
 // Request Interceptor

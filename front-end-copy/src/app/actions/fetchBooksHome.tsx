@@ -6,9 +6,9 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 async function fetchBooksHome(): Promise<BookProps[]> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      window.location.href = "/unoutherized";
-    }
+    // if (!session) {
+    //   window.location.href = "/unoutherized";
+    // }
     const accessToken = session?.accessToken;
 
     const url = accessToken ? "/books" : "/books/common-all";

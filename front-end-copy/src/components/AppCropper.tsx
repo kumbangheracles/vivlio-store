@@ -1,3 +1,4 @@
+"use";
 import { useState } from "react";
 import ReactCrop, { type Crop } from "react-image-crop";
 

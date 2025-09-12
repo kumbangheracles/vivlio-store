@@ -1,16 +1,19 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import { Result, Button } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Unauthorized = () => {
-  const navigate = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const auth = useAuth();
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const route =
     auth?.authenticated === true
       ? "/"
-      : `/auth/login?callbackUrl=${encodeURIComponent("/auth/login")}`;
+      : `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 
   return (
     <Result
@@ -22,7 +25,7 @@ const Unauthorized = () => {
           : "Sorry, you are not authorized to access this page."
       }
       extra={
-        <Button type="primary" onClick={() => navigate.push(route)}>
+        <Button type="primary" onClick={() => router.push(route)}>
           {auth?.authenticated === true ? "Back to home" : "Sign in"}
         </Button>
       }

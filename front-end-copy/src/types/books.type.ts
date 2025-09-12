@@ -10,6 +10,7 @@ export type BookProps = {
   book_cover?: string;
   categoryId?: string;
   genres?: string[];
+  isPopular?: boolean;
   images?: BookImage[];
   description?: string;
   categories?: CategoryProps;

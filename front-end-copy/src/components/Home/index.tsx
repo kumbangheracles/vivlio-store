@@ -16,6 +16,23 @@ interface PropTypes {
 }
 
 export default function HomePage(prop: PropTypes) {
+  const recentPopularBook = prop.dataBooks
+    ?.filter((item) => item.isPopular)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+    )
+    .slice(0, 5);
+
+  const bestSellerBook = prop.dataBooks?.slice(0, 5);
+  const newestBooks = prop.dataBooks
+    ?.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // terbaru dulu
+    })
+    .slice(0, 5); // ambil 5 teratas
+
   // const { titleSection } = prop;
   return (
     <>
@@ -27,13 +44,19 @@ export default function HomePage(prop: PropTypes) {
         <TitleList>Popular Category</TitleList>
         <ListCategory dataCategories={prop.dataCategories} />
       </div>
-      <ListBook
-        dataBooks={prop.dataBooks}
-        titleSection={"Recently Popular"}
-        fetchBooks={prop.fetchBooks}
-      />
-      <ListBook titleSection={"Best Seller"} />
-      <ListBook titleSection={"Latest Popular"} />
+      <div>
+        <ListBook
+          dataBooks={recentPopularBook}
+          titleSection={"Recently Popular"}
+          fetchBooks={prop.fetchBooks}
+        />
+      </div>
+      <div>
+        <ListBook titleSection={"Best Seller"} dataBooks={bestSellerBook} />
+      </div>
+      <div>
+        <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
+      </div>
     </>
   );
 }

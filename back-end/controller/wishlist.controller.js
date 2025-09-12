@@ -5,7 +5,7 @@ const {
   BookImage,
   Genre,
 } = require("../models/index");
-
+const { updateBookPopularity } = require("../helpers/updatePopularityBook");
 module.exports = {
   async getBookById(req, res) {
     try {
@@ -96,6 +96,7 @@ module.exports = {
       }
 
       await UserWishlist.create({ userId, bookId });
+      await updateBookPopularity(bookId);
       res.status(200).json({
         status: 200,
         message: "Success Add to wishlist",

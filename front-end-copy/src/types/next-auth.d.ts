@@ -1,4 +1,5 @@
 import NextAuth, { DefaultSession } from "next-auth";
+import { UserImage } from "./user.type";
 
 declare module "next-auth" {
   interface Session {
@@ -15,6 +16,7 @@ declare module "next-auth" {
     role: string;
     token: string;
     isVerified: boolean;
+    profileImage?: UserImage;
   }
 }
 

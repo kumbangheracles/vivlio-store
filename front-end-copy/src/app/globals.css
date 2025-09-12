@@ -81,3 +81,7 @@ label {
   transform: translateY(10px);
   transition: all 300ms ease-in-out;
 }
+
+.dropdown-header-nav {
+  cursor: default !important;
+}

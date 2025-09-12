@@ -101,7 +101,7 @@ const CategoryEdit = () => {
           : [],
       });
       console.log("data cat: ", data);
-      const categortImage = res.data.categoryImage;
+      const categoryImage = res.data.result.categoryImage;
       const imagePrev: UploadFile<any>[] = [
         {
           uid: "1",
@@ -117,9 +117,10 @@ const CategoryEdit = () => {
 
       // setDataGenre(res.data.result.genres);
       setFileList(imagePrev || []);
-      setPreviewImage(categortImage.imageUrl || null);
+      setPreviewImage(categoryImage.imageUrl);
     } catch (error) {
-      ErrorHandler(error);
+      // ErrorHandler(error);
+      console.log("error fetch data category: ", error);
     } finally {
       setIsLoading(false);
     }

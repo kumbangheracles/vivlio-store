@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["res.cloudinary.com"],
   },
+  compiler: {
+    styledComponents: true,
+  },
 };
 
 export default nextConfig;
