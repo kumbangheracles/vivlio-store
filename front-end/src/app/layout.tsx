@@ -15,9 +15,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   //   AOS.init();
   // }, []);
   const dataUser = await fetchUser();
-  const isAuthTrue = true;
 
-  console.log("DATA USER RootLayout:", dataUser);
   return (
     <html lang="en">
       <body>

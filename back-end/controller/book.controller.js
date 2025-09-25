@@ -11,7 +11,7 @@ const {
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
 const uploader = require("../config/uploader");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 
 module.exports = {
@@ -262,6 +262,9 @@ module.exports = {
   },
 
   async getOne(req, res) {
+    const userId = req.id;
+
+    console.log("UserID Get One: ", userId);
     try {
       const { id } = req.params;
       const book = await Book.findOne({
@@ -276,6 +279,15 @@ module.exports = {
             model: Genre,
             as: "genres",
             attributes: ["genreId", "genre_title"],
+          },
+
+          {
+            model: User,
+            as: "wishlistUsers",
+            attributes: ["id"],
+            through: { attributes: [] },
+            required: false,
+            where: { id: userId },
           },
         ],
       });

@@ -10,6 +10,7 @@ const genresRoutes = require("./routes/genre");
 const rolesRoutes = require("./routes/role");
 const authRoutes = require("./routes/auth");
 const userWishlistRoutes = require("./routes/userWishlist");
+const midtransRoutes = require("./routes/midtrans");
 const mediaRoutes = require("./routes/media");
 const cookieParser = require("cookie-parser");
 const { swaggerUi, specs } = require("./docs/swagger");
@@ -76,6 +77,8 @@ async function init() {
     app.use("/roles", rolesRoutes);
 
     app.use("/media", mediaRoutes);
+
+    app.use("/midtrans", midtransRoutes);
 
     app.get("/", (req, res) => {
       res.json({

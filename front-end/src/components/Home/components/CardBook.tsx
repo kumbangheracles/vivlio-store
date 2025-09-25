@@ -94,9 +94,13 @@ const CardBook: React.FC<CardBookProps> = React.memo(
       setIsInWishlist(wishlistUsers?.length! > 0);
       setIsWishlist?.(bookId as string, isInWishlist);
     }, [wishlistUsers]);
-    const stringPrice = price as number;
+
+    const goToDetail = (id: string) => {
+      router.push(`/book/${id}`);
+    };
+
     return (
-      <StyledCard>
+      <StyledCard onClick={() => goToDetail(bookId as string)}>
         <div
           className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
           onClick={() => handleWishlist()}

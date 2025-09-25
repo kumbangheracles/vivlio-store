@@ -16,11 +16,7 @@ router.get(
   bookController.cmsGetAll
 );
 
-router.get(
-  "/:id",
-
-  bookController.getOne
-);
+router.get("/:id", authMiddleware, bookController.getOne);
 
 // Create book
 router.post(

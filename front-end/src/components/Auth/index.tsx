@@ -216,7 +216,7 @@ const LoginForm: React.FC = () => {
             <p>Don't have account?</p>
             <p
               style={{ color: "#7badff", cursor: "pointer" }}
-              onClick={() => navigate.push("/register")}
+              onClick={() => navigate.push("/auth/register")}
             >
               Sign Up
             </p>

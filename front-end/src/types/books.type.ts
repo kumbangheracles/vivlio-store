@@ -1,4 +1,5 @@
 import { CategoryProps } from "./category.types";
+import { GenreProperties } from "./genre.type";
 
 export type BookProps = {
   id?: string;
@@ -9,7 +10,7 @@ export type BookProps = {
   book_type: BookType;
   book_cover?: string;
   categoryId?: string;
-  genres?: string[];
+  genres?: GenreProperties[];
   isPopular?: boolean;
   images?: BookImage[];
   description?: string;
@@ -21,7 +22,7 @@ export type BookProps = {
     wishlistCount?: number;
   };
   wishlistUsers?: WishlistUser[];
-  fetchBooks?: any;
+  fetchBooks?: () => void;
   createdAt?: Date;
   updateAt?: Date;
 };

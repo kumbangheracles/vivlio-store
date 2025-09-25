@@ -10,7 +10,6 @@ import "@ant-design/v5-patch-for-react-19";
 import GlobalLoading from "./GlobalLoading";
 import { StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
-import AuthProvider from "@/context/AuthProvider";
 import { usePathname } from "next/navigation";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import AOS from "aos";
@@ -19,25 +18,34 @@ interface LayoutProps {
   dataUser?: UserProperties;
   isAuthPageTampil?: boolean;
 }
-const AppLayout: React.FC<LayoutProps> = ({
-  children,
-  dataUser,
-  isAuthPageTampil = true,
-}) => {
+const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
   const pathname = usePathname();
   const isPageAuth = pathname.startsWith("/auth");
-
+  const isResult = pathname.startsWith("/result");
   useEffect(() => {
     AOS.init();
   }, []);
 
+  useEffect(() => {
+    const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY as string;
+    const script = document.createElement("script");
+    script.src = snapScript;
+    script.setAttribute("data-client-key", clientKey);
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
   return (
     <>
       <StyleSheetManager shouldForwardProp={isPropValid}>
         <StyleProvider>
           <AntdRegistry>
             <ConfigProvider>
-              {isPageAuth ? (
+              {isPageAuth || isResult ? (
                 <>{children}</>
               ) : (
                 <>

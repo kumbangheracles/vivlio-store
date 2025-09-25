@@ -11,7 +11,8 @@ export default withAuth(
       pathname === "/blog" ||
       pathname === "/shop" ||
       pathname === "/about-us" ||
-      pathname === "/contact-us";
+      pathname === "/contact-us" ||
+      pathname === "/book";
 
     if (!token && isProtectedRoute) {
       return NextResponse.redirect(new URL("/unoutherized", req.url));
@@ -44,5 +45,6 @@ export const config = {
     "/auth/login",
     "/auth/register",
     "/unoutherized",
+    "/book/:path",
   ],
 };
