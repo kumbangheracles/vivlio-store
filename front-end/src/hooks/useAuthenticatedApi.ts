@@ -9,7 +9,6 @@ export function useAuthenticatedApi() {
   const api = useMemo(() => {
     const authenticatedAxios = myAxios.create();
 
-    // Override request interceptor untuk instance ini
     authenticatedAxios.interceptors.request.use(async (config) => {
       if (session?.accessToken) {
         config.headers.Authorization = `Bearer ${session.accessToken}`;

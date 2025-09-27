@@ -58,7 +58,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const [isInWishlist, setIsInWishlist] = useState(
     book?.wishlistUsers?.length! > 0
   );
-  const [quantity, setQuantity] = useState(1);
   const { fetchBooksHome } = useWishlistStore();
   const { setIsWishlist, wishlist, isWishlist } = useIsWishlistStore();
   const [loading, setLoading] = useState<boolean>(false);
@@ -79,10 +78,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         message.success("Success add to wishlist");
         setIsInWishlist(true);
         setIsWishlist(bookId as string, true);
+        isWishlist(bookId as string);
       } else {
         await myAxios.delete(`/userWishlist/${bookId}`);
         message.success("Success remove from wishlist");
-
+        isWishlist(bookId as string);
         setIsInWishlist(false);
         setIsWishlist(bookId as string, false);
       }
@@ -284,14 +284,22 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 <Space size="middle">
                   <Button
                     loading={loading}
-                    type={isInWishlist ? "primary" : "default"}
+                    type={isWishlist(bookId as string) ? "primary" : "default"}
                     size="large"
-                    icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}
+                    icon={
+                      isWishlist(bookId as string) ? (
+                        <HeartFilled />
+                      ) : (
+                        <HeartOutlined />
+                      )
+                    }
                     onClick={handleWishlistClick}
                     className="h-12 px-6"
-                    danger={isInWishlist}
+                    danger={isWishlist(bookId as string)}
                   >
-                    {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                    {isWishlist(bookId as string)
+                      ? "Remove from Wishlist"
+                      : "Add to Wishlist"}
                   </Button>
 
                   <Button

@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import fetchWishlist from "@/components/Account/fetchWishlist";
 
-import { promises } from "dns";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 type WishlistState = {
   books: BookWithWishlist[];

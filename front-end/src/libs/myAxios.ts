@@ -10,7 +10,6 @@ const myAxios = axios.create({
   withCredentials: true,
 });
 
-// Request Interceptor
 myAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const session = await getSession();
@@ -26,27 +25,26 @@ myAxios.interceptors.request.use(
     return config;
   },
   (error: AxiosError) => {
-    console.log("🚨 Request error:", error);
+    console.log("Request error:", error);
     return Promise.reject(error);
   }
 );
 
-// Response Interceptor
 myAxios.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    console.log("🚨 Response error:", error.response?.data || error.message);
+    console.log("Response error:", error.response?.data || error.message);
 
     switch (error.response?.status) {
       case 401:
-        console.log("🔒 Unauthorized access");
+        console.log("Unauthorized access");
         break;
       case 403:
-        console.log("⛔ Forbidden access");
+        console.log("Forbidden access");
 
         break;
       case 500:
-        console.log("💥 Server error");
+        console.log("Server error");
         break;
     }
 

@@ -74,10 +74,11 @@ const CardBook: React.FC<CardBookProps> = React.memo(
           message.success("Success add to wishlist");
           setIsInWishlist(true);
           setIsWishlist(bookId as string, true);
+          isWishlist(bookId as string);
         } else {
           await myAxios.delete(`/userWishlist/${bookId}`);
           message.success("Success remove from wishlist");
-
+          isWishlist(bookId as string);
           setIsInWishlist(false);
           setIsWishlist(bookId as string, false);
         }
@@ -88,6 +89,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
         setModalOpen(false);
 
         await fetchBooksHome();
+        router.refresh();
       }
     };
     useEffect(() => {
@@ -100,7 +102,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     };
 
     return (
-      <StyledCard onClick={() => goToDetail(bookId as string)}>
+      <StyledCard>
         <div
           className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
           onClick={() => handleWishlist()}
@@ -122,7 +124,10 @@ const CardBook: React.FC<CardBookProps> = React.memo(
        
         </div> */}
 
-          <div className="relative w-full">
+          <div
+            className="relative w-full"
+            onClick={() => goToDetail(bookId as string)}
+          >
             <div className="mid-content flex items-center justify-center w-[120px] h-full overflow-hidden z-50">
               {images?.[0] && (
                 <WrapperImage key={images[0].bookId || images[0].public_id}>
