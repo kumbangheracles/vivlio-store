@@ -42,7 +42,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
   return (
     <>
       <StyleSheetManager shouldForwardProp={isPropValid}>
-        <StyleProvider>
+        <StyleProvider hashPriority="high">
           <AntdRegistry>
             <ConfigProvider>
               {isPageAuth || isResult ? (

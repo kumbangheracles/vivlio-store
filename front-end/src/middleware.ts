@@ -12,7 +12,8 @@ export default withAuth(
       pathname === "/shop" ||
       pathname === "/about-us" ||
       pathname === "/contact-us" ||
-      pathname === "/book";
+      pathname === "/book" ||
+      pathname === "/cart";
 
     if (!token && isProtectedRoute) {
       return NextResponse.redirect(new URL("/unoutherized", req.url));

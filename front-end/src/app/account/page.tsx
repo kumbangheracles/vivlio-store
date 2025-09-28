@@ -15,13 +15,11 @@ const AccountPage = async () => {
   const dataUser = await fetchUser();
   const dataWishlist = await fetchWishlist();
   return (
-    // <AppLayout isAuthPageTampil={false}>
     <AccountIndex
       dataUser={dataUser as UserProperties}
       dataWishlist={dataWishlist}
       fetchWishlist={fetchWishlist}
     />
-    // </AppLayout>
   );
 };
 

@@ -10,6 +10,7 @@ const genresRoutes = require("./routes/genre");
 const rolesRoutes = require("./routes/role");
 const authRoutes = require("./routes/auth");
 const userWishlistRoutes = require("./routes/userWishlist");
+const userCartRoutes = require("./routes/cart");
 const midtransRoutes = require("./routes/midtrans");
 const mediaRoutes = require("./routes/media");
 const cookieParser = require("cookie-parser");
@@ -67,6 +68,8 @@ async function init() {
     app.use("/auth", authRoutes);
     app.use("/books", bookRoutes);
     app.use("/userWishlist", userWishlistRoutes);
+
+    app.use("/cart", userCartRoutes);
 
     app.use("/users", userRoutes);
 

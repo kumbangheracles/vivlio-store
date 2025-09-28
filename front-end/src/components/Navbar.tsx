@@ -50,11 +50,19 @@ export default function Navbar({ dataUser }: PropTypes) {
   };
 
   // useEffect(() => {
-  //   // kalau auth masih undefined (belum selesai check), jangan redirect dulu
   //   if (auth?.authenticated === false) {
   //     router.push("/auth/login");
   //   }
   // }, [auth?.authenticated, router]);
+
+  const goToCart = () => {
+    if (!auth.accessToken) {
+      message.info("You must login first!!!");
+      return;
+    }
+
+    router.push("/cart");
+  };
   const items = auth.authenticated
     ? [
         {
@@ -152,7 +160,8 @@ export default function Navbar({ dataUser }: PropTypes) {
             </Dropdown>
           </div>
           <img
-            style={{ width: "24px" }}
+            onClick={() => goToCart()}
+            style={{ width: "24px", cursor: "pointer" }}
             src="/icons/chart.svg"
             alt="chart-icon"
           />

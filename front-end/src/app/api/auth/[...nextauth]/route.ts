@@ -9,7 +9,7 @@ const authAxios = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 3000,
+  timeout: 5000,
 });
 const authOptions: NextAuthOptions = {
   providers: [
@@ -63,7 +63,6 @@ const authOptions: NextAuthOptions = {
             return userObj;
           }
 
-          console.error("Login failed: Invalid response structure");
           console.log("Response data:", data);
           return null;
         } catch (error) {
@@ -71,12 +70,8 @@ const authOptions: NextAuthOptions = {
 
           if (error instanceof AxiosError) {
             const errorData = error.response?.data as ApiError;
-            console.error("Status:", error.response?.status);
+
             console.error("Response data:", errorData);
-            console.error(
-              "Error message:",
-              errorData?.message || error.message
-            );
 
             // Log full error untuk debugging
             if (error.response?.status === 403) {
@@ -99,8 +94,8 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     // JWT callback - dipanggil saat token dibuat atau diupdate
     async jwt({ token, user, trigger }) {
-      console.log("🔑 JWT callback called:");
-      console.log("🔑 JWT callback triggered:", trigger);
+      console.log("JWT callback called:");
+      console.log("JWT callback triggered:", trigger);
       console.log("User:", user);
       console.log("Token before:", token);
 
