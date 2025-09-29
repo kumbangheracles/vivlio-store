@@ -25,6 +25,7 @@ export type BookProps = {
   fetchBooks?: () => void;
   createdAt?: Date;
   updateAt?: Date;
+  isInCart?: boolean;
 };
 
 export interface WishlistUser {

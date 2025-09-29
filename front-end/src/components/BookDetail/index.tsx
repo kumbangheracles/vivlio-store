@@ -19,7 +19,6 @@ import {
   HeartFilled,
   ShareAltOutlined,
   ShoppingCartOutlined,
-  EyeOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import AppBreadcrumb from "../Breadcrumb";
@@ -59,7 +58,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     book?.wishlistUsers?.length! > 0
   );
   const { fetchBooksHome } = useWishlistStore();
-  const { setIsWishlist, wishlist, isWishlist } = useIsWishlistStore();
+  const { setIsWishlist, isWishlist } = useIsWishlistStore();
+  const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [loading, setLoading] = useState<boolean>(false);
   const bookId = book?.id;
   const handleWishlistClick = async () => {
@@ -100,8 +100,29 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     onShare?.(book);
   };
 
-  const handleAddToCart = () => {
-    onAddToCart?.(book);
+  const handleAddToCart = async () => {
+    if (!auth.accessToken) {
+      message.info("You must login first!!!");
+      router.push("/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      if (!isCart) {
+        await myAxios.post("/cart", { bookId });
+        setIsCart(true);
+        message.success("Success add to cart");
+      } else {
+        await myAxios.delete(`/cart/${bookId}`);
+        setIsCart(false);
+        message.success("Success remove from cart");
+      }
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -112,8 +133,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       maximumFractionDigits: 0,
     }).format(price);
   };
-
-  console.log("Data Book: ", book);
 
   const handleCheckout = async () => {
     try {
@@ -274,11 +293,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   type="primary"
                   size="large"
                   icon={<ShoppingCartOutlined />}
-                  onClick={handleCheckout}
+                  onClick={handleAddToCart}
                   disabled={book.status.toLowerCase() === "out_of_stock"}
                   className="flex-1 h-12 font-semibold"
                 >
-                  Checkout
+                  {isCart ? "Remove from cart" : "Add to cart"}
                 </Button>
 
                 <Space size="middle">

@@ -1,21 +1,20 @@
 import HomePage from "@/components/Home";
-import AppLayout from "@/components/Layout";
 import myAxios from "@/libs/myAxios";
-import { BookProps } from "@/types/books.type";
-import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
-import Image from "next/image";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+// import { BookProps } from "@/types/books.type";
+// import { getServerSession } from "next-auth";
+// import { cookies } from "next/headers";
+// import Image from "next/image";
+// import { authOptions } from "./api/auth/[...nextauth]/route";
 import { CategoryProps } from "@/types/category.types";
 import fetchBooksHome from "./actions/fetchBooksHome";
-import { resolve } from "path";
-import GlobalLoading from "@/components/GlobalLoading";
-import { FaSpinner } from "react-icons/fa";
-import { Spin } from "antd";
+// import { resolve } from "path";
+// import GlobalLoading from "@/components/GlobalLoading";
+// import { FaSpinner } from "react-icons/fa";
+// import { Spin } from "antd";
 
 async function fetchCategory(): Promise<CategoryProps[]> {
   try {
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
 
     // if (!session) {
     //   window.location.href = "/unoutherized";

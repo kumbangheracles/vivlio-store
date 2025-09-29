@@ -146,13 +146,15 @@ module.exports = {
         offset,
         // logging: console.log,
       });
-
+      const isInCart =
+        bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
       const results = rows.map((book) => {
         const bookJson = book.toJSON();
         return {
           ...bookJson,
           isWishlisted:
             bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+          isInCart,
         };
       });
       res.status(200).json({
@@ -236,12 +238,16 @@ module.exports = {
         offset,
       });
 
+      const isInCart =
+        bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
+
       const results = rows.map((book) => {
         const bookJson = book.toJSON();
         return {
           ...bookJson,
           isWishlisted:
             bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+          isInCart,
         };
       });
       res.status(200).json({
@@ -289,6 +295,14 @@ module.exports = {
             required: false,
             where: { id: userId },
           },
+          {
+            model: User,
+            as: "cartUsers",
+            attributes: ["id"],
+            through: { attributes: [] },
+            required: false,
+            where: { id: userId },
+          },
         ],
       });
 
@@ -296,9 +310,21 @@ module.exports = {
         return res.status(404).json({ message: "Book not found" });
       }
 
+      // pastikan convert ke object plain
+      const bookData = book.toJSON();
+
+      // bikin flag isInCart
+      const isInCart =
+        bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
+
+      // opsional: hapus field cartUsers biar responsenya lebih clean
+      delete bookData.cartUsers;
       res.status(200).json({
         message: "Success",
-        result: book,
+        result: {
+          ...bookData,
+          isInCart,
+        },
       });
     } catch (err) {
       res.status(500).json({ error: err.message });

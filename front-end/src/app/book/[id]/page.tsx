@@ -37,6 +37,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
     });
     const book = res.data.result;
 
+    console.log("Data book: ", book);
     if (!book) {
       return (
         <div className="w-screen h-screen flex items-center justify-center">
