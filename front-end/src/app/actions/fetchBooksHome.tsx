@@ -18,7 +18,7 @@ async function fetchBooksHome(): Promise<BookProps[]> {
 
     return response.data.results;
   } catch (err: any) {
-    console.log("fetchBooks error:", err.message || err);
+    console.log("fetchBooks error:", err || err);
     return [];
   }
 }

@@ -3,9 +3,15 @@ import { Button, Card, Checkbox, Divider } from "antd";
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
 import styled from "styled-components";
-import AppButton from "../AppButton";
 import { cn } from "@/libs/cn";
-const CartIndex = () => {
+import Image from "next/image";
+import { BookProps } from "@/types/books.type";
+import DefaultImage from "../../assets/images/default-img.png";
+interface PropTypes {
+  books: BookProps[];
+}
+
+const CartIndex = ({ books }: PropTypes) => {
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
   return (
     <div className="p-4">
@@ -21,25 +27,57 @@ const CartIndex = () => {
               <h4>Select All {"(0)"}</h4>
             </div>
 
-            <button
-              className={`flex items-center gap-1 text-base cursor-pointer p-2 bg-red-400 rounded-xl font-bold text-white hover:bg-red-900 ${cn(
-                !checkedAll && "hidden"
+            <Button
+              icon={<MdDelete />}
+              className={`!flex !items-center !gap-1 !text-base !cursor-pointer !p-2 !bg-red-400 !rounded-xl !font-bold !text-white hover:!bg-red-900 ${cn(
+                !checkedAll && "!hidden"
               )} `}
             >
               {checkedAll && (
                 <>
-                  <MdDelete />
                   <h4>Delete</h4>
                 </>
               )}
-            </button>
+            </Button>
           </div>
-          {Array.from({ length: 10 }).map((_, i) => (
+          {books.map((item) => (
             <div
-              key={i}
+              key={item.id}
               className="flex items-center justify-between p-3 m-3 border border-gray-300 rounded-xl shadow-md"
             >
-              Item {i + 1}
+              <div className="flex items-center gap-3">
+                <Checkbox />
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-[80px] h-[100px]  rounded-md overflow-hidden">
+                    <Image
+                      src={item?.images![0].imageUrl || DefaultImage}
+                      width={100}
+                      height={100}
+                      className="object-contain"
+                      alt={`cart-img-${item.title}`}
+                    />
+                  </div>
+
+                  <div>
+                    <span className="bg-gray-300 rounded-md p-1 text-xs text-gray-700 font-bold">
+                      {item?.book_type}
+                    </span>
+                    <h4 className="text-gray-700 text-sm">{item?.title}</h4>
+                    <span className="text-sm font-bold">Rp200.000</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button>
+                  <MdDelete />
+                </Button>
+                <div className="flex items-center gap-3">
+                  <Button>-</Button>
+                  <span>0</span>
+                  <Button>+</Button>
+                </div>
+              </div>
             </div>
           ))}
         </div>

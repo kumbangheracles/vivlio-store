@@ -5,6 +5,7 @@ const {
   User,
   BookStats,
   UserWishlist,
+  UserCart,
 } = require("../models/index");
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
@@ -139,22 +140,32 @@ module.exports = {
                   required: false,
                   attributes: ["id"],
                 },
+                {
+                  model: User,
+                  as: "cartUsers",
+                  through: {
+                    model: UserCart,
+                    where: { userId },
+                    attributes: [],
+                  },
+                  required: false,
+                  attributes: ["id"],
+                },
               ]
             : []),
         ],
 
         offset,
+        distinct: true,
         // logging: console.log,
       });
-      const isInCart =
-        bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
       const results = rows.map((book) => {
         const bookJson = book.toJSON();
         return {
           ...bookJson,
           isWishlisted:
             bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
-          isInCart,
+          isInCart: bookJson.cartUsers && bookJson.cartUsers.length > 0,
         };
       });
       res.status(200).json({
