@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import DefaultImage from "../../assets/images/bookDefault.png";
 import {
@@ -62,6 +62,9 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [loading, setLoading] = useState<boolean>(false);
   const bookId = book?.id;
+  useEffect(() => {
+    console.log("Book detail: ", book);
+  }, [book]);
   const handleWishlistClick = async () => {
     if (!auth.accessToken) {
       message.info("You must login first.");
@@ -164,6 +167,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       setLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto p-4">
@@ -294,7 +298,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   size="large"
                   icon={<ShoppingCartOutlined />}
                   onClick={handleAddToCart}
-                  disabled={book.status.toLowerCase() === "out_of_stock"}
+                  disabled={loading}
                   className="flex-1 h-12 font-semibold"
                 >
                   {isCart ? "Remove from cart" : "Add to cart"}
@@ -312,6 +316,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                         <HeartOutlined />
                       )
                     }
+                    disabled={loading}
                     onClick={handleWishlistClick}
                     className="h-12 px-6"
                     danger={isWishlist(bookId as string)}

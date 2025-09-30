@@ -1,12 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "antd/es/dropdown/dropdown";
 import { message } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
 import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
-import NextAuth from "next-auth";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppInput from "./AppInput";
 import Link from "next/link";
@@ -34,26 +33,17 @@ export default function Navbar({ dataUser }: PropTypes) {
       message.info("Logout Success");
       await signOut({
         callbackUrl: "/auth/login",
-        // redirect: true,
       });
-      // router.push("/auth/login");
     } catch (error) {
       console.log("Error Logout: ", error);
       ErrorHandler(error);
       await signOut({
         callbackUrl: "/auth/login",
-        // redirect: true,
       });
     } finally {
       setIsloading(false);
     }
   };
-
-  // useEffect(() => {
-  //   if (auth?.authenticated === false) {
-  //     router.push("/auth/login");
-  //   }
-  // }, [auth?.authenticated, router]);
 
   const goToCart = () => {
     if (!auth.accessToken) {
@@ -159,12 +149,16 @@ export default function Navbar({ dataUser }: PropTypes) {
               </AccountIcon>
             </Dropdown>
           </div>
-          <img
+          <div
+            className="flex items-center justify-centers w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
             onClick={() => goToCart()}
-            style={{ width: "24px", cursor: "pointer" }}
-            src="/icons/chart.svg"
-            alt="chart-icon"
-          />
+          >
+            <img
+              className="w-full h-full object-cover"
+              src="/icons/chart.svg"
+              alt="chart-icon"
+            />
+          </div>
         </div>
       </div>
 

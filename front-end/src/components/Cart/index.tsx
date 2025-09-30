@@ -7,12 +7,17 @@ import { cn } from "@/libs/cn";
 import Image from "next/image";
 import { BookProps } from "@/types/books.type";
 import DefaultImage from "../../assets/images/default-img.png";
+import { useRouter } from "next/navigation";
 interface PropTypes {
   books: BookProps[];
 }
 
 const CartIndex = ({ books }: PropTypes) => {
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
+  const router = useRouter();
+  const goToDetail = (id: string) => {
+    router.push(`/book/${id}`);
+  };
   return (
     <div className="p-4">
       <h4 className="font-bold text-2xl">Cart</h4>
@@ -47,7 +52,10 @@ const CartIndex = ({ books }: PropTypes) => {
             >
               <div className="flex items-center gap-3">
                 <Checkbox />
-                <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-3 cursor-pointer"
+                  onClick={() => goToDetail(item?.id as string)}
+                >
                   <div className="flex items-center justify-center w-[80px] h-[100px]  rounded-md overflow-hidden">
                     <Image
                       src={item?.images![0].imageUrl || DefaultImage}
@@ -69,8 +77,8 @@ const CartIndex = ({ books }: PropTypes) => {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button>
-                  <MdDelete />
+                <Button color="default">
+                  <MdDelete className="text-red-400" />
                 </Button>
                 <div className="flex items-center gap-3">
                   <Button>-</Button>

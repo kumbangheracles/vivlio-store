@@ -16,10 +16,10 @@ myAxios.interceptors.request.use(
 
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
-      console.log("✅ Added Bearer token to request");
-      console.log("token: ", session.accessToken);
+      // console.log("Added Bearer token to request");
+      // console.log("token: ", session.accessToken);
     } else {
-      console.log("⚠️ No access token found in session");
+      console.log("No access token found in session");
     }
 
     return config;

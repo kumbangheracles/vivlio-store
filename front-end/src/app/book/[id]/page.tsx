@@ -3,15 +3,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import myAxios from "@/libs/myAxios";
 import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
-import { getSession } from "next-auth/react";
 import { Empty, message } from "antd";
-import { redirect } from "next/dist/server/api-utils";
-import { NextResponse } from "next/server";
+
 interface BookDetailPageProps {
   params: { id: string };
 }
 export async function generateStaticParams() {
-  // const session = getServerSession(authOptions);
   try {
     const res = await myAxios.get<{ result: BookProps[] }>("/books");
     const books = res.data.result;
@@ -37,7 +34,6 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
     });
     const book = res.data.result;
 
-    console.log("Data book: ", book);
     if (!book) {
       return (
         <div className="w-screen h-screen flex items-center justify-center">
@@ -65,6 +61,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             wishlistUsers: book?.wishlistUsers,
             createdAt: book?.createdAt,
             updateAt: book?.updateAt,
+            isInCart: book?.isInCart,
           }}
         />
       </div>

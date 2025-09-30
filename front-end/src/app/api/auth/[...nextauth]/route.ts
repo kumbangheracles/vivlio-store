@@ -43,7 +43,7 @@ const authOptions: NextAuthOptions = {
             loginData
           );
 
-          console.log("Backend response data:", response.data);
+          // console.log("Backend response data:", response.data);
 
           const data = response.data;
 
@@ -59,19 +59,19 @@ const authOptions: NextAuthOptions = {
               isVerified: data.results.isVerified,
             };
 
-            console.log("Login successful, returning user:", userObj);
+            // console.log("Login successful, returning user:", userObj);
             return userObj;
           }
 
-          console.log("Response data:", data);
+          // console.log("Response data:", data);
           return null;
         } catch (error) {
-          console.error("🚨 Login error occurred:");
+          // console.error("🚨 Login error occurred:");
 
           if (error instanceof AxiosError) {
             const errorData = error.response?.data as ApiError;
 
-            console.error("Response data:", errorData);
+            console.error("Login error response data:", errorData);
 
             // Log full error untuk debugging
             if (error.response?.status === 403) {
@@ -94,10 +94,10 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     // JWT callback - dipanggil saat token dibuat atau diupdate
     async jwt({ token, user, trigger }) {
-      console.log("JWT callback called:");
-      console.log("JWT callback triggered:", trigger);
-      console.log("User:", user);
-      console.log("Token before:", token);
+      // console.log("JWT callback called:");
+      // console.log("JWT callback triggered:", trigger);
+      // console.log("User:", user);
+      // console.log("Token before:", token);
 
       // Saat pertama login, user object tersedia
       if (user) {
@@ -134,9 +134,9 @@ const authOptions: NextAuthOptions = {
 
     // Session callback - menentukan data apa yang akan dikirim ke client
     async session({ session, token }) {
-      console.log("Session callback called:");
-      console.log("Session before:", session);
-      console.log("Token:", token);
+      // console.log("Session callback called:");
+      // console.log("Session before:", session);
+      // console.log("Token:", token);
 
       if (token) {
         session.user.id = token.id as string;
@@ -145,7 +145,7 @@ const authOptions: NextAuthOptions = {
         session.accessToken = token.accessToken;
       }
 
-      console.log("Session after:", session);
+      // console.log("Session after:", session);
       return session;
     },
   },
