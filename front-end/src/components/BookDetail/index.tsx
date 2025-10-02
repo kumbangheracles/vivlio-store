@@ -31,6 +31,7 @@ import { useIsWishlistStore } from "@/zustand/isWishlist.store";
 import { ErrorHandler } from "@/helpers/handleError";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { product } from "@/libs/product";
+import useCart from "@/hooks/useCart";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -103,30 +104,38 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     onShare?.(book);
   };
 
-  const handleAddToCart = async () => {
-    if (!auth.accessToken) {
-      message.info("You must login first!!!");
-      router.push("/auth/login");
-      return;
-    }
+  const { handleAddToCart } = useCart({
+    loading,
+    setLoading,
+    isCart,
+    setIsCart,
+    bookId: bookId as string,
+  });
 
-    try {
-      setLoading(true);
-      if (!isCart) {
-        await myAxios.post("/cart", { bookId });
-        setIsCart(true);
-        message.success("Success add to cart");
-      } else {
-        await myAxios.delete(`/cart/${bookId}`);
-        setIsCart(false);
-        message.success("Success remove from cart");
-      }
-    } catch (error) {
-      ErrorHandler(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleAddToCart = async () => {
+  //   if (!auth.accessToken) {
+  //     message.info("You must login first!!!");
+  //     router.push("/auth/login");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     if (!isCart) {
+  //       await myAxios.post("/cart", { bookId });
+  //       setIsCart(true);
+  //       message.success("Success add to cart");
+  //     } else {
+  //       await myAxios.delete(`/cart/${bookId}`);
+  //       setIsCart(false);
+  //       message.success("Success remove from cart");
+  //     }
+  //   } catch (error) {
+  //     ErrorHandler(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
