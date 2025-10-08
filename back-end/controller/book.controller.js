@@ -248,19 +248,16 @@ module.exports = {
         ],
         offset,
       });
-
-      const isInCart =
-        bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
-
       const results = rows.map((book) => {
         const bookJson = book.toJSON();
         return {
           ...bookJson,
           isWishlisted:
             bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
-          isInCart,
+          isInCart: bookJson.cartUsers && bookJson.cartUsers.length > 0,
         };
       });
+
       res.status(200).json({
         status: 200,
         message: "Success",

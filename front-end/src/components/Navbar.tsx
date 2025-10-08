@@ -45,9 +45,13 @@ export default function Navbar({ dataUser }: PropTypes) {
     }
   };
 
+  console.log("Auth: ", auth);
+
   const goToCart = () => {
+    if (auth.loading) return;
     if (!auth.accessToken) {
       message.info("You must login first!!!");
+      router.push("/auth/login");
       return;
     }
 

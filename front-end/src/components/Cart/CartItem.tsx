@@ -1,24 +1,45 @@
 "use client";
 import { BookProps } from "@/types/books.type";
-import { Button, Checkbox, Modal } from "antd";
+import { Button, Checkbox, message, Modal } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../assets/images/default-img.png";
 import { MdDelete } from "react-icons/md";
 import useCart from "@/hooks/useCart";
-import { useState } from "react";
-import fetchBooksHome from "@/app/actions/fetchBooksHome";
+import { Dispatch, SetStateAction, useState } from "react";
+import { PropCheck } from ".";
+import { useAuth } from "@/hooks/useAuth";
+import myAxios from "@/libs/myAxios";
 interface PropTypes {
   book: BookProps;
+  isChecked?: PropCheck[];
+  setIsChecked?: Dispatch<SetStateAction<PropCheck[]>>;
+  books?: BookProps[];
+  quantity?: number;
+  setQuantity?: Dispatch<SetStateAction<number>>;
+  handleChangeQuantity?: (type?: "add" | "remove", id?: string) => void;
+  quantities?: Record<string, number>;
+  setQuantities?: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 }
 
-const CartItem = ({ book }: PropTypes) => {
+const CartItem = ({
+  book,
+  isChecked,
+  books,
+  setIsChecked,
+  // handleChangeQuantity,
+  // quantity,
+  // setQuantity,
+  quantities,
+  setQuantities,
+}: PropTypes) => {
   const router = useRouter();
+
   const goToDetail = (id: string) => {
     router.push(`/book/${id}`);
   };
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [quantity, setQuantity] = useState<number>(book?.quantity as number);
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { handleAddToCart } = useCart({
@@ -29,10 +50,34 @@ const CartItem = ({ book }: PropTypes) => {
     bookId: book?.id as string,
   });
 
+  console.log("Books: quantity: ", quantity);
+
   const handleCart = () => {
     handleAddToCart();
     setIsOpen(false);
     router.refresh();
+  };
+
+  const handleChangeQuantity = async (type?: "add" | "remove", id?: string) => {
+    if (!id) return;
+
+    try {
+      setQuantity((prev) => {
+        // Hitung quantity baru
+        const newQty = type === "add" ? prev + 1 : Math.max(prev - 1, 1);
+
+        // Update backend (async terpisah)
+        myAxios
+          .patch(`/books/${id}`, { quantity: newQty })
+          .then(() => console.log("Updated:", newQty))
+          .catch((err) => console.error("Failed to update:", err));
+
+        // Return nilai baru ke React
+        return newQty;
+      });
+    } catch (error) {
+      console.error("Error changing quantity:", error);
+    }
   };
 
   return (
@@ -41,7 +86,22 @@ const CartItem = ({ book }: PropTypes) => {
       className="flex items-center justify-between p-3 m-3 border border-gray-300 rounded-xl shadow-md"
     >
       <div className="flex items-center gap-3">
-        <Checkbox />
+        <Checkbox
+          checked={isChecked?.some((item) => item.id === book.id)}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            if (checked) {
+              setIsChecked?.((prev) => [
+                ...prev,
+                { id: book?.id as string, bookTitle: book?.title },
+              ]);
+            } else {
+              setIsChecked?.((prev) =>
+                prev.filter((item) => item.id !== book?.id)
+              );
+            }
+          }}
+        />
         <div
           className="flex items-center gap-3 cursor-pointer"
           onClick={() => goToDetail(book?.id as string)}
@@ -77,9 +137,17 @@ const CartItem = ({ book }: PropTypes) => {
           <MdDelete className="text-red-400" />
         </Button>
         <div className="flex items-center gap-3">
-          <Button>-</Button>
-          <span>0</span>
-          <Button>+</Button>
+          <Button
+            onClick={() => handleChangeQuantity?.("remove", book?.id as string)}
+          >
+            -
+          </Button>
+          <span>{quantity}</span>
+          <Button
+            onClick={() => handleChangeQuantity?.("add", book?.id as string)}
+          >
+            +
+          </Button>
         </div>
       </div>
 
