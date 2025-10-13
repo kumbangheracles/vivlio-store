@@ -166,6 +166,11 @@ const CartIndex = ({ books }: PropTypes) => {
     }
   };
 
+  const totalQuantity: number = (isCheckedBooks ?? []).reduce(
+    (acc: number, item: BookProps) => acc + Number(item.quantity),
+    0
+  );
+
   return (
     <div className="p-4 ">
       {books.length === 0 ? (
@@ -188,8 +193,8 @@ const CartIndex = ({ books }: PropTypes) => {
           ) : ( */}
           <>
             <h4 className="font-bold text-2xl">Cart</h4>
-            <div className="relative flex gap-6">
-              <div className="flex justify-start flex-col w-[65%]">
+            <div className="relative w-full flex flex-col sm:flex-row gap-6">
+              <div className="flex justify-start flex-col w-full sm:w-[65%]">
                 <div className="flex items-center justify-between p-3 m-3 border-gray-300 border rounded-xl shadow-md transition-all">
                   <div className="flex items-center gap-3 p-2 text-base">
                     <Checkbox checked={checkedAll} onChange={handleCheckAll} />
@@ -226,16 +231,18 @@ const CartIndex = ({ books }: PropTypes) => {
                   ))}
                 </>
               </div>
-              <div className="w-[30%]">
+              <div className="w-full sm:w-[30%]">
                 <div className="p-7 w-full shadow-md border border-gray-300 rounded-xl sticky top-35">
                   <h4 className="font-bold mb-2">Cart Review</h4>
                   <div className="flex items-center justify-between text-gray-500">
-                    <p>Total Item{`(${isCheckedBooks?.length})`}</p>
+                    <p>Total Item{`(${totalQuantity})`}</p>
                     <p>
                       Rp
                       {isCheckedBooks
                         ?.reduce(
-                          (acc, item) => acc + Number(item?.price || 0),
+                          (acc, item) =>
+                            acc +
+                            Number(item?.price || 0) * Number(item?.quantity),
                           0
                         )
                         .toLocaleString("id-ID")}

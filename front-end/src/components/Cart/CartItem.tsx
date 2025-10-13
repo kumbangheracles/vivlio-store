@@ -42,6 +42,7 @@ const CartItem = ({
   const [quantity, setQuantity] = useState<number>(book?.quantity as number);
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const { handleAddToCart } = useCart({
     loading,
     setLoading,
@@ -49,6 +50,11 @@ const CartItem = ({
     setIsCart,
     bookId: book?.id as string,
   });
+  if (book.quantity === 0) {
+    handleAddToCart();
+
+    return;
+  }
 
   console.log("Books: quantity: ", quantity);
 

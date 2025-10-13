@@ -311,6 +311,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   className="flex-1 h-12 font-semibold"
                 >
                   {isCart ? "Remove from cart" : "Add to cart"}
+                  {/* Buy */}
                 </Button>
 
                 <Space size="middle">
