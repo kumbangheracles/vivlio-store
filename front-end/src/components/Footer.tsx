@@ -85,7 +85,13 @@ export default Footer;
 const ParentContainer = styled.div`
   background-color: #d9eafd;
   color: #000000;
-  width: 100%;
+
+  /* @media (max-width: 768px) {
+    width: 100vh;
+      margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  } */
 `;
 
 const Container = styled.div`
@@ -94,7 +100,8 @@ const Container = styled.div`
   justify-content: center;
   align-items: flex-start;
   gap: 200px;
-  flex-wrap: wrap; /* penting agar elemen bisa turun di layar kecil */
+  width: 100%;
+  flex-wrap: wrap;
   letter-spacing: 1px;
 
   @media (max-width: 1024px) {

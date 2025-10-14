@@ -89,7 +89,7 @@ const CartItem = ({
   return (
     <div
       key={book?.id}
-      className="flex items-center justify-between p-3 m-3 border border-gray-300 rounded-xl shadow-md"
+      className="flex items-center justify-between p-3 m-3 border border-gray-300 rounded-xl shadow-md !w-full"
     >
       <div className="flex items-center gap-3">
         <Checkbox

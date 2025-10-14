@@ -262,9 +262,9 @@ export default function Navbar({ dataUser }: PropTypes) {
             </StyledLink>
 
             {auth?.accessToken ? (
-              <Button onClick={() => handleAuth("logout")}>Logout</Button>
+              <Button onClick={() => handleAuth("logout")}>LOGOUT</Button>
             ) : (
-              <Button onClick={() => handleAuth("login")}>login</Button>
+              <Button onClick={() => handleAuth("login")}>LOGIN</Button>
             )}
           </div>
         )}
