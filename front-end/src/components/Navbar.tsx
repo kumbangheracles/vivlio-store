@@ -124,7 +124,10 @@ export default function Navbar({ dataUser }: PropTypes) {
         {/* Top Navbar */}
         <div className="flex justify-between items-center px-5 md:px-[100px] py-3">
           {/* Logo */}
-          <span className="font-extrabold tracking-widest text-xl logo">
+          <span
+            className="font-extrabold tracking-widest text-xl logo cursor-pointer"
+            onClick={() => router.push("/")}
+          >
             VIVLIO
           </span>
 

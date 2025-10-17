@@ -11,7 +11,7 @@ import GlobalLoading from "./GlobalLoading";
 import { StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+import AntdRegistry from "@/libs/AntdRegistry";
 import AOS from "aos";
 interface LayoutProps {
   children: ReactNode;
