@@ -1,18 +1,18 @@
 "use client";
 import "aos/dist/aos.css";
+import "@ant-design/v5-patch-for-react-19";
+import AOS from "aos";
 import React, { Suspense, useEffect, type ReactNode } from "react";
 import styled, { StyleSheetManager } from "styled-components";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { UserProperties } from "@/types/user.type";
 import { ConfigProvider } from "antd";
-import "@ant-design/v5-patch-for-react-19";
 import GlobalLoading from "./GlobalLoading";
 import { StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
 import AntdRegistry from "@/libs/AntdRegistry";
-import AOS from "aos";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
@@ -41,10 +41,10 @@ const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
   }, []);
   return (
     <>
-      <StyleSheetManager shouldForwardProp={isPropValid}>
-        <StyleProvider hashPriority="high">
-          <AntdRegistry>
-            <ConfigProvider>
+      <AntdRegistry>
+        <ConfigProvider>
+          <StyleSheetManager shouldForwardProp={isPropValid}>
+            <StyleProvider hashPriority="high">
               {isPageAuth || isResult ? (
                 <>{children}</>
               ) : (
@@ -60,10 +60,10 @@ const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
                   </WrapperLayout>
                 </>
               )}
-            </ConfigProvider>
-          </AntdRegistry>
-        </StyleProvider>
-      </StyleSheetManager>
+            </StyleProvider>
+          </StyleSheetManager>
+        </ConfigProvider>
+      </AntdRegistry>
     </>
   );
 };

@@ -194,8 +194,8 @@ const CartIndex = ({ books }: PropTypes) => {
           <>
             <h4 className="font-bold text-2xl">Cart</h4>
             <div className="relative w-full flex flex-col sm:flex-row gap-6">
-              <div className="flex justify-start flex-col !w-[370px] sm:w-[65%]">
-                <div className="flex items-center justify-between p-3 m-3 border-gray-300 border rounded-xl shadow-md transition-all">
+              <div className="flex justify-start flex-col !w-[370px] sm:!w-[65%]">
+                <div className="flex items-center justify-between p-3 m-3 w-full border-gray-300 border rounded-xl shadow-md transition-all">
                   <div className="flex items-center gap-3 p-2 text-base">
                     <Checkbox checked={checkedAll} onChange={handleCheckAll} />
                     <h4>Select All {`(${isCheckedBooks?.length})`}</h4>

@@ -131,15 +131,20 @@ export default function Navbar({ dataUser }: PropTypes) {
             VIVLIO
           </span>
 
+          <div className="input-search-navbar w-[70%] mx-auto">
+            <AppInput
+              icon={<SearchOutlined />}
+              style={{
+                width: "100%",
+                height: "35px",
+                borderRadius: 15,
+                letterSpacing: 1,
+              }}
+            />
+          </div>
           {/* Desktop Menu */}
           <div className="hidden md:flex justify-around items-center gap-5">
             {/* Search */}
-            <div className="input-search-navbar">
-              <AppInput
-                icon={<SearchOutlined />}
-                style={{ width: "200px", height: "30px" }}
-              />
-            </div>
 
             {/* Account */}
             <div
@@ -148,7 +153,13 @@ export default function Navbar({ dataUser }: PropTypes) {
             >
               <Dropdown trigger={["click"]} menu={{ items }}>
                 <AccountIcon isTriggered={isHover} isAuth={auth?.authenticated}>
-                  <div className="w-[35px] h-[35px] overflow-hidden rounded-full flex items-center justify-center cursor-pointer">
+                  <div
+                    className={` ${
+                      auth?.accessToken
+                        ? "w-[35px] h-[35px]"
+                        : "w-[25px] h-[25px]"
+                    }  overflow-hidden rounded-full flex items-center justify-center cursor-pointer`}
+                  >
                     <img
                       className="object-cover w-full h-full"
                       src={
