@@ -32,6 +32,7 @@ import { ErrorHandler } from "@/helpers/handleError";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { product } from "@/libs/product";
 import useCart from "@/hooks/useCart";
+import ListBook from "../Home/components/ListBook";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -42,16 +43,14 @@ interface BookDetailProps {
   onRemoveFromWishlist?: (bookId: string) => void;
   onShare?: (book: BookProps) => void;
   onAddToCart?: (book: BookProps) => void;
+  similiarBooks?: BookProps[];
 }
 
 const BookDetailPage: React.FC<BookDetailProps> = ({
   book,
-  // isInWishlist = false,
 
-  onAddToWishlist,
-  onRemoveFromWishlist,
   onShare,
-  onAddToCart,
+  similiarBooks,
 }) => {
   const auth = useAuth();
   const router = useRouter();
@@ -66,6 +65,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   useEffect(() => {
     console.log("Book detail: ", book);
   }, [book]);
+  console.log("Similiar Books: ", similiarBooks);
   const handleWishlistClick = async () => {
     if (!auth.accessToken) {
       message.info("You must login first.");
@@ -180,11 +180,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   return (
     <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto p-4">
-        <Card className="shadow-lg rounded-lg overflow-hidden">
+        <Card className="shadow-lg rounded-lg overflow-hidden sm:!mt-4">
           <AppBreadcrumb isBook={true} bookName={book.title} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-            <div className="space-y-4">
+            <div className="!space-y-2">
               <div className="relative">
                 {book.isPopular && (
                   <Badge.Ribbon text="Popular" color="red" className="z-10">
@@ -193,9 +193,12 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 )}
 
                 {book?.images && book?.images.length > 0 ? (
-                  <Carousel autoplay className="rounded-lg overflow-hidden">
+                  <Carousel
+                    autoplay
+                    className="rounded-lg overflow-hidden w-[300px] p-4 m-auto"
+                  >
                     {book?.images.map((image, index) => (
-                      <div key={index} className="relative h-96 w-full">
+                      <div key={index} className="relative h-95 w-full">
                         <Image
                           src={image?.imageUrl as string}
                           alt={
@@ -348,24 +351,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 </Space>
               </div>
 
-              {/* Description */}
-              {book.description && (
-                <div>
-                  <Divider orientation="left">
-                    <Title level={4} className="!mb-0">
-                      Description
-                    </Title>
-                  </Divider>
-                  <Card className="bg-gray-50">
-                    <Paragraph className="text-gray-700 leading-relaxed">
-                      <div
-                        dangerouslySetInnerHTML={{ __html: book?.description }}
-                      />
-                    </Paragraph>
-                  </Card>
-                </div>
-              )}
-
               {/* Additional Info */}
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                 {book.createdAt && (
@@ -385,7 +370,29 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Description */}
+          {book.description && (
+            <div className="w-full">
+              <Divider orientation="left">
+                <Title level={4} className="!mb-0">
+                  Description
+                </Title>
+              </Divider>
+              <Card className="bg-gray-50">
+                <Paragraph className="text-gray-700 leading-relaxed">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: book?.description }}
+                  />
+                </Paragraph>
+              </Card>
+            </div>
+          )}
         </Card>
+      </div>
+
+      <div>
+        <ListBook dataBooks={similiarBooks} titleSection="Similiar Books" />
       </div>
     </div>
   );

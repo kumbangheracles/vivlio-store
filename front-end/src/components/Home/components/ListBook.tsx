@@ -10,7 +10,7 @@ import { Empty } from "antd";
 import GlobalLoading from "@/components/GlobalLoading";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { BookWithWishlist, WishlistProps } from "@/types/wishlist.type";
-
+import CardBook from "./CardBook";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -24,7 +24,7 @@ const ListBook: React.FC<BookTypes> = ({
   fetchBooks,
   dataWishlist,
 }) => {
-  const CardBook = React.lazy(() => import("./CardBook"));
+  // const CardBook = React.lazy(() => import("./CardBook"));
   return (
     <>
       <div style={{ marginTop: "50px" }}>

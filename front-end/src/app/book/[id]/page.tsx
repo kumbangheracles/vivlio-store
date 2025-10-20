@@ -4,7 +4,7 @@ import myAxios from "@/libs/myAxios";
 import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
 import { Empty, message } from "antd";
-
+import fetchBooksHome from "@/app/actions/fetchBooksHome";
 interface BookDetailPageProps {
   params: { id: string };
 }
@@ -27,12 +27,23 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
   const accessToken = session?.accessToken;
-
+  const allBooks = await fetchBooksHome();
+  console.log("Allbooks: ", allBooks);
   try {
     const res = await myAxios.get<{ result: BookProps }>(`/books/${id}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
     const book = res.data.result;
+
+    const similiarBooks = allBooks.filter(
+      (item) =>
+        item.id !== book.id &&
+        item.genres?.some((genre) =>
+          book.genres?.some(
+            (bookGenre) => bookGenre.genre_title === genre.genre_title
+          )
+        )
+    );
 
     if (!book) {
       return (
@@ -63,6 +74,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             updateAt: book?.updateAt,
             isInCart: book?.isInCart,
           }}
+          similiarBooks={similiarBooks}
         />
       </div>
     );
