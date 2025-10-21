@@ -74,7 +74,7 @@ const ListBook: React.FC<BookTypes> = ({
 
 export default ListBook;
 
-const TitleList = styled.h4`
+export const TitleList = styled.h4`
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 2px;

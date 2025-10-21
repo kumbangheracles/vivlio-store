@@ -528,6 +528,7 @@ module.exports = {
 
         if (imagesToDelete.length > 0) {
           // Delete dari Cloudinary
+
           console.log("Deleting from Cloudinary...");
           await Promise.all(
             imagesToDelete.map((img) => deleteFromCloudinary(img.imageUrl))

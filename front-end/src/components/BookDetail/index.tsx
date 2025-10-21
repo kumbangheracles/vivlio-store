@@ -13,6 +13,7 @@ import {
   Badge,
   Carousel,
   message,
+  Empty,
 } from "antd";
 import {
   HeartOutlined,
@@ -33,6 +34,7 @@ import { useWishlistStore } from "@/zustand/wishlist.store";
 import { product } from "@/libs/product";
 import useCart from "@/hooks/useCart";
 import ListBook from "../Home/components/ListBook";
+import { TitleList } from "../Home";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -392,7 +394,16 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       </div>
 
       <div>
-        <ListBook dataBooks={similiarBooks} titleSection="Similiar Books" />
+        {(similiarBooks?.length as number) > 0 ? (
+          <ListBook dataBooks={similiarBooks} titleSection="Similiar Books" />
+        ) : (
+          <>
+            <div>
+              <TitleList>Similiar Books</TitleList>
+              <Empty description="No Books has similiarity to this book" />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

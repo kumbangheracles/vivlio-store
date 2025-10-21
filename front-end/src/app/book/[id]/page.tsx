@@ -5,9 +5,16 @@ import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
 import { Empty, message } from "antd";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
+import { Metadata } from "next";
 interface BookDetailPageProps {
   params: { id: string };
 }
+
+export const metadata: Metadata = {
+  title: "Vivlio - Book Detail",
+  description: "Book Detail",
+};
+
 export async function generateStaticParams() {
   try {
     const res = await myAxios.get<{ result: BookProps[] }>("/books");
