@@ -124,16 +124,20 @@ export default function Navbar({ dataUser }: PropTypes) {
         {/* Top Navbar */}
         <div className="flex justify-between items-center px-5 md:px-[100px] py-3">
           {/* Logo */}
-          <span
-            className="font-extrabold tracking-widest text-xl logo cursor-pointer"
-            onClick={() => router.push("/")}
-          >
-            VIVLIO
-          </span>
 
-          <div className="input-search-navbar w-[70%] mx-auto">
+          {!isMobile && (
+            <span
+              className="font-extrabold tracking-widest text-xl logo cursor-pointer"
+              onClick={() => router.push("/")}
+            >
+              VIVLIO
+            </span>
+          )}
+
+          <div className="input-search-navbar w-full sm:w-[70%] mr-4">
             <AppInput
-              icon={<SearchOutlined />}
+              prefix={<SearchOutlined />}
+              placeholder="Sarch Book"
               style={{
                 width: "100%",
                 height: "35px",
@@ -143,6 +147,7 @@ export default function Navbar({ dataUser }: PropTypes) {
             />
           </div>
           {/* Desktop Menu */}
+
           <div className="hidden md:flex justify-around items-center gap-5">
             {/* Search */}
 
@@ -187,8 +192,20 @@ export default function Navbar({ dataUser }: PropTypes) {
             </div>
           </div>
 
+          {isMobile && (
+            <div
+              className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
+              onClick={() => goToCart()}
+            >
+              <img
+                className="w-full h-full object-cover"
+                src="/icons/chart.svg"
+                alt="chart-icon"
+              />
+            </div>
+          )}
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-4">
+          {/* <div className="md:hidden flex items-center gap-4">
             <div
               className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
               onClick={() => goToCart()}
@@ -205,7 +222,7 @@ export default function Navbar({ dataUser }: PropTypes) {
             >
               {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Bottom Navbar - Desktop */}
