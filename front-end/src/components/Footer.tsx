@@ -5,77 +5,112 @@ import { styled } from "styled-components";
 import IconLocation from "../assets/icons/icon-location.svg";
 import {
   FacebookOutlined,
+  HeartOutlined,
+  HomeOutlined,
   InstagramOutlined,
   MailFilled,
   PhoneFilled,
   TikTokOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
-
+import CategoryOutlined from "../assets/icons/category-icon.svg";
+import useDeviceType from "@/hooks/useDeviceType";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 const Footer = () => {
+  const router = useRouter();
+  const isMobile = useDeviceType();
+
   return (
     <>
-      <ParentContainer>
-        <Container>
-          {/* Bagian Kiri - Info Kontak */}
-          <div className="flex flex-col gap-[10px] w-[300px]">
-            <IconWrapper>
-              <img src={IconLocation} width={20} height={20} alt="location" />
-              <p>Jln raya bayur kali</p>
-            </IconWrapper>
-            <IconWrapper>
-              <PhoneFilled />
-              <p>08897231231</p>
-            </IconWrapper>
-            <IconWrapper>
-              <MailFilled />
-              <p>jamal@gmail.com</p>
-            </IconWrapper>
+      {isMobile ? (
+        <div className="flex items-center justify-between w-full border-t-2 border-gray-400 fixed bottom-0 bg-white p-4">
+          <div>
+            <HomeOutlined
+              className="w-[20px]"
+              onClick={() => router.push("/")}
+            />
           </div>
-
-          {/* Bagian Tengah - Navigasi */}
-          <Navigation>
-            <Link className="link" href={"/"}>
-              Home
-            </Link>
-            <Link className="link" href={"/blog"}>
-              Blog
-            </Link>
-            <Link className="link" href={"/shop"}>
-              Shop
-            </Link>
-            <Link className="link" href={"/about-us"}>
-              About Us
-            </Link>
-            <Link className="link" href={"/contact-us"}>
-              Contact Us
-            </Link>
-          </Navigation>
-
-          {/* Bagian Kanan - Tentang Perusahaan */}
-          <AboutSection>
-            <h1 className="font-bold">About the company</h1>
-            <p className="mt-2.5">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Repellendus cum hic mollitia fugit facere enim velit sunt officia.
-              Aliquid labore impedit accusamus, eligendi eveniet repellendus.
-              Cum, ex. Ad, reiciendis obcaecati!
-            </p>
-          </AboutSection>
-        </Container>
-
-        <Divider />
-
-        {/* Bottom Bar */}
-        <BottomBar>
-          <p>© 2025 PT Vivlio Jaya Media</p>
-          <div className="social-icons">
-            <FacebookOutlined />
-            <InstagramOutlined />
-            <TikTokOutlined />
+          <div>
+            <Image
+              src={CategoryOutlined}
+              width={20}
+              height={20}
+              alt="category-icon"
+              className="w-[20px]"
+            />
           </div>
-        </BottomBar>
-      </ParentContainer>
+          <div>
+            <HeartOutlined className="w-[20px]" />
+          </div>
+          <div>
+            <UserOutlined className="w-[20px]" />
+          </div>
+        </div>
+      ) : (
+        <ParentContainer>
+          <Container>
+            {/* Bagian Kiri - Info Kontak */}
+            <div className="flex flex-col gap-[10px] w-[300px]">
+              <IconWrapper>
+                <img src={IconLocation} width={20} height={20} alt="location" />
+                <p>Jln raya bayur kali</p>
+              </IconWrapper>
+              <IconWrapper>
+                <PhoneFilled />
+                <p>08897231231</p>
+              </IconWrapper>
+              <IconWrapper>
+                <MailFilled />
+                <p>jamal@gmail.com</p>
+              </IconWrapper>
+            </div>
+
+            {/* Bagian Tengah - Navigasi */}
+            <Navigation>
+              <Link className="link" href={"/"}>
+                Home
+              </Link>
+              <Link className="link" href={"/blog"}>
+                Blog
+              </Link>
+              <Link className="link" href={"/shop"}>
+                Shop
+              </Link>
+              <Link className="link" href={"/about-us"}>
+                About Us
+              </Link>
+              <Link className="link" href={"/contact-us"}>
+                Contact Us
+              </Link>
+            </Navigation>
+
+            {/* Bagian Kanan - Tentang Perusahaan */}
+            <AboutSection>
+              <h1 className="font-bold">About the company</h1>
+              <p className="mt-2.5">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Repellendus cum hic mollitia fugit facere enim velit sunt
+                officia. Aliquid labore impedit accusamus, eligendi eveniet
+                repellendus. Cum, ex. Ad, reiciendis obcaecati!
+              </p>
+            </AboutSection>
+          </Container>
+
+          <Divider />
+
+          {/* Bottom Bar */}
+          <BottomBar>
+            <p>© 2025 PT Vivlio Jaya Media</p>
+            <div className="social-icons">
+              <FacebookOutlined />
+              <InstagramOutlined />
+              <TikTokOutlined />
+            </div>
+          </BottomBar>
+        </ParentContainer>
+      )}
     </>
   );
 };
