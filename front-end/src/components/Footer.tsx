@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import IconLocation from "../assets/icons/icon-location.svg";
 import {
@@ -17,35 +17,67 @@ import Link from "next/link";
 import CategoryOutlined from "../assets/icons/category-icon.svg";
 import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 const Footer = () => {
   const router = useRouter();
   const isMobile = useDeviceType();
+  const path = usePathname();
+  const [classFoot, setClassFoot] = useState("");
+
+  const handleStyleFoot = (pathName: string) => {
+    if (
+      pathName === "/" ||
+      pathName === "/account" ||
+      pathName === "/category" ||
+      pathName === "/wishlist"
+    ) {
+      setClassFoot(
+        "base-blue rounded-full w-[40px] h-[40px] p-1 flex items-center justify-center"
+      );
+    } else {
+      setClassFoot("w-[20px]");
+    }
+  };
+
+  useEffect(() => {
+    handleStyleFoot(path);
+  }, [path]);
 
   return (
     <>
       {isMobile ? (
-        <div className="flex items-center justify-between w-full border-t-2 border-gray-400 fixed bottom-0 bg-white p-4">
-          <div>
+        <div className="flex items-center justify-between w-full border-t-2 border-gray-400 fixed bottom-0 bg-white py-4 px-7 left-0 rounded-t-2xl z-50">
+          <div className="flex items-center flex-col gap-2">
             <HomeOutlined
-              className="w-[20px]"
-              onClick={() => router.push("/")}
+              onClick={() => {
+                router.push("/");
+              }}
+              className={path === "/" ? classFoot : "w-[20px]"}
             />
+            <span className="text-[10px]">Home</span>
           </div>
-          <div>
+          <div className="flex items-center flex-col gap-1">
             <Image
               src={CategoryOutlined}
               width={20}
               height={20}
               alt="category-icon"
-              className="w-[20px]"
+              className={path === "/category" ? classFoot : "w-[20px]"}
             />
+            <span className="text-[10px]">Category</span>
           </div>
-          <div>
-            <HeartOutlined className="w-[20px]" />
+          <div className="flex items-center flex-col gap-2">
+            <HeartOutlined
+              className={path === "/wishlist" ? classFoot : "w-[20px]"}
+            />
+            <span className="text-[10px]">Wishlist</span>
           </div>
-          <div>
-            <UserOutlined className="w-[20px]" />
+          <div className="flex items-center flex-col gap-2">
+            <UserOutlined
+              className={path === "/account" ? classFoot : "w-[20px]"}
+              onClick={() => router.push("/account")}
+            />
+            <span className="text-[10px]">Account</span>
           </div>
         </div>
       ) : (

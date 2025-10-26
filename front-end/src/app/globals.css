@@ -85,3 +85,7 @@ label {
 .dropdown-header-nav {
   cursor: default !important;
 }
+
+.base-blue {
+  background-color: #d9eafd;
+}
