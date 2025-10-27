@@ -30,8 +30,14 @@ const MobileBanner = ({ totalbanner }: PropTypes) => {
   ];
 
   useEffect(() => {
-    console.log("Index banner: ", indexBanner);
-  }, [indexBanner]);
+    const interval = setInterval(() => {
+      setIndexBanner((prevIndex) =>
+        prevIndex === dataBanners.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 6000); // 6 detik
+
+    return () => clearInterval(interval);
+  }, [dataBanners.length]);
 
   return (
     <div className="relative w-screen h-[200px] overflow-hidden">

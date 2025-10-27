@@ -11,6 +11,7 @@ import GlobalLoading from "@/components/GlobalLoading";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { BookWithWishlist, WishlistProps } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
+import useDeviceType from "@/hooks/useDeviceType";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -24,50 +25,66 @@ const ListBook: React.FC<BookTypes> = ({
   fetchBooks,
   dataWishlist,
 }) => {
+  const isMobile = useDeviceType();
   // const CardBook = React.lazy(() => import("./CardBook"));
   return (
     <>
-      <div style={{ marginTop: "50px" }}>
-        {dataBooks!?.length > 0 ? (
-          <>
-            <TitleList>{titleSection}</TitleList>
-            <Suspense fallback={<GlobalLoading />}>
-              <ListBookWrapper className="flex flex-wrap gap-5 justify-center">
-                {dataBooks?.slice(0, 8).map((item, index) => (
-                  <div
-                    key={item?.id} // jangan lupa key di div paling luar
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                  >
-                    <CardBook
-                      key={item?.id}
-                      title={item?.title}
-                      id={item.id}
-                      price={item?.price}
-                      author={item?.author}
-                      categoryId={item?.categoryId}
-                      book_type={item?.book_type}
-                      book_cover={item?.book_cover || "/images/no-image.png"}
-                      description={item?.description}
-                      status={item?.status}
-                      genres={item?.genres}
-                      images={item?.images}
-                      stats={item.stats}
-                      wishlistUsers={item.wishlistUsers}
-                      fetchBooks={fetchBooks}
-                    />
-                  </div>
-                ))}
-              </ListBookWrapper>
-            </Suspense>
-          </>
-        ) : (
-          <>
-            <TitleList>{titleSection}</TitleList>
-            <Empty />
-          </>
-        )}
-      </div>
+      {isMobile ? (
+        <>
+          <div className="mt-4 p-4">
+            <h4 className="font-semibold tracking-wider text-[11px]">
+              {titleSection}
+            </h4>
+          </div>
+        </>
+      ) : (
+        <>
+          {" "}
+          <div style={{ marginTop: "50px" }}>
+            {dataBooks!?.length > 0 ? (
+              <>
+                <TitleList>{titleSection}</TitleList>
+                <Suspense fallback={<GlobalLoading />}>
+                  <ListBookWrapper className="flex flex-wrap gap-5 justify-center">
+                    {dataBooks?.slice(0, 8).map((item, index) => (
+                      <div
+                        key={item?.id} // jangan lupa key di div paling luar
+                        data-aos="fade-up"
+                        data-aos-delay={index * 100} // delay 100ms bertahap tiap card
+                      >
+                        <CardBook
+                          key={item?.id}
+                          title={item?.title}
+                          id={item.id}
+                          price={item?.price}
+                          author={item?.author}
+                          categoryId={item?.categoryId}
+                          book_type={item?.book_type}
+                          book_cover={
+                            item?.book_cover || "/images/no-image.png"
+                          }
+                          description={item?.description}
+                          status={item?.status}
+                          genres={item?.genres}
+                          images={item?.images}
+                          stats={item.stats}
+                          wishlistUsers={item.wishlistUsers}
+                          fetchBooks={fetchBooks}
+                        />
+                      </div>
+                    ))}
+                  </ListBookWrapper>
+                </Suspense>
+              </>
+            ) : (
+              <>
+                <TitleList>{titleSection}</TitleList>
+                <Empty />
+              </>
+            )}
+          </div>
+        </>
+      )}
     </>
   );
 };
