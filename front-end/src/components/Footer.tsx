@@ -32,10 +32,10 @@ const Footer = () => {
       pathName === "/wishlist"
     ) {
       setClassFoot(
-        "base-blue rounded-full w-[40px] h-[40px] p-1 flex items-center justify-center"
+        "bg-white rounded-full w-[40px] h-[40px] p-1 flex items-center justify-center absolute top-[-20px]"
       );
     } else {
-      setClassFoot("w-[20px]");
+      setClassFoot("w-[40px] h-[40px] p-1");
     }
   };
 
@@ -46,17 +46,16 @@ const Footer = () => {
   return (
     <>
       {isMobile ? (
-        <div className="flex items-center justify-between w-full border-t-2 border-gray-400 fixed bottom-0 bg-white py-4 px-7 left-0 rounded-t-2xl z-50">
-          <div className="flex items-center flex-col gap-2">
+        <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 bg-white py-5 px-7 z-50">
+          <div className="flex items-center flex-col relative w-full">
             <HomeOutlined
               onClick={() => {
                 router.push("/");
               }}
               className={path === "/" ? classFoot : "w-[20px]"}
             />
-            <span className="text-[10px]">Home</span>
           </div>
-          <div className="flex items-center flex-col gap-1">
+          <div className="flex items-center flex-col relative w-full">
             <Image
               src={CategoryOutlined}
               width={20}
@@ -64,20 +63,17 @@ const Footer = () => {
               alt="category-icon"
               className={path === "/category" ? classFoot : "w-[20px]"}
             />
-            <span className="text-[10px]">Category</span>
           </div>
-          <div className="flex items-center flex-col gap-2">
+          <div className="flex items-center flex-col relative w-full ">
             <HeartOutlined
               className={path === "/wishlist" ? classFoot : "w-[20px]"}
             />
-            <span className="text-[10px]">Wishlist</span>
           </div>
-          <div className="flex items-center flex-col gap-2">
+          <div className="flex items-center flex-col relative w-full ">
             <UserOutlined
               className={path === "/account" ? classFoot : "w-[20px]"}
               onClick={() => router.push("/account")}
             />
-            <span className="text-[10px]">Account</span>
           </div>
         </div>
       ) : (

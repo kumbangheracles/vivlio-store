@@ -7,7 +7,8 @@ import { styled } from "styled-components";
 import ListCategory from "./components/ListCategory";
 import { BookProps } from "@/types/books.type";
 import { CategoryProps } from "@/types/category.types";
-
+import useDeviceType from "@/hooks/useDeviceType";
+import MobileBanner from "./components/MobileBanner";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -16,6 +17,7 @@ interface PropTypes {
 }
 
 export default function HomePage(prop: PropTypes) {
+  const isMobile = useDeviceType();
   const recentPopularBook = prop.dataBooks
     ?.filter((item) => item.isPopular)
     .sort(
@@ -36,14 +38,51 @@ export default function HomePage(prop: PropTypes) {
   // const { titleSection } = prop;
   return (
     <>
-      <div>
-        <Banner />
-      </div>
+      {isMobile ? (
+        <div>
+          <div className="flex items-center justify-between mx-3">
+            <span className="font-semibold tracking-wider text-sm">
+              Categories
+            </span>
+            <span className=" tracking-wider text-[10px] text-gray-400">
+              See All
+            </span>
+          </div>
+          <div className="w-full overflow-scroll py-2 px-1">
+            <div className="flex items-center gap-3 py-2 px-1 justify-center">
+              <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                Fantasy
+              </span>
+              <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                Sci-fi
+              </span>
+              <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                Art
+              </span>
+              <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                Philosopy
+              </span>
+              <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                Manga
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <Banner />
+        </div>
+      )}
 
-      <div className="mt-7">
-        <TitleList>Popular Category</TitleList>
-        <ListCategory dataCategories={prop.dataCategories} />
-      </div>
+      {isMobile ? (
+        <MobileBanner />
+      ) : (
+        <div className="mt-7">
+          <TitleList>Popular Category</TitleList>
+          <ListCategory dataCategories={prop.dataCategories} />
+        </div>
+      )}
+
       <div>
         <ListBook
           dataBooks={recentPopularBook}
