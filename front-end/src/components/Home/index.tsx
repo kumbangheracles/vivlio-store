@@ -48,7 +48,7 @@ export default function HomePage(prop: PropTypes) {
               See All
             </span>
           </div>
-          <div className="w-full overflow-scroll py-2 px-1">
+          <div className="w-full overflow-x-scroll py-2 scrollbar-hide px-1">
             <div className="flex items-center gap-3 py-2 px-1 justify-center">
               <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
                 Fantasy

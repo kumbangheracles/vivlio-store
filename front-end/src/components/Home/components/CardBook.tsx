@@ -1,29 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
-import type { BookImage, BookProps } from "../../../types/books.type";
+import type { BookProps } from "../../../types/books.type";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
-import { FaRegTrashAlt, FaTrash } from "react-icons/fa";
-import { Card, Carousel, Flex, message, Modal, Spin } from "antd";
-import type { BaseMultipleResponse } from "../../../types/base.type";
+import { Card, message, Spin } from "antd";
 import DefaultImage from "../../../assets/images/bookDefault.png";
 import Image from "next/image";
-import { CarouselRef } from "antd/es/carousel";
-import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
 import { useAuth } from "@/hooks/useAuth";
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
 import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
-import AppModal from "@/components/AppModal";
-import AppButton from "@/components/AppButton";
-import fetchWishlist from "@/components/Account/fetchWishlist";
+
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useIsWishlistStore } from "@/zustand/isWishlist.store";
 // import { fetchBooks } from "@/app/page";
@@ -126,10 +114,6 @@ const CardBook: React.FC<CardBookProps> = React.memo(
           )}
         </div>
         <div className="top-card w-full">
-          {/* <div className="top-content relative">
-       
-        </div> */}
-
           <div
             className="relative w-full"
             onClick={() => goToDetail(bookId as string)}

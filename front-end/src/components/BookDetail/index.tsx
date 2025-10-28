@@ -180,7 +180,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="sm:min-h-screen w-screen h-screen">
       <div className="max-w-7xl mx-auto p-4">
         <Card className="shadow-lg rounded-lg overflow-hidden sm:!mt-4">
           <AppBreadcrumb isBook={true} bookName={book.title} />
@@ -313,7 +313,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   icon={<ShoppingCartOutlined />}
                   onClick={handleAddToCart}
                   disabled={loading}
-                  className="flex-1 h-12 font-semibold"
+                  className="!flex-1 h-12 !font-semibold !p-2"
                 >
                   {isCart ? "Remove from cart" : "Add to cart"}
                   {/* Buy */}

@@ -89,3 +89,7 @@ label {
 .base-blue {
   background-color: #d9eafd;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, dan Opera */
+}

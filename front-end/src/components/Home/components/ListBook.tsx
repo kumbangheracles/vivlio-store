@@ -31,11 +31,41 @@ const ListBook: React.FC<BookTypes> = ({
     <>
       {isMobile ? (
         <>
-          <div className="mt-4 p-4">
+          <div className="mt-4 p-4 ">
             <h4 className="font-semibold tracking-wider text-[11px]">
               {titleSection}
             </h4>
+
+            <div className="flex gap-2 overflow-x-scroll scrollbar-hide p-4">
+              {dataBooks?.slice(0, 8).map((item, index) => (
+                <div
+                  key={item?.id}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
+                >
+                  <CardBook
+                    key={item?.id}
+                    title={item?.title}
+                    id={item.id}
+                    price={item?.price}
+                    author={item?.author}
+                    categoryId={item?.categoryId}
+                    book_type={item?.book_type}
+                    book_cover={item?.book_cover || "/images/no-image.png"}
+                    description={item?.description}
+                    status={item?.status}
+                    genres={item?.genres}
+                    images={item?.images}
+                    stats={item.stats}
+                    wishlistUsers={item.wishlistUsers}
+                    fetchBooks={fetchBooks}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+
+          <div className="p-7"></div>
         </>
       ) : (
         <>
