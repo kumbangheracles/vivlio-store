@@ -1,15 +1,11 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-
+import React, { Suspense } from "react";
 import styled from "styled-components";
-import axios from "axios";
-import type { BaseMultipleResponse } from "../../../types/base.type";
 import type { BookProps } from "../../../types/books.type";
 import { Empty } from "antd";
 import GlobalLoading from "@/components/GlobalLoading";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
-import { BookWithWishlist, WishlistProps } from "@/types/wishlist.type";
+import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
 interface BookTypes {
@@ -17,21 +13,21 @@ interface BookTypes {
   dataBooks?: BookProps[];
   dataWishlist?: BookWithWishlist[];
   fetchBooks?: any;
+  isSpace?: boolean;
 }
 
 const ListBook: React.FC<BookTypes> = ({
   titleSection,
   dataBooks,
   fetchBooks,
-  dataWishlist,
+  isSpace = false,
 }) => {
   const isMobile = useDeviceType();
-  // const CardBook = React.lazy(() => import("./CardBook"));
   return (
     <>
       {isMobile ? (
         <>
-          <div className="mt-4 p-4 ">
+          <div className="mt-1 p-4 ">
             <h4 className="font-semibold tracking-wider text-[11px]">
               {titleSection}
             </h4>
@@ -65,7 +61,7 @@ const ListBook: React.FC<BookTypes> = ({
             </div>
           </div>
 
-          <div className="p-7"></div>
+          {isSpace && <div className="p-7"></div>}
         </>
       ) : (
         <>

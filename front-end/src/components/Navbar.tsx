@@ -137,7 +137,7 @@ export default function Navbar({ dataUser }: PropTypes) {
           <div className="input-search-navbar w-full sm:w-[70%] mr-4">
             <AppInput
               prefix={<SearchOutlined />}
-              placeholder="Sarch Book"
+              placeholder="Search Books, Blogs, etc"
               style={{
                 width: "100%",
                 height: "35px",
