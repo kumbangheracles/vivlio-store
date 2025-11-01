@@ -27,12 +27,12 @@ const ListBook: React.FC<BookTypes> = ({
     <>
       {isMobile ? (
         <>
-          <div className="mt-1 p-4 ">
-            <h4 className="font-semibold tracking-wider text-[11px]">
+          <div className="mt-3 pt-2 bg-gray-100">
+            <h4 className="font-semibold tracking-wider text-[11px] px-2">
               {titleSection}
             </h4>
 
-            <div className="flex gap-2 overflow-x-scroll scrollbar-hide p-4">
+            <div className="flex gap-3 overflow-x-scroll scrollbar-hide p-4">
               {dataBooks?.slice(0, 8).map((item, index) => (
                 <div
                   key={item?.id}
@@ -74,7 +74,7 @@ const ListBook: React.FC<BookTypes> = ({
                   <ListBookWrapper className="flex flex-wrap gap-5 justify-center">
                     {dataBooks?.slice(0, 8).map((item, index) => (
                       <div
-                        key={item?.id} // jangan lupa key di div paling luar
+                        key={item?.id}
                         data-aos="fade-up"
                         data-aos-delay={index * 100} // delay 100ms bertahap tiap card
                       >

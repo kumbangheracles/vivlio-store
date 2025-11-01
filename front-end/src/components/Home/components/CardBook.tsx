@@ -11,9 +11,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
-
+import { truncateText } from "@/helpers/truncateText";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useIsWishlistStore } from "@/zustand/isWishlist.store";
+import useDeviceType from "@/hooks/useDeviceType";
 // import { fetchBooks } from "@/app/page";
 type CardBookProps = BookProps & {
   showIcon?: "trash" | "wish";
@@ -34,6 +35,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
 
     wishlistUsers,
   }) => {
+    const isMobile = useDeviceType();
     const [isInWishlist, setIsInWishlist] = useState(
       wishlistUsers?.length! > 0
     );
@@ -96,63 +98,126 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     };
 
     return (
-      <StyledCard>
-        <div
-          className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
-          onClick={() => handleWishlist()}
-        >
-          {loading ? (
-            <Spin size="small" />
-          ) : (
-            <>
-              {isWishlist(bookId as string) ? (
-                <IoMdHeart className="text-sm text-red-400 " />
-              ) : (
-                <IoMdHeartEmpty className="text-sm text-red-400 " />
-              )}
-            </>
-          )}
-        </div>
-        <div className="top-card w-full">
-          <div
-            className="relative w-full"
-            onClick={() => goToDetail(bookId as string)}
-          >
-            <div className="mid-content flex items-center justify-center w-[120px] h-full overflow-hidden z-50">
+      <>
+        {isMobile ? (
+          <>
+            <div
+              className="flex items-center flex-col overflow-hidden relative bg-white rounded-md gap-1 w-[120px] h-[200px]"
+              onClick={() => goToDetail(bookId as string)}
+            >
+              <div
+                className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[18px] h-[18px] flex justify-center items-center border-black border-1 p-[2px]"
+                onClick={() => handleWishlist()}
+              >
+                {loading ? (
+                  <Spin size="small" />
+                ) : (
+                  <>
+                    {isWishlist(bookId as string) ? (
+                      <IoMdHeart className=" text-red-400 " />
+                    ) : (
+                      <IoMdHeartEmpty className=" text-red-400 " />
+                    )}
+                  </>
+                )}
+              </div>
               {images?.[0] && (
-                <WrapperImage key={images[0].bookId || images[0].public_id}>
-                  <StyledImage
+                <div
+                  key={images[0].bookId || images[0].public_id}
+                  className="flex items-center justify-center w-[100px] h-full overflow-hidden p-2 "
+                >
+                  <Image
                     src={images[0].imageUrl || DefaultImage}
-                    alt={`book-${title}`}
                     width={100}
                     height={100}
+                    alt="img-mobile"
+                    className="object-cover block object-center w-full h-full "
                   />
-                </WrapperImage>
+                </div>
               )}
+              <div className="flex flex-col w-full !px-4 tracking-wide">
+                <span className="text-[10px] text-gray-400 font-semibold">
+                  {author}
+                </span>
+                <span className="text-[8px] ">{truncateText(title, 17)}</span>
+              </div>
+              <div className="flex flex-col text-start !px-4 pb-3 w-full">
+                <span className="text-[10px] font-bold tracking-wide">
+                  {" "}
+                  {Number(price).toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  })}
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
-        <div
-          className="bottom-content flex flex-col items-center justify-center "
-          style={{ marginTop: 8 }}
-        >
-          <div className="flex flex-col leading-[17px] w-full">
-            <p className="text-gray-500 text-center">{author}</p>
-            <p className="font-medium text-start text-xs">
-              {title.length > 50
-                ? title.slice(0, 50) + " . . . . ."
-                : title || "No Content"}
-            </p>
-          </div>
-        </div>
-        <span className="font-bold tracking-wide absolute bottom-5">
-          {Number(price).toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-          })}
-        </span>
-      </StyledCard>
+          </>
+        ) : (
+          <>
+            {" "}
+            <StyledCard>
+              <div
+                className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
+                onClick={() => handleWishlist()}
+              >
+                {loading ? (
+                  <Spin size="small" />
+                ) : (
+                  <>
+                    {isWishlist(bookId as string) ? (
+                      <IoMdHeart className="text-sm text-red-400 " />
+                    ) : (
+                      <IoMdHeartEmpty className="text-sm text-red-400 " />
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="top-card w-full">
+                <div
+                  className="relative w-full"
+                  onClick={() => goToDetail(bookId as string)}
+                >
+                  <div className="mid-content flex items-center justify-center w-[120px] h-full overflow-hidden z-50">
+                    {images?.[0] && (
+                      <WrapperImage
+                        key={images[0].bookId || images[0].public_id}
+                      >
+                        <StyledImage
+                          src={images[0].imageUrl || DefaultImage}
+                          alt={`book-${title}`}
+                          width={100}
+                          height={100}
+                        />
+                      </WrapperImage>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div
+                className="bottom-content flex flex-col items-center justify-center "
+                style={{ marginTop: 8 }}
+              >
+                <div className="flex flex-col leading-[17px] w-full">
+                  <p className="text-gray-500 text-center">{author}</p>
+                  <p className="font-medium text-start text-xs">
+                    {title.length > 50
+                      ? title.slice(0, 50) + " . . . . ."
+                      : title || "No Content"}
+                  </p>
+                </div>
+              </div>
+              <span className="font-bold tracking-wide absolute bottom-5">
+                {Number(price).toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0,
+                })}
+              </span>
+            </StyledCard>
+          </>
+        )}
+      </>
     );
   }
 );

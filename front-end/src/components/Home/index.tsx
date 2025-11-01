@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Layout from "../../components/Layout";
 import Banner from "./components/Banner";
 import ListBook from "./components/ListBook";
 import { styled } from "styled-components";
@@ -50,21 +49,21 @@ export default function HomePage(prop: PropTypes) {
               </span>
             </div>
             <div className="w-full overflow-x-scroll py-2 scrollbar-hide px-1">
-              <div className="flex items-center gap-3 py-2 px-1 justify-center">
-                <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+              <div className="flex items-center gap-3 py-2 px-1 justify-center w-[450px]">
+                <span className="p-3 tracking-wider base-blue text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
+                  All
+                </span>
+                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
                   Fantasy
                 </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
                   Sci-fi
                 </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
                   Art
                 </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
+                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
                   Philosopy
-                </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm rounded-2xl text-[11px] sm:text-sm">
-                  Manga
                 </span>
               </div>
             </div>

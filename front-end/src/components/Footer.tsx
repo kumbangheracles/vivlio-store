@@ -46,7 +46,7 @@ const Footer = () => {
   return (
     <>
       {isMobile ? (
-        <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 bg-white py-5 px-7 z-50">
+        <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 py-5 px-7 z-50 m-2 !left-[-8px] rounded-xl">
           <div className="flex items-center flex-col relative w-full">
             <HomeOutlined
               onClick={() => {
