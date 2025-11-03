@@ -149,12 +149,12 @@ const ParentContainer = styled.div`
   background-color: #d9eafd;
   color: #000000;
 
-  /* @media (max-width: 768px) {
+  @media (max-width: 768px) {
     width: 100vh;
-      margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  } */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 `;
 
 const Container = styled.div`

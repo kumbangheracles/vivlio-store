@@ -35,6 +35,7 @@ import { product } from "@/libs/product";
 import useCart from "@/hooks/useCart";
 import ListBook from "../Home/components/ListBook";
 import { TitleList } from "../Home";
+import useDeviceType from "@/hooks/useDeviceType";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -54,6 +55,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   onShare,
   similiarBooks,
 }) => {
+  const isMobile = useDeviceType();
   const auth = useAuth();
   const router = useRouter();
   const [isInWishlist, setIsInWishlist] = useState(
@@ -180,9 +182,9 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   };
 
   return (
-    <div className="sm:min-h-screen w-screen h-screen">
+    <div className="w-screen h-screen sm:w-auto sm:h-auto">
       <div className="max-w-7xl mx-auto p-4">
-        <Card className="shadow-lg rounded-lg overflow-hidden sm:!mt-4">
+        <Card className="rounded-lg overflow-hidden sm:!mt-4">
           <AppBreadcrumb isBook={true} bookName={book.title} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
@@ -237,7 +239,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   </Text>
                 </div>
                 <Title
-                  level={1}
+                  level={isMobile ? 5 : 1}
                   className="!mb-3 text-3xl font-bold text-gray-800"
                 >
                   {book.title}
@@ -264,8 +266,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
 
               {/* Price */}
               <div className="bg-blue-50 p-4 rounded-lg">
-                <Text className="text-sm text-gray-600">Price</Text>
-                <Title level={2} className="!mb-0 text-blue-600">
+                {/* <Text className="text-sm text-gray-600">Price</Text> */}
+                <Title level={isMobile ? 4 : 2} className="!mb-0 text-blue-600">
                   {formatPrice(book.price)}
                 </Title>
               </div>
@@ -313,13 +315,13 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   icon={<ShoppingCartOutlined />}
                   onClick={handleAddToCart}
                   disabled={loading}
-                  className="!flex-1 h-12 !font-semibold !p-2"
+                  className="!flex-1 h-12 !font-semibold !p-3  !text-[12px] sm:!text-sm"
                 >
-                  {isCart ? "Remove from cart" : "Add to cart"}
+                  {isCart ? "Remove From Cart" : "Add to Cart"}
                   {/* Buy */}
                 </Button>
 
-                <Space size="middle">
+                <div className="flex flex-wrap gap-2 w-full">
                   <Button
                     loading={loading}
                     type={isWishlist(bookId as string) ? "primary" : "default"}
@@ -333,11 +335,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     }
                     disabled={loading}
                     onClick={handleWishlistClick}
-                    className="h-12 px-6"
+                    className="h-12 px-6 w-full sm:w-auto !text-[12px] sm:!text-sm"
                     danger={isWishlist(bookId as string)}
                   >
                     {isWishlist(bookId as string)
-                      ? "Remove from Wishlist"
+                      ? "Remove From Wishlist"
                       : "Add to Wishlist"}
                   </Button>
 
@@ -346,27 +348,20 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     size="large"
                     icon={<ShareAltOutlined />}
                     onClick={handleShareClick}
-                    className="h-12 px-6"
+                    className="h-12 px-6 !text-[12px] sm:!text-sm w-full sm:w-auto"
                   >
                     Share
                   </Button>
-                </Space>
+                </div>
               </div>
 
               {/* Additional Info */}
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                 {book.createdAt && (
-                  <div>
-                    <Text strong>Published: </Text>
+                  <div className="flex w-full gap-4">
                     <Text>
                       {new Date(book.createdAt).toLocaleDateString("id-ID")}
                     </Text>
-                  </div>
-                )}
-                {book.id && (
-                  <div>
-                    <Text strong>Book ID: </Text>
-                    <Text className="font-mono">{book.id}</Text>
                   </div>
                 )}
               </div>
@@ -381,13 +376,13 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   Description
                 </Title>
               </Divider>
-              <Card className="bg-gray-50">
-                <Paragraph className="text-gray-700 leading-relaxed">
+              <div className="bg-gray-50 p-4 rounded-md text-base">
+                <Paragraph className="text-gray-700 text-[10px]! text-base sm:text-sm! leading-relaxed">
                   <div
                     dangerouslySetInnerHTML={{ __html: book?.description }}
                   />
                 </Paragraph>
-              </Card>
+              </div>
             </div>
           )}
         </Card>
@@ -395,7 +390,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
 
       <div>
         {(similiarBooks?.length as number) > 0 ? (
-          <ListBook dataBooks={similiarBooks} titleSection="Similiar Books" />
+          <ListBook
+            dataBooks={similiarBooks}
+            isSpace={true}
+            titleSection="Similiar Books"
+          />
         ) : (
           <>
             <div>

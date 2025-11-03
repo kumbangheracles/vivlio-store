@@ -61,7 +61,7 @@ const ListBook: React.FC<BookTypes> = ({
             </div>
           </div>
 
-          {isSpace && <div className="p-7"></div>}
+          {isSpace && <div className="p-10"></div>}
         </>
       ) : (
         <>
@@ -127,6 +127,6 @@ export const TitleList = styled.h4`
 `;
 
 const ListBookWrapper = styled.div`
-  padding: 1rem;
+  padding: 5px;
   margin: 0rem 2rem;
 `;

@@ -102,7 +102,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
         {isMobile ? (
           <>
             <div
-              className="flex items-center flex-col overflow-hidden relative bg-white rounded-md gap-1 w-[120px] h-[200px]"
+              className="flex items-center flex-col overflow-hidden cursor-pointer relative bg-white rounded-md gap-1 w-[120px] h-[200px]"
               onClick={() => goToDetail(bookId as string)}
             >
               <div

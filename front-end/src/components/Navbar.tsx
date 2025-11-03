@@ -11,7 +11,7 @@ import AppInput from "./AppInput";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "next-auth/react";
-import { CloseOutlined, MenuOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import DropdownProfile from "./DropdownProfile";
 import { UserProperties } from "@/types/user.type";
 import { MdOutlineNavigateNext } from "react-icons/md";
