@@ -8,6 +8,7 @@ import { BookProps } from "@/types/books.type";
 import { CategoryProps } from "@/types/category.types";
 import useDeviceType from "@/hooks/useDeviceType";
 import MobileBanner from "./components/MobileBanner";
+import ListBlog from "../ListBlog";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -80,6 +81,8 @@ export default function HomePage(prop: PropTypes) {
             <ListBook titleSection={"Best Seller"} dataBooks={bestSellerBook} />
 
             <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
+
+            <ListBlog />
           </div>
         </>
       ) : (
@@ -105,6 +108,8 @@ export default function HomePage(prop: PropTypes) {
           <div>
             <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
           </div>
+
+          <ListBlog />
         </>
       )}
     </>
