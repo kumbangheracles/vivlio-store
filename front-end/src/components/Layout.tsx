@@ -1,6 +1,8 @@
 "use client";
 import "aos/dist/aos.css";
 import "@ant-design/v5-patch-for-react-19";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import AOS from "aos";
 import React, { Suspense, useEffect, type ReactNode } from "react";
 import styled, { StyleSheetManager } from "styled-components";

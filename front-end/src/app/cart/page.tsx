@@ -11,8 +11,9 @@ const CartPage = async () => {
   const dataBooks = await fetchBooksHome();
   const cartedBook = dataBooks.filter((item) => item.isInCart === true);
 
+  const key = Math.random();
   console.log("Carted Book: ", cartedBook);
-  return <CartIndex books={cartedBook} key={Math.random()} />;
+  return <CartIndex books={cartedBook} key={key} />;
 };
 
 export default CartPage;
