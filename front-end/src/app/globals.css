@@ -93,3 +93,24 @@ label {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, dan Opera */
 }
+
+.carousel-blog {
+  width: 100%;
+  overflow-x: hidden;
+  margin: 1em auto;
+  padding: 0px 2rem;
+  display: flex;
+  gap: 1em;
+  scroll-behavior: smooth !important;
+  transition: all 0.3s ease;
+  will-change: scroll-position !important;
+}
+
+.carousel-blog::-webkit-scrollbar {
+  display: none;
+}
+
+.blog-card {
+  flex: 0 0 20em;
+  transition: all 0.3s ease;
+}
