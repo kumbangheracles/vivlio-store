@@ -10,7 +10,7 @@ const ListBlog: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
-  const scrollByAmount = isMobile ? 250 : 700;
+  const scrollByAmount = isMobile ? 260 : 700;
 
   const handleScroll = () => {
     const el = carouselRef.current;
@@ -70,12 +70,14 @@ const ListBlog: React.FC = () => {
 
   return (
     <div className="py-4 w-full mt-4 relative">
-      <h4 className="font-bold tracking-wider text-xl !ml-10">Blog</h4>
+      <h4 className="font-bold text-sm tracking-wider sm:text-xl sm:!ml-10 ml-3">
+        Blog
+      </h4>
 
       {showLeft && (
         <button
           onClick={scrollLeft}
-          className="absolute cursor-pointer  left-2 top-1/2 -translate-y-1/2 w-[50px] h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
+          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm left-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
           aria-label="Scroll left"
         >
           <LeftOutlined />
@@ -85,7 +87,7 @@ const ListBlog: React.FC = () => {
       {showRight && (
         <button
           onClick={scrollRight}
-          className="absolute cursor-pointer  right-2 top-1/2 -translate-y-1/2 w-[50px] h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
+          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm  right-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
           aria-label="Scroll right"
         >
           <RightOutlined />
