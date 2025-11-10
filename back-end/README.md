@@ -181,6 +181,12 @@ Example: Creating a `Book` model:
 npx sequelize-cli model:generate --name Book --attributes title:string,author:string,price:decimal
 ```
 
+# Create a migration
+
+```sh
+npx sequelize-cli migration:generate --name create-users
+```
+
 This generates:
 
 - A model file in `models/book.js`

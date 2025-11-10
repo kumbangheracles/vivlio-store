@@ -114,3 +114,11 @@ label {
   flex: 0 0 20em;
   transition: all 0.3s ease;
 }
+.mobile-cardList::-webkit-scrollbar {
+  display: none !important;
+}
+
+.mobile-cardList {
+  -ms-overflow-style: none; /* untuk IE dan Edge */
+  scrollbar-width: none; /* untuk Firefox */
+}

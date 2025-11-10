@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const { sequelize, connectDB } = require("./config/database");
 const bookRoutes = require("./routes/book");
-const path = require("path");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
 const genresRoutes = require("./routes/genre");
@@ -13,6 +12,7 @@ const userWishlistRoutes = require("./routes/userWishlist");
 const userCartRoutes = require("./routes/cart");
 const midtransRoutes = require("./routes/midtrans");
 const mediaRoutes = require("./routes/media");
+const articleRoutes = require("./routes/article");
 const cookieParser = require("cookie-parser");
 const { swaggerUi, specs } = require("./docs/swagger");
 const bodyParser = require("body-parser");
@@ -81,6 +81,8 @@ async function init() {
 
     app.use("/media", mediaRoutes);
 
+    app.use("/articles", articleRoutes);
+
     app.use("/midtrans", midtransRoutes);
 
     app.get("/", (req, res) => {
@@ -96,7 +98,9 @@ async function init() {
 
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
     app.use((req, res) => {
-      res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+      res.status(404).json({
+        message: "routes does not exist",
+      });
     });
     app.listen(port, () => console.log(`Server running on port ${port}`));
   } catch (error) {

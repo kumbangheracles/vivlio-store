@@ -1,0 +1,53 @@
+"use strict";
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("Articles", {
+      id: {
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+        type: Sequelize.STRING,
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
+      createdByAdminId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: Sequelize.ENUM("PUBLISHED", "UNPUBLISHED"),
+        allowNull: false,
+        defaultValue: "UNPUBLISHED",
+      },
+      isPopular: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
+      },
+    });
+  },
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("Articles");
+  },
+};

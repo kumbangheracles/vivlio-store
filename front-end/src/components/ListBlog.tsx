@@ -10,7 +10,7 @@ const ListBlog: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
-  const scrollByAmount = isMobile ? 260 : 700;
+  const scrollByAmount = isMobile ? 250 : 700;
 
   const handleScroll = () => {
     const el = carouselRef.current;
@@ -74,7 +74,7 @@ const ListBlog: React.FC = () => {
         Blog
       </h4>
 
-      {showLeft && (
+      {!isMobile && showLeft && (
         <button
           onClick={scrollLeft}
           className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm left-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
@@ -84,21 +84,33 @@ const ListBlog: React.FC = () => {
         </button>
       )}
 
-      {showRight && (
+      {!isMobile && showRight && (
         <button
           onClick={scrollRight}
-          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm  right-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
+          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm right-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
           aria-label="Scroll right"
         >
           <RightOutlined />
         </button>
       )}
 
-      <div ref={carouselRef} className="carousel-blog">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <BlogCard key={i} />
-        ))}
-      </div>
+      {isMobile ? (
+        <>
+          <div className="w-full overflow-x-scroll mobile-cardList">
+            <div className="flex items-center gap-5 w-full p-4 mobile-cardList">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <BlogCard key={i} />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div ref={carouselRef} className="carousel-blog">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <BlogCard key={i} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

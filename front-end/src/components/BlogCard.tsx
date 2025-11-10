@@ -8,7 +8,7 @@ const BlogCard = () => {
   return (
     <>
       {isMobile ? (
-        <div className="relative rounded-md w-[100px] flex-none basis-[14em] overflow-hidden h-[200px] border border-[#cacaca]">
+        <div className="relative rounded-md w-[100px] flex-none basis-[10em] overflow-hidden h-[200px] border border-[#cacaca]">
           <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
             02/01/2005
           </span>
@@ -22,8 +22,8 @@ const BlogCard = () => {
             />
           </div>
 
-          <div className="p-4 flex flex-col gap-3 justify-center items-center absolute bottom-1">
-            <h4 className="font-semibold text-[12px] sm:text-[16px] tracking-wider">
+          <div className="p-2 flex flex-col gap-1 justify-center items-center absolute bottom-0">
+            <h4 className="font-semibold text-[10px] sm:text-[16px] tracking-wide">
               Kumpulan Budak Setan: Kini Cetak Ulang dengan Cover Baru!
             </h4>
 
