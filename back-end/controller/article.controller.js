@@ -15,7 +15,7 @@ module.exports = {
         include: [
           {
             model: ArticleImages,
-            as: "images",
+            as: "articleImages",
             attributes: ["id", "imageUrl", "public_id"],
           },
         ],
@@ -49,7 +49,7 @@ module.exports = {
         include: [
           {
             model: ArticleImages,
-            as: "images",
+            as: "articleImages",
             attributes: ["id", "imageUrl", "public_id"],
           },
         ],

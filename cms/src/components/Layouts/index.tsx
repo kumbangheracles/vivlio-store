@@ -12,14 +12,13 @@ import {
   Modal,
   Select,
 } from "antd";
-import { DashOutlined } from "@ant-design/icons";
 import {
   TbLayoutSidebarLeftCollapse,
   TbLayoutSidebarRightCollapse,
 } from "react-icons/tb";
-import { useMemo, useState, type ReactNode } from "react";
+import { TiWarning } from "react-icons/ti";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { BiSolidCategory } from "react-icons/bi";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
@@ -36,6 +35,7 @@ interface PropTypes {
 }
 
 const AppLayout = ({ children }: PropTypes) => {
+  const [isDesktop, setIsDesktop] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -113,6 +113,34 @@ const AppLayout = ({ children }: PropTypes) => {
           },
         },
       ];
+
+  useEffect(() => {
+    const checkViewport = () => {
+      setIsDesktop(window.innerWidth >= 760);
+    };
+
+    checkViewport();
+    window.addEventListener("resize", checkViewport);
+    return () => window.removeEventListener("resize", checkViewport);
+  }, []);
+
+  if (!isDesktop) {
+    return (
+      <div className=" w-screen h-screen flex flex-col sm:text-lg items-center justify-center text-center bg-gray-100">
+        <div className="flex flex-col sm:text-lg items-center justify-center rounded-md bg-sky-50 shadow-2xl p-4! mx-1!">
+          <h2 className="text-red-500 text-lg  sm:text-xl font-semibold flex gap-2 items-center">
+            <span>
+              <TiWarning />
+            </span>
+            <span>This page is desktop only</span>
+          </h2>
+          <p className="text-gray-600 mt-2! text-sm">
+            Please open this CMS on a device with a wider screen.
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>

@@ -24,7 +24,7 @@ import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
 import DefaultImage from "../../assets/images/profile-default.jpg";
 import { UserProperties } from "../../types/user.type";
-import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
+// import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
 import { RoleProperties } from "../../types/role.type";
 import { useDebounce } from "../../hooks/useDebounce";
 const { Text } = Typography;
@@ -38,7 +38,7 @@ const UserIndex = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
-  const [dataRole, setDataRole] = useState<RoleProperties[]>([]);
+  // const [dataRole, setDataRole] = useState<RoleProperties[]>([]);
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<UserProperties[]>([]);
 

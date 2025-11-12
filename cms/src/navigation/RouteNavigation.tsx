@@ -36,6 +36,7 @@ const RouteNavigation = () => {
   const UserIndex = React.lazy(() => import("../screens/users/index"));
   const UserEdit = React.lazy(() => import("../screens/users/Edit"));
   const UserDetail = React.lazy(() => import("../screens/users/Detail"));
+  const Articleindex = React.lazy(() => import("../screens/articles/index"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -231,6 +232,16 @@ const RouteNavigation = () => {
               <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <UserDetail />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/article"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <Articleindex />
                 </AppLayout>
               </ProtectedRoute>
             }

@@ -1,0 +1,20 @@
+export type ArticleProperties = {
+  id?: string;
+  title?: string;
+  description?: string;
+  status?: string;
+  createdByAdminId?: string;
+  isPopular?: boolean;
+  articleImages?: any;
+};
+
+export type ArticleImage = {
+  articleId: string;
+  imageUrl: string;
+  public_id: string;
+};
+
+export enum ArticleStatusType {
+  PUBLISH = "PUBLISHED",
+  UNPUBLISH = "UNPUBLISHED",
+}
