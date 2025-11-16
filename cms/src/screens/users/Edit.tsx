@@ -2,13 +2,10 @@ import {
   Space,
   Form,
   Input,
-  Radio,
   message,
-  Select,
   Upload,
   Image,
   UploadFile,
-  UploadProps,
   Modal,
 } from "antd";
 import Cropper from "react-easy-crop";
@@ -20,9 +17,8 @@ import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
 import { useCallback, useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
-import { isEmpty, isBooleanUndefined } from "../../helper/validation";
+import { isEmpty } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
-import { GenreStatusType } from "../../types/genre.type";
 import { initialUser, UserImage, UserProperties } from "../../types/user.type";
 import AppSelect from "../../components/AppSelect";
 import { RoleProperties } from "../../types/role.type";
@@ -37,9 +33,7 @@ const UserEdit = () => {
   const [user, setUser] = useState<UserProperties>(initialUser);
   const [dataRoles, setDataRoles] = useState<RoleProperties[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [image, setImage] = useState<UserImage | null>(null);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [form] = Form.useForm();
   const { id } = useParams();
@@ -91,7 +85,7 @@ const UserEdit = () => {
       isEmpty(data.email) ||
       isEmpty(data.roleId)
     ) {
-      message.error("All field is required");
+      message.error("All field is required!.");
       return;
     }
     // if (isEmpty(data.username)) {

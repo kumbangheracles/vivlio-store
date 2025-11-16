@@ -23,8 +23,8 @@ router.patch(
   articleController.updateArticle
 );
 
-// Delete admin
-router.patch(
+// Delete article
+router.delete(
   "/:id",
   [authMiddleware, checkRole(["super_admin", "admin"])],
   articleController.deleteArticle

@@ -7,6 +7,14 @@ export interface ILoginData {
   password: string;
 }
 
+export type AuthProps = {
+  id?: string;
+  identifier?: string;
+  password?: string;
+  role?: string;
+  username?: string;
+};
+
 export type AuthState = {
   status: EAuthStatus;
   user: UserProperties;

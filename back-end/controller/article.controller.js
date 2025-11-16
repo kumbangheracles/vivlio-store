@@ -88,7 +88,7 @@ module.exports = {
       );
 
       const articleImageData = imageArray.map((img) => ({
-        articleId: id,
+        articleId: newArticle.id,
         imageUrl: img.imageUrl,
         public_id: img.public_id,
       }));

@@ -158,7 +158,7 @@ CategoryImage.belongsTo(BookCategory, {
 
 // Articles ↔ ArticleImages
 Articles.hasOne(ArticleImages, {
-  foreignKey: "id",
+  foreignKey: "articleId",
   as: "articleImages",
 });
 

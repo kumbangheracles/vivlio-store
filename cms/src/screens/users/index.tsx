@@ -300,7 +300,7 @@ const UserIndex = () => {
             setPage(newPage);
             setLimit(newPageSize);
           },
-          showSizeChanger: true,
+          // showSizeChanger: true,
           position: ["bottomLeft"],
           style: {},
         }}

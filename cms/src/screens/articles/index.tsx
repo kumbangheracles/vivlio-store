@@ -1,5 +1,15 @@
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { Space, Row, Col, Modal, Tag, Image, Dropdown, Menu } from "antd";
+import {
+  Space,
+  Row,
+  Col,
+  Modal,
+  Tag,
+  Image,
+  Dropdown,
+  Menu,
+  message,
+} from "antd";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import AppTable from "../../components/AppTable";
@@ -13,6 +23,7 @@ import DefaultImage from "../../assets/images/default-img.png";
 import AppStatusSelect from "../../components/AppStatusSelect";
 import dayjs from "dayjs";
 import { UserProperties } from "../../types/user.type";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const ArticleIndex = () => {
   const navigate = useNavigate();
@@ -21,9 +32,12 @@ const ArticleIndex = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [dataArticle, setDataArticle] = useState<ArticleProperties[]>([]);
   const [dataUser, setDataUser] = useState<UserProperties[]>([]);
-
+  const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
+  const debouncedSearch = useDebounce(search, 500);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [filteredData, setFilteredData] = useState<UserProperties[]>([]);
   const fetchArticles = async (page: number, limit: number) => {
     try {
       setLoading(true);
@@ -32,7 +46,7 @@ const ArticleIndex = () => {
       });
 
       setDataArticle(res.data.results);
-
+      setTotalItems(res.data.total);
       console.log("Data articles: ", res.data);
     } catch (error) {
       ErrorHandler(error);
@@ -73,6 +87,26 @@ const ArticleIndex = () => {
       fetchAllUsers();
     }
   }, [dataArticle]);
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await myAxios.delete(`/articles/${selectedId}`);
+
+      message.success(`Successfully delete article`);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      await fetchArticles(page, limit);
+      setIsModalOpen(false);
+      setSelectedId("");
+      setLoading(false);
+    }
+  };
+
+  const handleModalOpen = (genreId: string) => {
+    setIsModalOpen(true);
+    setSelectedId(genreId);
+  };
 
   const articleColumn = [
     {
@@ -85,18 +119,19 @@ const ArticleIndex = () => {
         return (
           <div
             style={{
-              width: "130px",
+              width: "100px",
               height: "100px",
               overflow: "hidden",
               border: "2px solid gray",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Image
-              src={`${src}?v=${Date.now()}`}
+              src={src}
               alt={record.title}
-              style={{ width: "130px", height: "100px", objectFit: "cover" }}
+              style={{ width: "100%", height: "100px", objectFit: "cover" }}
             />
           </div>
         );
@@ -113,14 +148,19 @@ const ArticleIndex = () => {
       dataIndex: "description",
       key: "description",
       ellipsis: true,
-      render: (text: string) =>
-        text?.length > 100 ? `${text.slice(0, 100)}...` : text,
+      render: (text: string) => (
+        <span
+          dangerouslySetInnerHTML={{
+            __html: text?.length > 100 ? `${text.slice(0, 100)}...` : text,
+          }}
+        ></span>
+      ),
     },
     {
       title: "Created By",
       dataIndex: "createdByAdminId",
       key: "createdByAdminId",
-      width: 180,
+      width: 130,
 
       render: (_: any, record: ArticleProperties) => {
         const user = dataUser.find(
@@ -166,7 +206,8 @@ const ArticleIndex = () => {
     {
       title: "Action",
       key: "action",
-      width: 100,
+      center: true,
+      width: 80,
       render: (_: any, record: ArticleProperties) => {
         const menu = (
           <Menu
@@ -184,7 +225,7 @@ const ArticleIndex = () => {
               {
                 key: "delete",
                 label: "Delete",
-                // onClick: () => handleModalOpen(record.id as string),
+                onClick: () => handleModalOpen(record.id as string),
                 danger: true,
               },
             ]}
@@ -198,6 +239,17 @@ const ArticleIndex = () => {
       },
     },
   ];
+
+  useEffect(() => {
+    if (debouncedSearch) {
+      const filtered = dataArticle.filter((item: ArticleProperties) =>
+        item.title?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(dataArticle);
+    }
+  }, [debouncedSearch, dataArticle]);
   return (
     <>
       <HeaderPage
@@ -229,33 +281,33 @@ const ArticleIndex = () => {
       <AppTable
         style={{ marginTop: 20 }}
         columns={articleColumn}
-        // dataSource={filteredData}
-        dataSource={dataArticle}
+        dataSource={filteredData}
+        // dataSource={dataArticle}
         loading={loading}
         rowKey={"id"}
-        // pagination={{
-        //   current: page,
-        //   pageSize: limit,
-        //   total: totalItems,
-        //   onChange: (newPage, newPageSize) => {
-        //     setPage(newPage);
-        //     setLimit(newPageSize);
-        //   },
-        //   showSizeChanger: true,
-        //   position: ["bottomLeft"],
-        //   style: {},
-        // }}
+        pagination={{
+          current: page,
+          pageSize: limit,
+          total: totalItems,
+          onChange: (newPage, newPageSize) => {
+            setPage(newPage);
+            setLimit(newPageSize);
+          },
+          // showSizeChanger: true,
+          position: ["bottomLeft"],
+          style: {},
+        }}
       />
 
       <Modal
-        title={"Delete User"}
-        children={"Are you sure want to delete this user?"}
+        title={"Delete Article"}
+        children={"Are you sure want to delete this article?"}
         open={isModalOpen}
         okText="Yes"
         cancelText={"No"}
         confirmLoading={loading}
         onCancel={() => setIsModalOpen(false)}
-        // onOk={() => handleDelete()}
+        onOk={() => handleDelete()}
       />
     </>
   );

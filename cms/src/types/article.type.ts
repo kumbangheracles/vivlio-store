@@ -18,3 +18,13 @@ export enum ArticleStatusType {
   PUBLISH = "PUBLISHED",
   UNPUBLISH = "UNPUBLISHED",
 }
+
+export const initialArticleValue: ArticleProperties = {
+  id: "",
+  title: "",
+  description: "",
+  status: "",
+  createdByAdminId: "",
+  isPopular: false,
+  articleImages: [],
+};
