@@ -12,7 +12,7 @@ import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import HeaderPage from "../../components/HeaderPage";
 import HeaderSection from "../../components/HeaderSection";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DefaultImage from "../../assets/images/default-img.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -27,6 +27,7 @@ import { RcFile, UploadChangeParam } from "antd/es/upload";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 import { AuthProps } from "../../types/auth.type";
 import myAxios from "../../helper/myAxios";
+import { UploadFileStatus } from "antd/es/upload/interface";
 
 const ArticleEdit = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -177,6 +178,50 @@ const ArticleEdit = () => {
       <div>Upload</div>
     </button>
   );
+
+  const fetchDataArticle = async () => {
+    if (!id) return;
+
+    try {
+      setIsLoading(true);
+      const res = await myAxios.get(`/articles/${id}`);
+      console.log("Data article: ", res.data);
+      const data = res.data.result;
+      setArticle(data);
+      // form.setFieldsValue(res.data.result);
+      form.setFieldsValue({
+        ...data,
+        users: Array.isArray(data.users)
+          ? data.users.map((item: ArticleProperties) => item.id)
+          : [],
+      });
+      const articleImages = res.data.result.articleImages;
+      const imagePrev: UploadFile<any>[] = [
+        {
+          uid: "1",
+          name: "article-img.jpg",
+          status: "done" as UploadFileStatus,
+          url: "https://example.com/image.jpg",
+          response: {
+            secure_url: "https://example.com/image.jpg",
+            public_id: "some-id",
+          },
+        },
+      ];
+
+      // setDataGenre(res.data.result.genres);
+      setFileList(imagePrev);
+      setPreviewImage(articleImages.imageUrl);
+    } catch (error) {
+      // ErrorHandler(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataArticle();
+  }, [id]);
   return (
     <div>
       <HeaderPage
@@ -216,7 +261,7 @@ const ArticleEdit = () => {
         sectionSubTitle="this section is for creating new article"
       >
         <Form layout="vertical" form={form}>
-          <Form.Item name="articleImages" label="Article Image">
+          <Form.Item name="articlesImage" label="Article Image">
             <>
               <div
                 style={{

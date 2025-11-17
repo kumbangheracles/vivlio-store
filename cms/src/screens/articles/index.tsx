@@ -113,6 +113,7 @@ const ArticleIndex = () => {
       title: "Image",
       dataIndex: "articleImages",
       key: "articleImages",
+      width: 120,
       render: (_: any, record: ArticleProperties) => {
         const src = record.articleImages?.imageUrl || DefaultImage;
 

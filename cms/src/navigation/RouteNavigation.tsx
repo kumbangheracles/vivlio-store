@@ -1,12 +1,6 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  BrowserRouter,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../helper/protectedRoute";
 import React, { Suspense } from "react";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
 import GlobalLoading from "../components/GlobalLoading";
 import { EUserRole } from "../types/user.type";
 import GuestRoute from "../helper/GuestRoute";
@@ -27,17 +21,22 @@ const RouteNavigation = () => {
   const CategoryIndex = React.lazy(() => import("../screens/category/index"));
   const CategoryEdit = React.lazy(() => import("../screens/category/Edit"));
   const CategoryDetail = React.lazy(() => import("../screens/category/Detail"));
+  //Book
   const BookIndex = React.lazy(() => import("../screens/books/index"));
   const BookEdit = React.lazy(() => import("../screens/books/Edit"));
   const BookDetail = React.lazy(() => import("../screens/books/Detail"));
+  //Genre
   const GenreIndex = React.lazy(() => import("../screens/genre/index"));
   const GenreEdit = React.lazy(() => import("../screens/genre/Edit"));
   const GenreDetail = React.lazy(() => import("../screens/genre/Detail"));
+  //User
   const UserIndex = React.lazy(() => import("../screens/users/index"));
   const UserEdit = React.lazy(() => import("../screens/users/Edit"));
   const UserDetail = React.lazy(() => import("../screens/users/Detail"));
+  //Article
   const Articleindex = React.lazy(() => import("../screens/articles/index"));
   const ArticleEdit = React.lazy(() => import("../screens/articles/Edit"));
+  const ArticleDetail = React.lazy(() => import("../screens/articles/Detail"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -263,6 +262,16 @@ const RouteNavigation = () => {
               <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>
                   <ArticleEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/article/:id/detail"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <ArticleDetail />
                 </AppLayout>
               </ProtectedRoute>
             }
