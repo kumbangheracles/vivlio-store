@@ -87,6 +87,25 @@ const ArticleIndex = () => {
       fetchAllUsers();
     }
   }, [dataArticle]);
+
+  const handleStatusChange = async (id: string, status: ArticleStatusType) => {
+    try {
+      setLoading(true);
+
+      const res = await myAxios.patch(`/articles/${id}`, { status });
+      // setDataArticle((prev) =>
+      //   prev.map((item) => (item?.id === id ? res.data : item))
+      // );
+
+      message.success("Success update status");
+      console.log("response: ", res.data);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoading(false);
+      await fetchArticles(page, limit);
+    }
+  };
   const handleDelete = async () => {
     try {
       setLoading(true);
@@ -113,26 +132,31 @@ const ArticleIndex = () => {
       title: "Image",
       dataIndex: "articleImages",
       key: "articleImages",
-      width: 120,
       render: (_: any, record: ArticleProperties) => {
         const src = record.articleImages?.imageUrl || DefaultImage;
 
         return (
           <div
             style={{
-              width: "100px",
-              height: "100px",
+              width: "120px",
+              aspectRatio: "1 / 1",
               overflow: "hidden",
               border: "2px solid gray",
               display: "flex",
-              alignItems: "center",
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
             <Image
               src={src}
               alt={record.title}
-              style={{ width: "100%", height: "100px", objectFit: "cover" }}
+              width={150}
+              height={150}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
             />
           </div>
         );
@@ -164,8 +188,10 @@ const ArticleIndex = () => {
       width: 130,
 
       render: (_: any, record: ArticleProperties) => {
+        if (!record.createdByAdminId) return <Tag>Unknown</Tag>;
         const user = dataUser.find(
-          (item) => item.id === record.createdByAdminId
+          (item: UserProperties) =>
+            (item.id as string) === record.createdByAdminId
         );
         return <Tag>{user ? user.username : "Unknown"}</Tag>;
       },
@@ -180,7 +206,7 @@ const ArticleIndex = () => {
             value={record.status as string}
             onChange={(value) => {
               const newStatus = value as ArticleStatusType;
-              // handleStatusChange(record.id!, newStatus);
+              handleStatusChange(record.id as string, newStatus);
             }}
             options={Object.values(ArticleStatusType).map((i) => ({
               value: i,
