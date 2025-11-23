@@ -7,6 +7,7 @@ import myAxios from "@/libs/myAxios";
 // import { authOptions } from "./api/auth/[...nextauth]/route";
 import { CategoryProps } from "@/types/category.types";
 import fetchBooksHome from "./actions/fetchBooksHome";
+import fetchArticles from "./actions/fetchArticles";
 // import { resolve } from "path";
 // import GlobalLoading from "@/components/GlobalLoading";
 // import { FaSpinner } from "react-icons/fa";
@@ -39,6 +40,7 @@ export const revalidate = 60;
 export default async function Home() {
   const books = await fetchBooksHome();
   const categories = await fetchCategory();
+  const articles = await fetchArticles();
   console.log("Books: ", books);
 
   await new Promise((resolve) => {
@@ -49,7 +51,11 @@ export default async function Home() {
   return (
     <>
       {/* <AppLayout isAuthPageTampil={false}> */}
-      <HomePage dataBooks={books} dataCategories={categories} />
+      <HomePage
+        dataBooks={books}
+        dataCategories={categories}
+        dataArticles={articles}
+      />
 
       {/* </AppLayout> */}
     </>

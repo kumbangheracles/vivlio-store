@@ -4,8 +4,13 @@ import { useRef, useState, useEffect } from "react";
 import useDeviceType from "@/hooks/useDeviceType";
 import BlogCard from "./BlogCard";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { ArticleProperties } from "@/types/article.type";
 
-const ListBlog: React.FC = () => {
+interface PropTypes {
+  dataArticles: ArticleProperties[];
+}
+
+const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
   const isMobile = useDeviceType();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -98,16 +103,16 @@ const ListBlog: React.FC = () => {
         <>
           <div className="w-full overflow-x-scroll mobile-cardList">
             <div className="flex items-center gap-5 w-full p-4 mobile-cardList">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <BlogCard key={i} />
+              {dataArticles.map((item) => (
+                <BlogCard key={item.id} dataAricle={item} />
               ))}
             </div>
           </div>
         </>
       ) : (
         <div ref={carouselRef} className="carousel-blog">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <BlogCard key={i} />
+          {dataArticles.map((item) => (
+            <BlogCard key={item.id} dataAricle={item} />
           ))}
         </div>
       )}

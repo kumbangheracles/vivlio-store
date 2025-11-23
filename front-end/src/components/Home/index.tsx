@@ -9,11 +9,13 @@ import { CategoryProps } from "@/types/category.types";
 import useDeviceType from "@/hooks/useDeviceType";
 import MobileBanner from "./components/MobileBanner";
 import ListBlog from "../ListBlog";
+import { ArticleProperties } from "@/types/article.type";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
   dataCategories?: CategoryProps[];
   fetchBooks?: any;
+  dataArticles?: ArticleProperties[];
 }
 
 export default function HomePage(prop: PropTypes) {
@@ -36,6 +38,16 @@ export default function HomePage(prop: PropTypes) {
     .slice(0, 5); // ambil 5 teratas
 
   // const { titleSection } = prop;
+
+  const newestArticles = prop.dataArticles
+    ?.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // terbaru dulu
+    })
+    .slice(0, 5)
+    .filter((item) => item.status === "PUBLISHED");
+
   return (
     <>
       {isMobile ? (
@@ -82,7 +94,7 @@ export default function HomePage(prop: PropTypes) {
 
             <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
 
-            <ListBlog />
+            <ListBlog dataArticles={prop.dataArticles as ArticleProperties[]} />
           </div>
         </>
       ) : (
@@ -109,7 +121,7 @@ export default function HomePage(prop: PropTypes) {
             <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
           </div>
 
-          <ListBlog />
+          <ListBlog dataArticles={prop.dataArticles as ArticleProperties[]} />
         </>
       )}
     </>
