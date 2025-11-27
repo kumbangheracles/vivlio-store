@@ -284,6 +284,10 @@ router.patch(
     const t = await sequelize.transaction();
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ message: "ID is required" });
+      }
       let profileImage = req.body.profileImage;
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const user = await User.findByPk(id, { transaction: t });

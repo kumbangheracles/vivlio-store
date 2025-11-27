@@ -57,7 +57,7 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
 
           <div className="p-4 flex flex-col gap-2 justify-start items-start">
             <h4 className="font-semibold text-[12px] sm:text-[16px] tracking-wider">
-              {dataAricle?.title || "No Content"}
+              {truncateText(dataAricle?.title as string, 20) || "No Content"}
             </h4>
             <span className="text-[10px] sm:text-sm text-gray-500">
               {truncateText(dataAricle?.description as string, 100) ||

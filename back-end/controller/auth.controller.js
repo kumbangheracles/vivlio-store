@@ -262,6 +262,7 @@ module.exports = {
 
       const payload = {
         UserInfo: {
+          id: userByIdentifier.id,
           username: userByIdentifier.username,
           role: role.name,
         },

@@ -19,9 +19,10 @@ export type ConfigState = {
 };
 
 export interface BaseResponseProps<T> {
-  code: string;
+  status: number;
   message: string;
-  payload: T;
+  result?: T;
+  data?: T;
 }
 
 export interface BaseResponsePropsNoPayload {

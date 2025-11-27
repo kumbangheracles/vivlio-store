@@ -47,7 +47,11 @@ const ArticleEdit = () => {
   ) => {
     form.validateFields();
 
-    if (isEmpty(data.title) || isEmpty(data.description)) {
+    if (
+      isEmpty(data.title) ||
+      isEmpty(data.description) ||
+      isEmpty(previewImage)
+    ) {
       message.error("All fields is required!.");
       return;
     }
@@ -261,7 +265,7 @@ const ArticleEdit = () => {
         sectionSubTitle="this section is for creating new article"
       >
         <Form layout="vertical" form={form}>
-          <Form.Item name="articlesImage" label="Article Image">
+          <Form.Item name="articlesImage" label="Article Image" required>
             <>
               <div
                 style={{

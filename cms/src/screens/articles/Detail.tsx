@@ -9,7 +9,9 @@ import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { styled } from "styled-components";
 import DefaultImg from "../../assets/images/default-img.png";
-import { ArticleImage, ArticleProperties } from "../../types/article.type";
+import { ArticleProperties } from "../../types/article.type";
+import { UserProperties } from "../../types/user.type";
+import { BaseResponseProps } from "../../types/base.type";
 
 const ArticleDetail = () => {
   const navigate = useNavigate();
@@ -17,6 +19,7 @@ const ArticleDetail = () => {
   const [dataArticle, setDataArticle] = useState<ArticleProperties | undefined>(
     undefined
   );
+  const [dataUser, setDataUser] = useState<UserProperties>();
   const fetchArticle = async () => {
     if (!id) return;
     try {
@@ -28,10 +31,27 @@ const ArticleDetail = () => {
     }
   };
 
+  const fetchUser = async (id: string) => {
+    if (!id) return;
+
+    try {
+      const resUser = await myAxios.get<BaseResponseProps<UserProperties>>(
+        `/users/${id}`
+      );
+      setDataUser(resUser?.data?.result);
+      console.log("Data User: ", resUser?.data?.result);
+    } catch (error) {
+      ErrorHandler(error);
+    }
+  };
+
   useEffect(() => {
     fetchArticle();
   }, [id]);
 
+  useEffect(() => {
+    fetchUser(dataArticle?.createdByAdminId as string);
+  }, [dataArticle?.createdByAdminId]);
   const src = dataArticle?.articleImages?.imageUrl || DefaultImg;
 
   return (
@@ -65,10 +85,13 @@ const ArticleDetail = () => {
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               <div
                 style={{
-                  width: "100%",
+                  width: "400px",
                   height: "300px",
                   overflow: "hidden",
                   border: "2px solid gray",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <Image
@@ -76,9 +99,6 @@ const ArticleDetail = () => {
                     objectFit: "cover",
                     width: "100%",
                     height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                   }}
                   src={src}
                 />
@@ -91,6 +111,10 @@ const ArticleDetail = () => {
             <DetailItem
               label="Status"
               value={<Tag>{dataArticle?.status}</Tag>}
+            />
+            <DetailItem
+              label="Created By"
+              value={<Tag>{dataUser?.username}</Tag>}
             />
           </GridContainer>
           <div>

@@ -118,6 +118,9 @@ module.exports = {
     const t = await sequelize.transaction();
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ message: "ID is required" });
+      }
       let articleImages = req.body.articleImages;
 
       const article = await Articles.findByPk(id, { transaction: t });
