@@ -199,7 +199,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 {book?.images && book?.images.length > 0 ? (
                   <Carousel
                     autoplay
-                    className="rounded-lg overflow-hidden w-[300px] p-4 m-auto"
+                    className="rounded-lg overflow-hidden flex justify-center items-center w-full sm:w-[300px] p-4 m-auto"
                   >
                     {book?.images.map((image, index) => (
                       <div key={index} className="relative h-95 w-full">
@@ -388,7 +388,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         </Card>
       </div>
 
-      <div>
+      <div className="min-h-[50vh]">
         {(similiarBooks?.length as number) > 0 ? (
           <ListBook
             dataBooks={similiarBooks}
@@ -398,8 +398,13 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         ) : (
           <>
             <div>
-              <TitleList>Similiar Books</TitleList>
-              <Empty description="No Books has similiarity to this book" />
+              <h4 className="p-4 ml-3 font-semibold tracking-wide text-xl sm:text-2xl">
+                Similiar Books
+              </h4>
+              <Empty
+                style={{ fontSize: isMobile ? 12 : 16 }}
+                description="No Books has similiarity to this book"
+              />
             </div>
           </>
         )}

@@ -350,14 +350,6 @@ const TitleRegister = styled.h1`
   text-align: center;
 `;
 
-const FooterModalOtp = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 10px;
-  letter-spacing: 1px;
-  justify-content: center;
-`;
-
 const ButtonIcon = styled(Button)`
   padding: 16px;
   width: 100%;

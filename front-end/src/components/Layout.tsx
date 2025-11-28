@@ -15,6 +15,7 @@ import { StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
 import AntdRegistry from "@/libs/AntdRegistry";
+import useDeviceType from "@/hooks/useDeviceType";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
@@ -22,6 +23,7 @@ interface LayoutProps {
 }
 const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
   const pathname = usePathname();
+  const isMobile = useDeviceType();
   const isPageAuth = pathname.startsWith("/auth");
   const isResult = pathname.startsWith("/result");
   useEffect(() => {
@@ -53,7 +55,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
                 <>
                   <WrapperLayout>
                     <Navbar dataUser={dataUser} />
-                    <WrapperChildren>
+                    <WrapperChildren isMobile={isMobile}>
                       <Suspense fallback={<GlobalLoading />}>
                         {children}
                       </Suspense>
@@ -77,8 +79,13 @@ const WrapperLayout = styled.div`
   position: relative;
 `;
 
-const WrapperChildren = styled.div`
+interface WrapperProps {
+  isMobile?: boolean;
+}
+
+const WrapperChildren = styled.div<WrapperProps>`
   margin-block: 80px;
+  /* min-height: ${({ isMobile }) => (isMobile ? "200vh" : "auto")}; */
 `;
 
 export default AppLayout;
