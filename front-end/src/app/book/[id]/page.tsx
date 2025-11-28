@@ -31,7 +31,7 @@ export async function generateStaticParams() {
 
 export const revalidate = 60;
 export default async function BookDetail({ params }: BookDetailPageProps) {
-  const { id } = await params;
+  const { id } = params;
   const session = await getServerSession(authOptions);
   const accessToken = session?.accessToken;
   const allBooks = await fetchBooksHome();

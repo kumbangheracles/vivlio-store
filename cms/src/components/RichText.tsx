@@ -1,12 +1,12 @@
 type RichTextRendererProps = {
-  html: string;
+  html?: string;
 };
 
 const RichTextRenderer = ({ html }: RichTextRendererProps) => {
   return (
     <div
       className="prose prose-invert max-w-none"
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: html as string }}
     />
   );
 };

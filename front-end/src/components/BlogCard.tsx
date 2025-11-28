@@ -5,18 +5,26 @@ import useDeviceType from "@/hooks/useDeviceType";
 import { ArticleProperties } from "@/types/article.type";
 import { truncateText } from "@/helpers/truncateText";
 import dayjs from "dayjs";
-
+import { useRouter } from "next/navigation";
 interface PropTypes {
   dataAricle: ArticleProperties;
 }
 
 const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
   const isMobile = useDeviceType();
+  const router = useRouter();
+  const handleGoToDetail = (id: string) => {
+    if (!id) return;
 
+    router.push(`/articles/detail/${id}`);
+  };
   return (
     <>
       {isMobile ? (
-        <div className="relative rounded-md w-[100px] flex-none basis-[10em] overflow-hidden h-[200px] border border-[#cacaca]">
+        <div
+          onClick={() => handleGoToDetail(dataAricle?.id as string)}
+          className="relative rounded-md w-[100px] flex-none basis-[10em] overflow-hidden h-[200px] border border-[#cacaca]"
+        >
           <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
             {dayjs(dataAricle?.createdAt).format("YYYY-MM-DD") || "No Content"}
           </span>
@@ -32,16 +40,24 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
 
           <div className="p-2 flex flex-col gap-1 justify-center items-start">
             <h4 className="font-semibold text-[10px] sm:text-[16px] tracking-wide">
-              {dataAricle?.title || "No Content"}
+              {truncateText(dataAricle?.title as string, 20) || "No Content"}
             </h4>
 
-            <span className="text-[7px] sm:text-sm text-gray-500 tracking-wider">
-              {truncateText(dataAricle?.description as string, 100)}
-            </span>
+            <div
+              className="text-[10px] sm:text-sm text-gray-500"
+              dangerouslySetInnerHTML={{
+                __html:
+                  truncateText(dataAricle?.description as string, 100) ||
+                  "No Content",
+              }}
+            ></div>
           </div>
         </div>
       ) : (
-        <div className="blog-card rounded-md border border-[#cacaca] w-[200px] h-[200px]  sm:w-[350px] sm:h-[300px] relative overflow-hidden cursor-pointer transition-all hover:shadow-xl">
+        <div
+          onClick={() => handleGoToDetail(dataAricle?.id as string)}
+          className="blog-card rounded-md border border-[#cacaca] w-[200px] h-[200px]  sm:w-[350px] sm:h-[300px] relative overflow-hidden cursor-pointer transition-all hover:shadow-xl "
+        >
           <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
             {dayjs(dataAricle?.createdAt).format("YYYY-MM-DD") || "No Content"}
           </span>
@@ -59,10 +75,14 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
             <h4 className="font-semibold text-[12px] sm:text-[16px] tracking-wider">
               {truncateText(dataAricle?.title as string, 20) || "No Content"}
             </h4>
-            <span className="text-[10px] sm:text-sm text-gray-500">
-              {truncateText(dataAricle?.description as string, 100) ||
-                "No Content"}
-            </span>
+            <div
+              className="text-[10px] sm:text-sm text-gray-500"
+              dangerouslySetInnerHTML={{
+                __html:
+                  truncateText(dataAricle?.description as string, 100) ||
+                  "No Content",
+              }}
+            ></div>
           </div>
         </div>
       )}

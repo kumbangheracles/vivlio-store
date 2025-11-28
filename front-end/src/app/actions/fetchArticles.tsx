@@ -1,9 +1,9 @@
 import myAxios from "@/libs/myAxios";
-import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { ArticleProperties } from "@/types/article.type";
 
-async function fetchArticles(): Promise<BookProps[]> {
+async function fetchArticles(): Promise<ArticleProperties[]> {
   try {
     const session = await getServerSession(authOptions);
 

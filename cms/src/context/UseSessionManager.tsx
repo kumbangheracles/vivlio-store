@@ -13,17 +13,13 @@ const TIMOUT_SESSION = SESSION_DURATION - MODAL_BEFORE;
 let remainingTime = TIMOUT_SESSION / 1000;
 
 const countdownInterval = setInterval(() => {
-  // console.log(`⏳ Session will expire in ${remainingTime} seconds`);
   remainingTime--;
   if (remainingTime <= 0) {
     clearInterval(countdownInterval);
-    console.log("⚠️ Session countdown finished");
+    console.log("Session countdown finished");
   }
 }, 1000);
-export const useSessionManager = (
-  user: UserProperties | undefined,
-  setUser?: (user: UserProperties | undefined) => void
-) => {
+export const useSessionManager = (user: UserProperties | undefined) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(30); // default 30 detik sebelum logout
   const [logoutTimer, setLogoutTimer] = useState<NodeJS.Timeout | null>(null);
@@ -37,7 +33,6 @@ export const useSessionManager = (
   const signOut = useSignOut();
   const authHeader = useAuthHeader();
 
-  // Konfigurasi (dalam milidetik)
   const SESSION_DURATION = 10 * 60 * 1000; // 10 menit
   const MODAL_BEFORE = 30 * 1000; // Tampilkan modal 30 detik sebelum habis
   const SHOW_MODAL_AT = SESSION_DURATION - MODAL_BEFORE; // 9m30s
@@ -72,7 +67,7 @@ export const useSessionManager = (
       const token = authHeader?.replace("Bearer ", "");
       if (!token) throw new Error("No auth token found");
 
-      const res = await myAxios.get("/auth/refresh", {
+      await myAxios.get("/auth/refresh", {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -156,7 +151,7 @@ export const useSessionManager = (
         open={modalVisible}
         footer={null}
         centered
-        closable={false} // opsional: mencegah close sebelum pilih
+        closable={false}
         maskClosable={false}
       >
         <div className="!p-4" style={{ padding: "1rem" }}>
