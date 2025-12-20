@@ -27,6 +27,7 @@ export type BookProps = {
   updateAt?: Date;
   isInCart?: boolean;
   quantity?: number;
+  UserCart?: { quantity?: number; id?: string };
 };
 
 export interface WishlistUser {

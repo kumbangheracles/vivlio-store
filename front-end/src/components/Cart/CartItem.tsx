@@ -8,8 +8,8 @@ import { MdDelete } from "react-icons/md";
 import useCart from "@/hooks/useCart";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { PropCheck } from ".";
-import { useAuth } from "@/hooks/useAuth";
 import myAxios from "@/libs/myAxios";
+import { ErrorHandler } from "@/helpers/handleError";
 interface PropTypes {
   book: BookProps;
   isChecked?: PropCheck[];
@@ -23,27 +23,21 @@ interface PropTypes {
   loadingIds?: boolean;
 }
 
-const CartItem = ({
-  book,
-  isChecked,
-  setIsChecked,
-  // handleChangeQuantity,
-  // quantity,
-  // setQuantity,
-  loadingIds,
-}: PropTypes) => {
+const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
   const router = useRouter();
 
   const goToDetail = (id: string) => {
     router.push(`/book/${id}`);
   };
   const [loading, setLoading] = useState<boolean>(false);
-  const [quantity, setQuantity] = useState<number>(book?.quantity as number);
+  const [quantity, setQuantity] = useState<number>(
+    book?.UserCart?.quantity as number
+  );
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const isMounted = useRef<boolean>(false);
-
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { handleAddToCart } = useCart({
     loading,
     setLoading,
@@ -51,52 +45,58 @@ const CartItem = ({
     setIsCart,
     bookId: book?.id as string,
   });
-  if (book.quantity === 0) {
-    handleAddToCart();
+  const handleChangeQuantity = (type: "add" | "remove", id?: string) => {
+    if (!id) return;
 
-    return;
-  }
+    // 🔥 CLEAR timer lama (debounce)
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    const newQty = type === "add" ? quantity + 1 : Math.max(quantity - 1, 1);
+
+    setQuantity(newQty);
+    setIsLoading(true);
+
+    timerRef.current = setTimeout(async () => {
+      try {
+        await myAxios.patch(`/cart/${id}`, { type });
+      } catch (err) {
+        ErrorHandler(err);
+      } finally {
+        if (isMounted.current) {
+          setIsLoading(false);
+        }
+      }
+    }, 600);
+  };
+  useEffect(() => {
+    setIsCart(true);
+    if (book.UserCart?.quantity === 0) {
+      handleChangeQuantity("add", book?.UserCart?.id);
+    }
+  }, [isCart, book.UserCart?.quantity]);
 
   const handleCart = () => {
     handleAddToCart();
+  };
+  useEffect(() => {
     setIsOpen(false);
     router.refresh();
-  };
+  }, [isCart]);
+
   useEffect(() => {
     isMounted.current = true;
 
     return () => {
       isMounted.current = false;
+
+      // 🔥 WAJIB bersihkan timer saat unmount
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, []);
-
-  const handleChangeQuantity = async (type?: "add" | "remove", id?: string) => {
-    if (!id) return;
-
-    try {
-      setIsLoading(true);
-
-      const newQty = type === "add" ? quantity + 1 : Math.max(quantity - 1, 1);
-
-      setQuantity(newQty);
-
-      const timer = setTimeout(async () => {
-        try {
-          await myAxios.patch(`/books/${id}`, { quantity: newQty });
-        } catch (err) {
-          console.error(err);
-        } finally {
-          if (isMounted.current) {
-            setIsLoading(false);
-          }
-        }
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    } catch (error) {
-      console.error("Error changing quantity:", error);
-    }
-  };
 
   return (
     <div
@@ -167,7 +167,7 @@ const CartItem = ({
                 <Button
                   disabled={isLoading || quantity === 1}
                   onClick={() =>
-                    handleChangeQuantity?.("remove", book?.id as string)
+                    handleChangeQuantity("remove", book?.UserCart?.id as string)
                   }
                 >
                   {isLoading ? <Spin size="small" /> : "-"}
@@ -176,7 +176,7 @@ const CartItem = ({
                 <Button
                   disabled={isLoading}
                   onClick={() =>
-                    handleChangeQuantity?.("add", book?.id as string)
+                    handleChangeQuantity("add", book?.UserCart?.id as string)
                   }
                 >
                   {isLoading ? <Spin size="small" /> : "+"}
@@ -249,7 +249,7 @@ const CartItem = ({
               <Button
                 disabled={isLoading || quantity === 1}
                 onClick={() =>
-                  handleChangeQuantity?.("remove", book?.id as string)
+                  handleChangeQuantity?.("remove", book?.UserCart?.id as string)
                 }
               >
                 {isLoading ? <Spin size="small" /> : "-"}
@@ -258,7 +258,7 @@ const CartItem = ({
               <Button
                 disabled={isLoading}
                 onClick={() =>
-                  handleChangeQuantity?.("add", book?.id as string)
+                  handleChangeQuantity?.("add", book?.UserCart?.id as string)
                 }
               >
                 {isLoading ? <Spin size="small" /> : "+"}

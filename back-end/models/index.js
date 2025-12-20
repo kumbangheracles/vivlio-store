@@ -140,6 +140,21 @@ Book.belongsToMany(User, {
   as: "cartUsers",
 });
 
+UserCart.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
+
+UserCart.belongsTo(Book, {
+  foreignKey: "bookId",
+  as: "book",
+});
+
+Book.hasMany(UserCart, {
+  foreignKey: "bookId",
+  as: "cartItems",
+});
+
 //UserWishlist ↔ Book
 
 UserWishlist.belongsTo(Book, { foreignKey: "bookId", as: "book" });

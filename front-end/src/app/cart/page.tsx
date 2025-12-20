@@ -1,6 +1,6 @@
 import CartIndex from "@/components/Cart";
-import fetchBooksHome from "../actions/fetchBooksHome";
 import { Metadata } from "next";
+import fetchCartedBooks from "../actions/fetchCartedBooks";
 
 export const metadata: Metadata = {
   title: "Vivlio - Cart",
@@ -8,12 +8,9 @@ export const metadata: Metadata = {
 };
 
 const CartPage = async () => {
-  const dataBooks = await fetchBooksHome();
-  const cartedBook = dataBooks.filter((item) => item.isInCart === true);
-
-  const key = Math.random();
-  // console.log("Carted Book: ", cartedBook);
-  return <CartIndex books={cartedBook} key={key} />;
+  const dataCartedBooks = await fetchCartedBooks();
+  console.log("Data Carted Book: ", dataCartedBooks);
+  return <CartIndex books={dataCartedBooks} />;
 };
 
 export default CartPage;

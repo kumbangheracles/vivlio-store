@@ -4,6 +4,7 @@ const {
   BookStats,
   BookImage,
   Genre,
+  User,
 } = require("../models/index");
 
 module.exports = {
@@ -56,39 +57,73 @@ module.exports = {
     try {
       const userId = req.id;
       const { id } = req.params;
+      const { type } = req.body; // 'add' | 'remove'
+      console.log("CART ID:", id);
+      console.log("USER ID:", userId);
+      console.log("Type:", type);
 
       if (!userId) {
-        return res.status(404).json({
-          status: 404,
+        return res.status(401).json({
+          status: 401,
           message: "Unauthorized",
         });
       }
 
       if (!id) {
-        return res.status(404).json({
-          status: 404,
-          message: "Carted book not found",
+        return res.status(400).json({
+          status: 400,
+          message: "Cart item id is required",
         });
       }
 
-      const updateQuantityBookInCart = UserCart.findOne({
-        where: id,
+      if (!["add", "remove"].includes(type)) {
+        return res.status(400).json({
+          status: 400,
+          message: "Type must be 'add' or 'remove'",
+        });
+      }
+
+      const cartItem = await UserCart.findOne({
+        where: {
+          id,
+          userId,
+        },
       });
 
-      if (updateQuantityBookInCart) {
-        console.log("============ Update Quantity Success ========== ");
+      if (!cartItem) {
+        return res.status(404).json({
+          status: 404,
+          message: "Cart item not found",
+        });
       }
+
+      let newQty = cartItem.quantity;
+
+      if (type === "add") {
+        newQty += 1;
+      } else if (type === "remove") {
+        newQty = Math.max(1, newQty - 1);
+      }
+
+      console.log("Berhasil update quantity");
+
+      cartItem.quantity = newQty;
+      await cartItem.save();
 
       res.status(200).json({
         status: 200,
-        message: "Success",
-        results: updateQuantityBookInCart,
+        message: "Quantity updated successfully",
+        results: {
+          id: cartItem.id,
+          bookId: cartItem.bookId,
+          quantity: cartItem.quantity,
+        },
       });
     } catch (error) {
+      console.error("UPDATE CART QUANTITY ERROR:", error);
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",
-        data: [],
       });
     }
   },
@@ -96,6 +131,10 @@ module.exports = {
   async getAllCartedBook(req, res) {
     try {
       const userId = req.id;
+
+      if (!userId) {
+        return res.status(400).json({ status: 400, message: "Unauthorized" });
+      }
 
       const cartedBook = await UserCart.findAll({
         where: { userId },
@@ -111,13 +150,28 @@ module.exports = {
           },
         ],
       });
+      const user = await User.findByPk(userId, {
+        include: [
+          {
+            model: Book,
+            as: "cartBooks",
+            through: { attributes: ["quantity", "id"] },
+            include: [
+              { model: BookStats, as: "stats" },
+              { model: BookImage, as: "images" },
+              { model: Genre, as: "genres", through: { attributes: [] } },
+            ],
+          },
+        ],
+      });
 
       res.status(200).json({
         status: 200,
         message: "Success",
-        results: cartedBook,
+        results: user?.cartBooks || [],
       });
     } catch (error) {
+      console.error("GET CART ERROR:", error);
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",

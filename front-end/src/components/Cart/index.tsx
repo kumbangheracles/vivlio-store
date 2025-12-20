@@ -5,12 +5,9 @@ import { MdDelete } from "react-icons/md";
 import styled from "styled-components";
 import { cn } from "@/libs/cn";
 import { BookProps } from "@/types/books.type";
-import useDeviceType from "@/hooks/useDeviceType";
 import CartItem from "./CartItem";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
-
 import { useRouter } from "next/navigation";
-import myAxios from "@/libs/myAxios";
 import { useAuth } from "@/hooks/useAuth";
 interface PropTypes {
   books: BookProps[];
@@ -34,13 +31,10 @@ const CartIndex = ({ books }: PropTypes) => {
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<PropCheck[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
-  const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
-
   const [quantities, setQuantities] = useState<Record<string, number>>(
     quantityBooksRecord ?? {}
   );
 
-  const isMobile = useDeviceType();
   const router = useRouter();
   useEffect(() => {
     if (auth.loading) return;
@@ -51,8 +45,6 @@ const CartIndex = ({ books }: PropTypes) => {
   }, [auth.loading, auth.accessToken]);
 
   useEffect(() => {
-    // console.log("Is Checked: ", isChecked);
-
     if (isChecked.length === books?.length) {
       setCheckedAll(true);
     } else {
@@ -113,59 +105,6 @@ const CartIndex = ({ books }: PropTypes) => {
     }
   }, [books]);
 
-  // const handleChangeQuantity = (type?: "add" | "remove", id?: string) => {
-  //   try {
-  //     let changePrev = 0;
-  //     setQuantity((prev) => {
-  //       if (type === "add") {
-  //         changePrev = prev + 1;
-  //         myAxios.patch(`/books/${id}`, { quantity: changePrev });
-  //         console.log("Add: ", changePrev);
-  //         prev = changePrev;
-  //       } else if (type === "remove") {
-  //         changePrev = prev > 1 ? prev - 1 : 1;
-  //         myAxios.patch(`/books/${id}`, { quantity: changePrev });
-  //         prev = changePrev;
-  //       }
-  //       return prev;
-  //     });
-  //   } catch (error) {
-  //     console.error("Error changing quantity:", error);
-  //   }
-  // };
-
-  const handleChangeQuantity = async (type?: "add" | "remove", id?: string) => {
-    if (!id || !type) return;
-
-    try {
-      // Ambil current quantity dari state sekarang
-      const currentQty = quantities[id] || 1;
-      let newQty = currentQty;
-
-      if (type === "add") {
-        newQty = currentQty + 1;
-      } else if (type === "remove") {
-        newQty = currentQty > 1 ? currentQty - 1 : 1;
-      }
-
-      // Update state lokal dulu agar UI langsung terasa responsif
-      setQuantities((prev) => ({
-        ...prev,
-        [id]: newQty,
-      }));
-
-      // Lalu kirim patch ke backend
-      await myAxios.patch(`/books/${id}`, { quantity: newQty });
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-      // Optional: rollback ke quantity sebelumnya jika gagal
-      setQuantities((prev) => ({
-        ...prev,
-        [id]: quantities[id],
-      }));
-    }
-  };
-
   const totalQuantity: number = (isCheckedBooks ?? []).reduce(
     (acc: number, item: BookProps) => acc + Number(item.quantity),
     0
@@ -216,6 +155,7 @@ const CartIndex = ({ books }: PropTypes) => {
                 <>
                   {books.map((item) => (
                     <CartItem
+                      key={item.id}
                       book={item}
                       isChecked={isChecked}
                       setIsChecked={setIsChecked}
