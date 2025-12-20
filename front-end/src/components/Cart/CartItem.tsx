@@ -75,7 +75,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
     if (book.UserCart?.quantity === 0) {
       handleChangeQuantity("add", book?.UserCart?.id);
     }
-  }, [isCart, book.UserCart?.quantity]);
+  }, [book.UserCart?.quantity]);
 
   const handleCart = () => {
     handleAddToCart();
@@ -111,7 +111,11 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
             if (checked) {
               setIsChecked?.((prev) => [
                 ...prev,
-                { id: book?.id as string, bookTitle: book?.title },
+                {
+                  id: book?.id as string,
+                  bookTitle: book?.title,
+                  idCart: book?.UserCart?.id as string,
+                },
               ]);
             } else {
               setIsChecked?.((prev) =>
@@ -196,7 +200,11 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
             if (checked) {
               setIsChecked?.((prev) => [
                 ...prev,
-                { id: book?.id as string, bookTitle: book?.title },
+                {
+                  id: book?.id as string,
+                  bookTitle: book?.title,
+                  idCart: book?.UserCart?.id as string,
+                },
               ]);
             } else {
               setIsChecked?.((prev) =>
@@ -275,7 +283,8 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
         closable
         centered={true}
         closeIcon={false}
-        loading={loading}
+        // loading={loading}
+        confirmLoading={loading}
         children={
           <span className="flex justify-center">
             Are you sure want to delete {book?.title} from cart?

@@ -6,7 +6,7 @@ const {
   Genre,
   User,
 } = require("../models/index");
-
+const { Op } = require("sequelize");
 module.exports = {
   async getCartedBookById(req, res) {
     try {
@@ -213,6 +213,12 @@ module.exports = {
       const userId = req.id;
       const { bookId } = req.params;
 
+      if (!bookId) {
+        return res
+          .status(404)
+          .json({ status: 404, message: "Book id not found in cart" });
+      }
+
       const deleted = await UserCart.destroy({ where: { userId, bookId } });
       if (!deleted) {
         return res
@@ -224,7 +230,36 @@ module.exports = {
         status: 200,
         message: "Removed from cart success",
       });
-    } catch (errror) {
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+
+  async bulkRemoveFromCart(req, res) {
+    try {
+      const userId = req.id;
+      const { ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res
+          .status(404)
+          .json({ status: 404, message: "No IDs Provided" });
+      }
+
+      const result = await UserCart.destroy({
+        where: { id: { [Op.in]: ids }, userId },
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: "Bulk remove cart success",
+        result,
+      });
+    } catch (error) {
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",

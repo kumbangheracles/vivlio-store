@@ -7,5 +7,10 @@ router.get("/", authMiddleware, cartController.getAllCartedBook);
 router.get("/:id", authMiddleware, cartController.getCartedBookById);
 router.patch("/:id", authMiddleware, cartController.updateQuantityBook);
 router.post("/", authMiddleware, cartController.addToCart);
+router.delete(
+  "/bulk-remove",
+  authMiddleware,
+  cartController.bulkRemoveFromCart
+);
 router.delete("/:bookId", authMiddleware, cartController.removeFromCart);
 module.exports = router;

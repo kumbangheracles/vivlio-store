@@ -1,5 +1,14 @@
 "use client";
-import { Button, Card, Checkbox, Divider, Empty, message } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Divider,
+  Empty,
+  message,
+  Modal,
+  Result,
+} from "antd";
 import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import styled from "styled-components";
@@ -9,12 +18,15 @@ import CartItem from "./CartItem";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import myAxios from "@/libs/myAxios";
+import { ErrorHandler } from "@/helpers/handleError";
 interface PropTypes {
   books: BookProps[];
 }
 
 export interface PropCheck {
   id: string;
+  idCart: string;
   bookTitle?: string;
 }
 
@@ -22,15 +34,18 @@ const CartIndex = ({ books }: PropTypes) => {
   const auth = useAuth();
 
   const quantityBooksRecord = books?.reduce((acc, item) => {
-    if (item?.id && typeof item?.quantity === "number") {
-      acc[item.id] = item.quantity;
+    if (item?.UserCart?.id && typeof item?.UserCart?.quantity === "number") {
+      acc[item?.UserCart?.id] = item?.UserCart.quantity;
     }
     return acc;
   }, {} as Record<string, number>);
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<PropCheck[]>([]);
+  const [checkedIds, setCheckedIds] = useState<Array<string>>([]);
   const [quantity, setQuantity] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [quantities, setQuantities] = useState<Record<string, number>>(
     quantityBooksRecord ?? {}
   );
@@ -66,8 +81,9 @@ const CartIndex = ({ books }: PropTypes) => {
     if (checked) {
       const allBooks =
         books?.map((book) => ({
-          id: book.id as string,
+          id: book?.id as string,
           bookTitle: book.title,
+          idCart: book?.UserCart?.id as string,
         })) ?? [];
 
       setIsChecked(allBooks);
@@ -75,6 +91,28 @@ const CartIndex = ({ books }: PropTypes) => {
     } else {
       setIsChecked([]);
       setCheckedAll(false);
+    }
+  };
+
+  const isCheckedIds = isChecked.map((item) => item.idCart);
+  useEffect(() => {
+    setCheckedIds(isCheckedIds);
+
+    console.log("Ids: ", checkedIds);
+  }, [isChecked]);
+
+  const handleBulkDelete = async (ids: Array<string>) => {
+    try {
+      setIsLoading(true);
+
+      await myAxios.delete("/cart/bulk-remove", { data: { ids: ids } });
+      message.success("Success delete all books from cart");
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setIsOpen(false);
+      setIsLoading(false);
+      router.refresh();
     }
   };
   // Simpan ke localStorage setiap kali isChecked berubah
@@ -115,14 +153,15 @@ const CartIndex = ({ books }: PropTypes) => {
       {books.length === 0 ? (
         <div className="p-4 w-full h-full">
           <div className="flex items-center justify-center h-screen w-full flex-col gap-3">
-            <Empty description="Your cart is empty" />
-            <Button
-              type="primary"
-              className="!p-4"
-              onClick={() => router.push("/")}
-            >
-              Let's Shop First
-            </Button>
+            <Result
+              status={404}
+              title={"Looks like you haven’t added anything to your cart yet."}
+              extra={
+                <Button type="primary" onClick={() => router.push("/")}>
+                  Let's Shop First
+                </Button>
+              }
+            />
           </div>
         </div>
       ) : (
@@ -140,6 +179,7 @@ const CartIndex = ({ books }: PropTypes) => {
                   <Button
                     // loading={}
                     icon={<MdDelete />}
+                    onClick={() => setIsOpen(true)}
                     className={`!flex !items-center !gap-1 !text-base !cursor-pointer !p-2 !bg-red-400 !rounded-xl !font-bold !text-white hover:!bg-red-900 ${cn(
                       !checkedAll && "!hidden"
                     )} `}
@@ -232,6 +272,25 @@ const CartIndex = ({ books }: PropTypes) => {
               </button>
             </div>
           </div>
+
+          <Modal
+            open={isOpen}
+            onCancel={() => setIsOpen(false)}
+            onOk={() => handleBulkDelete(checkedIds)}
+            title={
+              <h1 className="flex justify-center p-2">Remove from cart</h1>
+            }
+            closable
+            centered={true}
+            closeIcon={false}
+            // loading={loading}
+            confirmLoading={isLoading}
+            children={
+              <span className="flex justify-center">
+                Are you sure want to delete these book from cart?
+              </span>
+            }
+          />
         </>
       )}
     </div>
