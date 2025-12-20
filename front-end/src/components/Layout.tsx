@@ -85,6 +85,7 @@ interface WrapperProps {
 
 const WrapperChildren = styled.div<WrapperProps>`
   margin-block: 80px;
+  min-height: 100vh;
   /* min-height: ${({ isMobile }) => (isMobile ? "200vh" : "auto")}; */
 `;
 

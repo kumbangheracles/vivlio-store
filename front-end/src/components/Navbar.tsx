@@ -28,7 +28,7 @@ export default function Navbar({ dataUser }: PropTypes) {
   const isMobile = useDeviceType();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
-  const [isBlue, setIsBlue] = useState<boolean>(true);
+  const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const handleLogout = async () => {
     try {
@@ -49,7 +49,7 @@ export default function Navbar({ dataUser }: PropTypes) {
     }
   };
 
-  console.log("Auth: ", auth);
+  // console.log("Auth: ", auth);
 
   const goToCart = () => {
     if (auth.loading) return;
@@ -120,6 +120,7 @@ export default function Navbar({ dataUser }: PropTypes) {
 
   return (
     <>
+      {isMobile && path !== "/cart"}
       <nav className="fixed top-0 w-full bg-white z-[999] shadow-sm transition-all">
         {/* Top Navbar */}
         <div className="flex justify-between items-center px-5 md:px-[100px] py-3">

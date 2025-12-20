@@ -28,9 +28,14 @@ const ListBook: React.FC<BookTypes> = ({
       {isMobile ? (
         <>
           <div className="mt-3 pt-2 bg-gray-100">
-            <h4 className="font-semibold tracking-wider text-[11px] px-2">
-              {titleSection}
-            </h4>
+            <div className="flex justify-between">
+              <h4 className="font-semibold tracking-wider text-[11px] px-2">
+                {titleSection}
+              </h4>
+              <h4 className="text-gray-500 font-normal tracking-normal text-[11px] ">
+                See All
+              </h4>
+            </div>
 
             <div className="flex gap-3 overflow-x-scroll scrollbar-hide p-4">
               {dataBooks?.slice(0, 8).map((item, index) => (

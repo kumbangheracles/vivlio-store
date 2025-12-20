@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Form, Input, Divider, message, Button, Card } from "antd";
@@ -9,7 +9,6 @@ import {
   GoogleCircleFilled,
   TwitterCircleFilled,
 } from "@ant-design/icons";
-import AOS from "aos";
 import styled from "styled-components";
 
 interface LoginFormState {
@@ -231,9 +230,12 @@ export default LoginForm;
 
 const TitleRegister = styled.h1`
   font-weight: 700;
-  font-size: 24px;
+  font-size: 18px;
   letter-spacing: 1px;
   text-align: center;
+  @media (min-width: 720px) {
+    font-size: 24px;
+  }
 `;
 
 const ButtonIcon = styled(Button)`
@@ -260,7 +262,11 @@ const Container = styled.div`
   align-items: center;
   height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+
+  padding: 10px;
+  @media (min-width: 720px) {
+    padding: 0;
+  }
 `;
 
 const WrapperDeviderTop = styled.div`
@@ -272,13 +278,18 @@ const WrapperDeviderTop = styled.div`
   p {
     letter-spacing: 1px;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 10px;
     color: grey;
     position: absolute;
-    left: 27%;
+    left: 20%;
     padding: 10px;
     bottom: -2px;
     background-color: white;
+
+    @media (min-width: 720px) {
+      font-size: 12px;
+      left: 27%;
+    }
   }
 `;
 const WrapperDeviderBot = styled.div`
@@ -291,13 +302,17 @@ const WrapperDeviderBot = styled.div`
   p {
     letter-spacing: 1px;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 10px;
     color: grey;
     position: absolute;
     left: 45%;
     padding: 10px;
     bottom: -2px;
     background-color: white;
+  }
+
+  @media (min-width: 720px) {
+    font-size: 12px;
   }
 `;
 
@@ -307,6 +322,11 @@ const WrapperSignIn = styled.div`
   padding: 10px;
   justify-content: center;
   gap: 10px;
+  font-size: 12px;
+
+  @media (min-width: 720px) {
+    font-size: 14px;
+  }
 `;
 
 const WrapperContent = styled.div``;

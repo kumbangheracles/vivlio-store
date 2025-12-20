@@ -52,6 +52,47 @@ module.exports = {
     }
   },
 
+  async updateQuantityBook(req, res) {
+    try {
+      const userId = req.id;
+      const { id } = req.params;
+
+      if (!userId) {
+        return res.status(404).json({
+          status: 404,
+          message: "Unauthorized",
+        });
+      }
+
+      if (!id) {
+        return res.status(404).json({
+          status: 404,
+          message: "Carted book not found",
+        });
+      }
+
+      const updateQuantityBookInCart = UserCart.findOne({
+        where: id,
+      });
+
+      if (updateQuantityBookInCart) {
+        console.log("============ Update Quantity Success ========== ");
+      }
+
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: updateQuantityBookInCart,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+
   async getAllCartedBook(req, res) {
     try {
       const userId = req.id;

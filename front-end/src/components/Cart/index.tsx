@@ -23,6 +23,7 @@ export interface PropCheck {
 
 const CartIndex = ({ books }: PropTypes) => {
   const auth = useAuth();
+
   const quantityBooksRecord = books?.reduce((acc, item) => {
     if (item?.id && typeof item?.quantity === "number") {
       acc[item.id] = item.quantity;
@@ -33,6 +34,8 @@ const CartIndex = ({ books }: PropTypes) => {
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<PropCheck[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
+  const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
+
   const [quantities, setQuantities] = useState<Record<string, number>>(
     quantityBooksRecord ?? {}
   );
@@ -48,7 +51,7 @@ const CartIndex = ({ books }: PropTypes) => {
   }, [auth.loading, auth.accessToken]);
 
   useEffect(() => {
-    console.log("Is Checked: ", isChecked);
+    // console.log("Is Checked: ", isChecked);
 
     if (isChecked.length === books?.length) {
       setCheckedAll(true);
@@ -152,10 +155,7 @@ const CartIndex = ({ books }: PropTypes) => {
       }));
 
       // Lalu kirim patch ke backend
-      const res = await myAxios.patch(`/books/${id}`, { quantity: newQty });
-
-      // Optional: bisa log hasil dari server untuk debugging
-      console.log(` Quantity updated for ${id}:`, res.data);
+      await myAxios.patch(`/books/${id}`, { quantity: newQty });
     } catch (error) {
       console.error("Error updating quantity:", error);
       // Optional: rollback ke quantity sebelumnya jika gagal
@@ -172,7 +172,7 @@ const CartIndex = ({ books }: PropTypes) => {
   );
 
   return (
-    <div className="p-4 ">
+    <div>
       {books.length === 0 ? (
         <div className="p-4 w-full h-full">
           <div className="flex items-center justify-center h-screen w-full flex-col gap-3">
@@ -188,20 +188,18 @@ const CartIndex = ({ books }: PropTypes) => {
         </div>
       ) : (
         <>
-          {/* {isMobile ? (
-            <></>
-          ) : ( */}
-          <>
-            <h4 className="font-bold text-2xl">Cart</h4>
+          <div className="sm:p-4 p-0">
+            <h4 className="font-bold  text-lg sm:text-2xl">Cart</h4>
             <div className="relative w-full flex flex-col sm:flex-row gap-6">
-              <div className="flex justify-start flex-col !w-[370px] sm:!w-[65%]">
-                <div className="flex items-center justify-between p-3 m-3 w-full border-gray-300 border rounded-xl shadow-md transition-all">
+              <div className="flex justify-start flex-col !w-full sm:!w-[65%]">
+                <div className="hidden sm:flex items-center justify-between p-3 my-3 w-full border-gray-300 border rounded-xl shadow-md transition-all">
                   <div className="flex items-center gap-3 p-2 text-base">
                     <Checkbox checked={checkedAll} onChange={handleCheckAll} />
                     <h4>Select All {`(${isCheckedBooks?.length})`}</h4>
                   </div>
 
                   <Button
+                    // loading={}
                     icon={<MdDelete />}
                     className={`!flex !items-center !gap-1 !text-base !cursor-pointer !p-2 !bg-red-400 !rounded-xl !font-bold !text-white hover:!bg-red-900 ${cn(
                       !checkedAll && "!hidden"
@@ -222,7 +220,7 @@ const CartIndex = ({ books }: PropTypes) => {
                       isChecked={isChecked}
                       setIsChecked={setIsChecked}
                       books={books}
-                      handleChangeQuantity={handleChangeQuantity}
+                      // handleChangeQuantity={handleChangeQuantity}
                       quantity={quantity}
                       setQuantity={setQuantity}
                       quantities={quantities}
@@ -231,7 +229,7 @@ const CartIndex = ({ books }: PropTypes) => {
                   ))}
                 </>
               </div>
-              <div className="w-full sm:w-[30%]">
+              <div className="w-full hidden sm:block sm:w-[30%]">
                 <div className="p-7 w-full shadow-md border border-gray-300 rounded-xl sticky top-35">
                   <h4 className="font-bold mb-2">Cart Review</h4>
                   <div className="flex items-center justify-between text-gray-500">
@@ -270,8 +268,30 @@ const CartIndex = ({ books }: PropTypes) => {
                 </div>
               </div>
             </div>
-          </>
-          {/* )} */}
+          </div>
+          <div className="sm:hidden flex w-full px-2 py-4 justify-between base-blue fixed shadow-md bottom-0 left-0">
+            <div className="flex items-center gap-2">
+              <Checkbox checked={checkedAll} onChange={handleCheckAll} />
+              <p className="text-sm">Select All</p>
+            </div>
+
+            <div className="flex items-center gap-1 text-sm">
+              <p>
+                {" "}
+                Rp
+                {isCheckedBooks
+                  ?.reduce(
+                    (acc, item) =>
+                      acc + Number(item?.price || 0) * Number(item?.quantity),
+                    0
+                  )
+                  .toLocaleString("id-ID")}
+              </p>
+              <button className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300">
+                Checkout {`(${isCheckedBooks?.length})`}
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>

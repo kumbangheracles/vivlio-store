@@ -12,7 +12,7 @@ const CartPage = async () => {
   const cartedBook = dataBooks.filter((item) => item.isInCart === true);
 
   const key = Math.random();
-  console.log("Carted Book: ", cartedBook);
+  // console.log("Carted Book: ", cartedBook);
   return <CartIndex books={cartedBook} key={key} />;
 };
 

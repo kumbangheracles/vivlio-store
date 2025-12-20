@@ -1,12 +1,12 @@
 "use client";
 import { BookProps } from "@/types/books.type";
-import { Button, Checkbox, message, Modal } from "antd";
+import { Button, Checkbox, message, Modal, Spin } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../assets/images/default-img.png";
 import { MdDelete } from "react-icons/md";
 import useCart from "@/hooks/useCart";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { PropCheck } from ".";
 import { useAuth } from "@/hooks/useAuth";
 import myAxios from "@/libs/myAxios";
@@ -20,18 +20,17 @@ interface PropTypes {
   handleChangeQuantity?: (type?: "add" | "remove", id?: string) => void;
   quantities?: Record<string, number>;
   setQuantities?: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+  loadingIds?: boolean;
 }
 
 const CartItem = ({
   book,
   isChecked,
-  books,
   setIsChecked,
   // handleChangeQuantity,
   // quantity,
   // setQuantity,
-  quantities,
-  setQuantities,
+  loadingIds,
 }: PropTypes) => {
   const router = useRouter();
 
@@ -42,6 +41,8 @@ const CartItem = ({
   const [quantity, setQuantity] = useState<number>(book?.quantity as number);
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isMounted = useRef<boolean>(false);
 
   const { handleAddToCart } = useCart({
     loading,
@@ -56,31 +57,42 @@ const CartItem = ({
     return;
   }
 
-  console.log("Books: quantity: ", quantity);
-
   const handleCart = () => {
     handleAddToCart();
     setIsOpen(false);
     router.refresh();
   };
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleChangeQuantity = async (type?: "add" | "remove", id?: string) => {
     if (!id) return;
 
     try {
-      setQuantity((prev) => {
-        // Hitung quantity baru
-        const newQty = type === "add" ? prev + 1 : Math.max(prev - 1, 1);
+      setIsLoading(true);
 
-        // Update backend (async terpisah)
-        myAxios
-          .patch(`/books/${id}`, { quantity: newQty })
-          .then(() => console.log("Updated:", newQty))
-          .catch((err) => console.error("Failed to update:", err));
+      const newQty = type === "add" ? quantity + 1 : Math.max(quantity - 1, 1);
 
-        // Return nilai baru ke React
-        return newQty;
-      });
+      setQuantity(newQty);
+
+      const timer = setTimeout(async () => {
+        try {
+          await myAxios.patch(`/books/${id}`, { quantity: newQty });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          if (isMounted.current) {
+            setIsLoading(false);
+          }
+        }
+      }, 1000);
+
+      return () => clearTimeout(timer);
     } catch (error) {
       console.error("Error changing quantity:", error);
     }
@@ -89,9 +101,94 @@ const CartItem = ({
   return (
     <div
       key={book?.id}
-      className="flex items-center justify-between p-3 m-3 border border-gray-300 rounded-xl shadow-md !w-full"
+      className="flex items-center gap-3 sm:justify-between p-3 mx-1 mt-2 sm:mt-0 sm:mx-0 sm:m-3 border border-gray-300 rounded-xl sm:shadow-md !w-full bg-white"
     >
-      <div className="flex items-center gap-3">
+      <div className="sm:flex hidden items-center gap-3 w-full">
+        <Checkbox
+          checked={isChecked?.some((item) => item.id === book.id)}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            if (checked) {
+              setIsChecked?.((prev) => [
+                ...prev,
+                { id: book?.id as string, bookTitle: book?.title },
+              ]);
+            } else {
+              setIsChecked?.((prev) =>
+                prev.filter((item) => item.id !== book?.id)
+              );
+            }
+          }}
+        />
+        <div className="flex items-center sm:justify-between w-full gap-4 ">
+          {/* <p className="text-sm w-[100px] !font-medium">{book.author}</p> */}
+          <div
+            className="flex items-center justify-center w-[80px] h-[100px] rounded-sm sm:rounded-md overflow-hidden border-gray-300 border cursor-pointer"
+            onClick={() => goToDetail(book?.id as string)}
+          >
+            <Image
+              src={book?.images![0].imageUrl || DefaultImage}
+              width={100}
+              height={100}
+              className="object-cover w-full h-full"
+              alt={`cart-img-${book?.title}`}
+            />
+          </div>
+
+          <div className="sm:flex sm:justify-between w-full hidden gap-1">
+            <div className="flex flex-col gap-1">
+              <span className="bg-gray-300 max-w-max rounded-md p-1 text-[10px] sm:text-xs text-gray-700 font-bold">
+                {book?.book_type}
+              </span>
+              <h4 className="text-gray-700 text-[10px] sm:text-sm">
+                {book?.title}
+              </h4>
+              <span className="sm:text-sm text-[12px] font-bold">
+                {Number(book?.price).toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0,
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 relative z-10">
+              <Button
+                disabled={isLoading}
+                color="default"
+                onClick={() => setIsOpen(true)}
+              >
+                {isLoading ? (
+                  <Spin size="small" />
+                ) : (
+                  <MdDelete className="text-red-400" />
+                )}
+              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  disabled={isLoading || quantity === 1}
+                  onClick={() =>
+                    handleChangeQuantity?.("remove", book?.id as string)
+                  }
+                >
+                  {isLoading ? <Spin size="small" /> : "-"}
+                </Button>
+                <span>{quantity}</span>
+                <Button
+                  disabled={isLoading}
+                  onClick={() =>
+                    handleChangeQuantity?.("add", book?.id as string)
+                  }
+                >
+                  {isLoading ? <Spin size="small" /> : "+"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =================== Mobile View =========================*/}
+      <div className="flex gap-3 sm:hidden">
         <Checkbox
           checked={isChecked?.some((item) => item.id === book.id)}
           onChange={(e) => {
@@ -109,25 +206,26 @@ const CartItem = ({
           }}
         />
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center justify-center w-[80px] h-[100px] rounded-sm sm:rounded-md overflow-hidden border-gray-300 border cursor-pointer"
           onClick={() => goToDetail(book?.id as string)}
         >
-          <div className="flex items-center justify-center w-[80px] h-[100px]  rounded-md overflow-hidden border-gray-300 border">
-            <Image
-              src={book?.images![0].imageUrl || DefaultImage}
-              width={100}
-              height={100}
-              className="object-cover w-full h-full"
-              alt={`cart-img-${book?.title}`}
-            />
-          </div>
-
-          <div>
-            <span className="bg-gray-300 rounded-md p-1 text-xs text-gray-700 font-bold">
+          <Image
+            src={book?.images![0].imageUrl || DefaultImage}
+            width={100}
+            height={100}
+            className="object-cover w-full h-full"
+            alt={`cart-img-${book?.title}`}
+          />
+        </div>
+        <div className="flex flex-col n gap-1">
+          <div className="flex flex-col gap-1">
+            <span className="bg-gray-300 max-w-max rounded-md p-1 text-[10px] sm:text-xs text-gray-700 font-bold">
               {book?.book_type}
             </span>
-            <h4 className="text-gray-700 text-sm">{book?.title}</h4>
-            <span className="text-sm font-bold">
+            <h4 className="text-gray-700 text-[10px] sm:text-sm">
+              {book?.title}
+            </h4>
+            <span className="sm:text-sm text-[12px] font-bold">
               {Number(book?.price).toLocaleString("id-ID", {
                 style: "currency",
                 currency: "IDR",
@@ -135,28 +233,40 @@ const CartItem = ({
               })}
             </span>
           </div>
+          <div className="flex justify-start items-center gap-3">
+            <Button
+              disabled={isLoading}
+              color="default"
+              onClick={() => setIsOpen(true)}
+            >
+              {isLoading ? (
+                <Spin size="small" />
+              ) : (
+                <MdDelete className="text-red-400" />
+              )}
+            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                disabled={isLoading || quantity === 1}
+                onClick={() =>
+                  handleChangeQuantity?.("remove", book?.id as string)
+                }
+              >
+                {isLoading ? <Spin size="small" /> : "-"}
+              </Button>
+              <span>{quantity}</span>
+              <Button
+                disabled={isLoading}
+                onClick={() =>
+                  handleChangeQuantity?.("add", book?.id as string)
+                }
+              >
+                {isLoading ? <Spin size="small" /> : "+"}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="flex items-center gap-3">
-        <Button color="default" onClick={() => setIsOpen(true)}>
-          <MdDelete className="text-red-400" />
-        </Button>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => handleChangeQuantity?.("remove", book?.id as string)}
-          >
-            -
-          </Button>
-          <span>{quantity}</span>
-          <Button
-            onClick={() => handleChangeQuantity?.("add", book?.id as string)}
-          >
-            +
-          </Button>
-        </div>
-      </div>
-
       <Modal
         open={isOpen}
         onCancel={() => setIsOpen(false)}

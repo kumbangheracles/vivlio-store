@@ -40,12 +40,12 @@ const AppLayout = ({ children }: PropTypes) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuthUser<UserProperties>();
-  console.log("Auth: ", auth);
+  // console.log("Auth: ", auth);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
   const [isHover, setIshover] = useState<boolean>(false);
-  console.log("isAuth: ", isAuthenticated);
+  // console.log("isAuth: ", isAuthenticated);
   const handleLogout = async () => {
     try {
       await myAxios.post("/auth/logout");

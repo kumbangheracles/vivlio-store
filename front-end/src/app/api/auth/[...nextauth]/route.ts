@@ -108,11 +108,11 @@ const authOptions: NextAuthOptions = {
         token.tokenExpiry = Date.now() + 60 * 60 * 1000 * 12;
       }
 
-      console.log("Token after:", token);
+      // console.log("Token after:", token);
 
       // Jika token expired
       if (token.tokenExpiry && Date.now() > Number(token.tokenExpiry)) {
-        console.log("Token expired, need to refresh");
+        // console.log("Token expired, need to refresh");
 
         try {
           const res = await authAxios.get("/auth/refresh");
