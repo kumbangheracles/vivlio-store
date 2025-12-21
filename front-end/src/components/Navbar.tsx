@@ -11,7 +11,7 @@ import AppInput from "./AppInput";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "next-auth/react";
-import { SearchOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, SearchOutlined } from "@ant-design/icons";
 import DropdownProfile from "./DropdownProfile";
 import { UserProperties } from "@/types/user.type";
 import { MdOutlineNavigateNext } from "react-icons/md";
@@ -120,93 +120,98 @@ export default function Navbar({ dataUser }: PropTypes) {
 
   return (
     <>
-      {isMobile && path !== "/cart"}
-      <nav className="fixed top-0 w-full bg-white z-[999] shadow-sm transition-all">
-        {/* Top Navbar */}
-        <div className="flex justify-between items-center px-5 md:px-[100px] py-3">
-          {/* Logo */}
+      {isMobile && path === "/cart" ? (
+        <></>
+      ) : (
+        <nav className="fixed top-0 w-full bg-white z-[999] shadow-sm transition-all">
+          {/* Top Navbar */}
+          <div className="flex justify-between items-center px-5 md:px-[100px] py-3">
+            {/* Logo */}
 
-          {!isMobile && (
-            <span
-              className="font-extrabold tracking-widest text-xl logo cursor-pointer"
-              onClick={() => router.push("/")}
-            >
-              VIVLIO
-            </span>
-          )}
+            {!isMobile && (
+              <span
+                className="font-extrabold tracking-widest text-xl logo cursor-pointer"
+                onClick={() => router.push("/")}
+              >
+                VIVLIO
+              </span>
+            )}
 
-          <div className="input-search-navbar w-full sm:w-[70%] mr-4">
-            <AppInput
-              prefix={<SearchOutlined />}
-              placeholder="Search Books, Blogs, etc"
-              style={{
-                width: "100%",
-                height: "35px",
-                borderRadius: 15,
-                letterSpacing: 1,
-              }}
-            />
-          </div>
-          {/* Desktop Menu */}
+            <div className="input-search-navbar w-full sm:w-[70%] mr-4">
+              <AppInput
+                prefix={<SearchOutlined />}
+                placeholder="Search Books, Blogs, etc"
+                style={{
+                  width: "100%",
+                  height: "35px",
+                  borderRadius: 15,
+                  letterSpacing: 1,
+                }}
+              />
+            </div>
+            {/* Desktop Menu */}
 
-          <div className="hidden md:flex justify-around items-center gap-5">
-            {/* Search */}
+            <div className="hidden md:flex justify-around items-center gap-5">
+              {/* Search */}
 
-            {/* Account */}
-            <div
-              onMouseEnter={() => setIshover(true)}
-              onMouseLeave={() => setIshover(false)}
-            >
-              <Dropdown trigger={["click"]} menu={{ items }}>
-                <AccountIcon isTriggered={isHover} isAuth={auth?.authenticated}>
-                  <div
-                    className={` ${
-                      auth?.accessToken
-                        ? "w-[35px] h-[35px]"
-                        : "w-[25px] h-[25px]"
-                    }  overflow-hidden rounded-full flex items-center justify-center cursor-pointer`}
+              {/* Account */}
+              <div
+                onMouseEnter={() => setIshover(true)}
+                onMouseLeave={() => setIshover(false)}
+              >
+                <Dropdown trigger={["click"]} menu={{ items }}>
+                  <AccountIcon
+                    isTriggered={isHover}
+                    isAuth={auth?.authenticated}
                   >
-                    <img
-                      className="object-cover w-full h-full"
-                      src={
-                        auth?.authenticated
-                          ? dataUser?.profileImage?.imageUrl
-                          : "/icons/account.svg"
-                      }
-                      alt="account-icon"
-                    />
-                  </div>
-                </AccountIcon>
-              </Dropdown>
+                    <div
+                      className={` ${
+                        auth?.accessToken
+                          ? "w-[35px] h-[35px]"
+                          : "w-[25px] h-[25px]"
+                      }  overflow-hidden rounded-full flex items-center justify-center cursor-pointer`}
+                    >
+                      <img
+                        className="object-cover w-full h-full"
+                        src={
+                          auth?.authenticated
+                            ? dataUser?.profileImage?.imageUrl
+                            : "/icons/account.svg"
+                        }
+                        alt="account-icon"
+                      />
+                    </div>
+                  </AccountIcon>
+                </Dropdown>
+              </div>
+
+              {/* Cart */}
+              <div
+                className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
+                onClick={() => goToCart()}
+              >
+                <img
+                  className="w-full h-full object-cover"
+                  src="/icons/chart.svg"
+                  alt="chart-icon"
+                />
+              </div>
             </div>
 
-            {/* Cart */}
-            <div
-              className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
-              onClick={() => goToCart()}
-            >
-              <img
-                className="w-full h-full object-cover"
-                src="/icons/chart.svg"
-                alt="chart-icon"
-              />
-            </div>
-          </div>
-
-          {isMobile && (
-            <div
-              className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
-              onClick={() => goToCart()}
-            >
-              <img
-                className="w-full h-full object-cover"
-                src="/icons/chart.svg"
-                alt="chart-icon"
-              />
-            </div>
-          )}
-          {/* Mobile Menu Button */}
-          {/* <div className="md:hidden flex items-center gap-4">
+            {isMobile && (
+              <div
+                className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
+                onClick={() => goToCart()}
+              >
+                <img
+                  className="w-full h-full object-cover"
+                  src="/icons/chart.svg"
+                  alt="chart-icon"
+                />
+              </div>
+            )}
+            {/* Mobile Menu Button */}
+            {/* <div className="md:hidden flex items-center gap-4">
             <div
               className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
               onClick={() => goToCart()}
@@ -224,99 +229,100 @@ export default function Navbar({ dataUser }: PropTypes) {
               {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
             </button>
           </div> */}
-        </div>
-
-        {/* Bottom Navbar - Desktop */}
-        <div className="hidden md:block border-t">
-          <BottomNavbar>
-            <li>
-              <StyledLink href="/">HOME</StyledLink>
-            </li>
-            <li>
-              <StyledLink href="/blog">BLOG</StyledLink>
-            </li>
-            <li>
-              <StyledLink href="/shop">SHOP</StyledLink>
-            </li>
-            <li>
-              <StyledLink href="/about-us">ABOUT US</StyledLink>
-            </li>
-            <li>
-              <StyledLink href="/contact-us">CONTACT US</StyledLink>
-            </li>
-          </BottomNavbar>
-        </div>
-
-        {/* Mobile Dropdown Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t flex flex-col items-center py-3 gap-3 transition-all">
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/")}
-              href="/"
-            >
-              HOME
-            </StyledLink>
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/blog")}
-              href="/blog"
-            >
-              BLOG
-            </StyledLink>
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/shop")}
-              href="/shop"
-            >
-              SHOP
-            </StyledLink>
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/about-us")}
-              href="/about-us"
-            >
-              ABOUT US
-            </StyledLink>
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/contact-us")}
-              href="/contact-us"
-            >
-              CONTACT US
-            </StyledLink>
-            <StyledLink
-              onClick={() => setIsMobileMenuOpen(false)}
-              isBlue={isActive("/account")}
-              href="/account"
-            >
-              ACCOUNT
-            </StyledLink>
-
-            {auth?.accessToken ? (
-              <Button onClick={() => handleAuth("logout")}>LOGOUT</Button>
-            ) : (
-              <Button onClick={() => handleAuth("login")}>LOGIN</Button>
-            )}
           </div>
-        )}
 
-        {/* Logout Modal */}
-        <Modal
-          open={isOpen}
-          okText="Yes"
-          cancelText="Cancel"
-          onCancel={() => setIsOpen(false)}
-          onOk={handleLogout}
-          confirmLoading={isLoading}
-          title={<h1 className="text-center font-bold">Logout</h1>}
-          centered
-        >
-          <div className="text-center">
-            <h1>Are you sure you want to logout?</h1>
+          {/* Bottom Navbar - Desktop */}
+          <div className="hidden md:block border-t">
+            <BottomNavbar>
+              <li>
+                <StyledLink href="/">HOME</StyledLink>
+              </li>
+              <li>
+                <StyledLink href="/blog">BLOG</StyledLink>
+              </li>
+              <li>
+                <StyledLink href="/shop">SHOP</StyledLink>
+              </li>
+              <li>
+                <StyledLink href="/about-us">ABOUT US</StyledLink>
+              </li>
+              <li>
+                <StyledLink href="/contact-us">CONTACT US</StyledLink>
+              </li>
+            </BottomNavbar>
           </div>
-        </Modal>
-      </nav>
+
+          {/* Mobile Dropdown Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden bg-white border-t flex flex-col items-center py-3 gap-3 transition-all">
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/")}
+                href="/"
+              >
+                HOME
+              </StyledLink>
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/blog")}
+                href="/blog"
+              >
+                BLOG
+              </StyledLink>
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/shop")}
+                href="/shop"
+              >
+                SHOP
+              </StyledLink>
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/about-us")}
+                href="/about-us"
+              >
+                ABOUT US
+              </StyledLink>
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/contact-us")}
+                href="/contact-us"
+              >
+                CONTACT US
+              </StyledLink>
+              <StyledLink
+                onClick={() => setIsMobileMenuOpen(false)}
+                isBlue={isActive("/account")}
+                href="/account"
+              >
+                ACCOUNT
+              </StyledLink>
+
+              {auth?.accessToken ? (
+                <Button onClick={() => handleAuth("logout")}>LOGOUT</Button>
+              ) : (
+                <Button onClick={() => handleAuth("login")}>LOGIN</Button>
+              )}
+            </div>
+          )}
+
+          {/* Logout Modal */}
+          <Modal
+            open={isOpen}
+            okText="Yes"
+            cancelText="Cancel"
+            onCancel={() => setIsOpen(false)}
+            onOk={handleLogout}
+            confirmLoading={isLoading}
+            title={<h1 className="text-center font-bold">Logout</h1>}
+            centered
+          >
+            <div className="text-center">
+              <h1>Are you sure you want to logout?</h1>
+            </div>
+          </Modal>
+        </nav>
+      )}
     </>
   );
 }

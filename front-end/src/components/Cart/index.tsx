@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 interface PropTypes {
   books: BookProps[];
 }
@@ -49,6 +50,7 @@ const CartIndex = ({ books }: PropTypes) => {
   const [quantities, setQuantities] = useState<Record<string, number>>(
     quantityBooksRecord ?? {}
   );
+  const [isChange, setIsChange] = useState<boolean>(false);
 
   const router = useRouter();
   useEffect(() => {
@@ -150,6 +152,22 @@ const CartIndex = ({ books }: PropTypes) => {
 
   return (
     <div>
+      {/* Navbar Cart */}
+      <div className="py-5 px-4 bg-white shadow-sm flex fixed left-0 z-50 top-0 w-full justify-between items-center sm:hidden">
+        <div className="flex gap-4 items-center">
+          <ArrowLeftOutlined onClick={() => router.back()} />
+          <h4 className="font-semibold tracking-wider">
+            My Cart ({books.length})
+          </h4>
+        </div>
+
+        {books.length !== 0 && (
+          <p className="mr-2" onClick={() => setIsChange((prev) => !prev)}>
+            {isChange ? "Completed" : "Change"}
+          </p>
+        )}
+      </div>
+
       {books.length === 0 ? (
         <div className="p-4 w-full h-full">
           <div className="flex items-center justify-center h-screen w-full flex-col gap-3">
@@ -167,7 +185,9 @@ const CartIndex = ({ books }: PropTypes) => {
       ) : (
         <>
           <div className="sm:p-4 p-0">
-            <h4 className="font-bold  text-lg sm:text-2xl">Cart</h4>
+            <h4 className="font-bold mx-3 sm:mx-2 sm:mt-4 text-lg sm:text-2xl">
+              Cart
+            </h4>
             <div className="relative w-full flex flex-col sm:flex-row gap-6">
               <div className="flex justify-start flex-col !w-full sm:!w-[65%]">
                 <div className="hidden sm:flex items-center justify-between p-3 my-3 w-full border-gray-300 border rounded-xl shadow-md transition-all">
@@ -209,7 +229,7 @@ const CartIndex = ({ books }: PropTypes) => {
                   ))}
                 </>
               </div>
-              <div className="w-full hidden sm:block sm:w-[30%]">
+              <div className="w-full hidden sm:block sm:w-[30%] my-3">
                 <div className="p-7 w-full shadow-md border border-gray-300 rounded-xl sticky top-35">
                   <h4 className="font-bold mb-2">Cart Review</h4>
                   <div className="flex items-center justify-between text-gray-500">
@@ -249,27 +269,39 @@ const CartIndex = ({ books }: PropTypes) => {
               </div>
             </div>
           </div>
-          <div className="sm:hidden flex w-full px-2 py-4 justify-between base-blue fixed shadow-md bottom-0 left-0">
+          <div className="sm:hidden flex w-full px-4 py-4 justify-between base-blue fixed shadow-md bottom-0 left-0">
             <div className="flex items-center gap-2">
               <Checkbox checked={checkedAll} onChange={handleCheckAll} />
               <p className="text-sm">Select All</p>
             </div>
 
             <div className="flex items-center gap-1 text-sm">
-              <p>
-                {" "}
-                Rp
-                {isCheckedBooks
-                  ?.reduce(
-                    (acc, item) =>
-                      acc + Number(item?.price || 0) * Number(item?.quantity),
-                    0
-                  )
-                  .toLocaleString("id-ID")}
-              </p>
-              <button className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300">
-                Checkout {`(${isCheckedBooks?.length})`}
-              </button>
+              {!isChange && (
+                <p>
+                  {" "}
+                  Rp
+                  {isCheckedBooks
+                    ?.reduce(
+                      (acc, item) =>
+                        acc + Number(item?.price || 0) * Number(item?.quantity),
+                      0
+                    )
+                    .toLocaleString("id-ID")}
+                </p>
+              )}
+
+              {isChange ? (
+                <button
+                  className="bg-red-500 px-4 !active:bg-blue-300 text-white rounded-md w-full border-none  py-2 font-bold hover:red-blue-300"
+                  onClick={() => setIsOpen(true)}
+                >
+                  Delete
+                </button>
+              ) : (
+                <button className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300">
+                  Checkout {`(${isCheckedBooks?.length})`}
+                </button>
+              )}
             </div>
           </div>
 
