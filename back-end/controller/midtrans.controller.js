@@ -50,10 +50,10 @@ module.exports = {
 
   async midtransMultiCheckout(req, res) {
     try {
-      const { cartItems } = req.body;
+      const { books } = req.body;
 
-      const grossAmount = cartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
+      const grossAmount = books.reduce(
+        (acc, item) => acc + item?.price * item?.UserCart?.quantity,
         0
       );
 
@@ -62,11 +62,11 @@ module.exports = {
           order_id: uuidv4(),
           gross_amount: grossAmount,
         },
-        item_details: cartItems.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: Number(item.price),
-          quantity: Number(item.quantity),
+        item_details: books.map((item) => ({
+          id: item?.id,
+          name: item?.title,
+          price: Number(item?.price),
+          quantity: Number(item?.UserCart?.quantity),
         })),
       };
 

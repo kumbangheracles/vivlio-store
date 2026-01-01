@@ -32,7 +32,7 @@ const ListBook: React.FC<BookTypes> = ({
               <h4 className="font-semibold tracking-wider text-[11px] px-2">
                 {titleSection}
               </h4>
-              <h4 className="text-gray-500 font-normal tracking-normal text-[11px] ">
+              <h4 className="text-gray-500 font-normal mr-2 tracking-normal text-[11px] ">
                 See All
               </h4>
             </div>

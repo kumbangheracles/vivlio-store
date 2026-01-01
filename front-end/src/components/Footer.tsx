@@ -88,7 +88,12 @@ const Footer = () => {
             {/* Bagian Kiri - Info Kontak */}
             <div className="flex flex-col gap-[10px] w-[300px]">
               <IconWrapper>
-                <img src={IconLocation} width={20} height={20} alt="location" />
+                <Image
+                  src={IconLocation}
+                  width={20}
+                  height={20}
+                  alt="location"
+                />
                 <p>Jln raya bayur kali</p>
               </IconWrapper>
               <IconWrapper>
@@ -124,10 +129,10 @@ const Footer = () => {
             <AboutSection>
               <h1 className="font-bold">About the company</h1>
               <p className="mt-2.5">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Repellendus cum hic mollitia fugit facere enim velit sunt
-                officia. Aliquid labore impedit accusamus, eligendi eveniet
-                repellendus. Cum, ex. Ad, reiciendis obcaecati!
+                Vivlio hadir sebagai teman membaca Anda. Kami menyediakan
+                beragam buku pilihan untuk semua kalangan, karena kami percaya
+                setiap halaman memiliki cerita dan makna yang layak untuk
+                ditemukan.
               </p>
             </AboutSection>
           </Container>

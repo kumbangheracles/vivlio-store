@@ -77,6 +77,7 @@ const CartIndex = ({ books }: PropTypes) => {
 
   const handleCheckAll = (e: CheckboxChangeEvent) => {
     if (!books?.length) return;
+    router.refresh();
     const checked = e.target.checked;
     setCheckedAll(checked);
 
@@ -146,9 +147,34 @@ const CartIndex = ({ books }: PropTypes) => {
   }, [books]);
 
   const totalQuantity: number = (isCheckedBooks ?? []).reduce(
-    (acc: number, item: BookProps) => acc + Number(item.quantity),
+    (acc: number, item: BookProps) => acc + Number(item.UserCart?.quantity),
     0
   );
+
+  const handleBulkCheckout = async () => {
+    try {
+      setIsLoading(true);
+
+      const res = await myAxios.post<{ redirect_url: string; token: string }>(
+        "/midtrans/bulk-checkout",
+        { books }
+      );
+
+      console.log("Data sended: ", res.data);
+
+      if (res) {
+        // router.push(res.data?.redirect_url);
+        window.snap.pay(res.data.token); // untuk menampilkan pop-up payment dari midtrans
+      }
+
+      // message.info("checkout success you'll be redirect to midtrans payment");
+    } catch (error) {
+      console.log("Error checkout: ", error);
+      ErrorHandler(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -229,6 +255,8 @@ const CartIndex = ({ books }: PropTypes) => {
                   ))}
                 </>
               </div>
+
+              {/* Checkout Card */}
               <div className="w-full hidden sm:block sm:w-[30%] my-3">
                 <div className="p-7 w-full shadow-md border border-gray-300 rounded-xl sticky top-35">
                   <h4 className="font-bold mb-2">Cart Review</h4>
@@ -240,7 +268,8 @@ const CartIndex = ({ books }: PropTypes) => {
                         ?.reduce(
                           (acc, item) =>
                             acc +
-                            Number(item?.price || 0) * Number(item?.quantity),
+                            Number(item?.price || 0) *
+                              Number(item?.UserCart?.quantity),
                           0
                         )
                         .toLocaleString("id-ID")}
@@ -256,19 +285,25 @@ const CartIndex = ({ books }: PropTypes) => {
                         ?.reduce(
                           (acc, item) =>
                             acc +
-                            Number(item?.price || 0) * Number(item?.quantity),
+                            Number(item?.price || 0) *
+                              Number(item?.UserCart?.quantity),
                           0
                         )
                         .toLocaleString("id-ID")}
                     </h4>
                   </div>
-                  <Button className="!bg-blue-500 !text-white !rounded-lg !w-full !border-none !shadow-md !py-6 !font-bold hover:!bg-blue-300">
+                  <Button
+                    onClick={() => handleBulkCheckout()}
+                    className="!bg-blue-500 !text-white !rounded-lg !w-full !border-none !shadow-md !py-6 !font-bold hover:!bg-blue-300"
+                  >
                     Checkout
                   </Button>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Footer Cart Mobile */}
           <div className="sm:hidden flex w-full px-4 py-4 justify-between base-blue fixed shadow-md bottom-0 left-0">
             <div className="flex items-center gap-2">
               <Checkbox checked={checkedAll} onChange={handleCheckAll} />
@@ -283,7 +318,9 @@ const CartIndex = ({ books }: PropTypes) => {
                   {isCheckedBooks
                     ?.reduce(
                       (acc, item) =>
-                        acc + Number(item?.price || 0) * Number(item?.quantity),
+                        acc +
+                        Number(item?.price || 0) *
+                          Number(item?.UserCart?.quantity),
                       0
                     )
                     .toLocaleString("id-ID")}
@@ -298,8 +335,11 @@ const CartIndex = ({ books }: PropTypes) => {
                   Delete
                 </button>
               ) : (
-                <button className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300">
-                  Checkout {`(${isCheckedBooks?.length})`}
+                <button
+                  onClick={() => handleBulkCheckout()}
+                  className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300"
+                >
+                  Checkout {`(${totalQuantity})`}
                 </button>
               )}
             </div>

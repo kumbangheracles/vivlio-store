@@ -163,6 +163,7 @@ const Books = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
+      width: 150,
       render: (price: number) => `Rp ${Number(price).toLocaleString("id-ID")}`,
     },
 

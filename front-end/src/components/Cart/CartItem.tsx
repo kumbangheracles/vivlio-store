@@ -48,7 +48,6 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
   const handleChangeQuantity = (type: "add" | "remove", id?: string) => {
     if (!id) return;
 
-    // 🔥 CLEAR timer lama (debounce)
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -61,6 +60,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
     timerRef.current = setTimeout(async () => {
       try {
         await myAxios.patch(`/cart/${id}`, { type });
+        router.refresh();
       } catch (err) {
         ErrorHandler(err);
       } finally {
@@ -91,7 +91,6 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
     return () => {
       isMounted.current = false;
 
-      // 🔥 WAJIB bersihkan timer saat unmount
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
@@ -107,6 +106,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
         <Checkbox
           checked={isChecked?.some((item) => item.id === book.id)}
           onChange={(e) => {
+            router.refresh();
             const checked = e.target.checked;
             if (checked) {
               setIsChecked?.((prev) => [
@@ -196,6 +196,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
         <Checkbox
           checked={isChecked?.some((item) => item.id === book.id)}
           onChange={(e) => {
+            router.refresh();
             const checked = e.target.checked;
             if (checked) {
               setIsChecked?.((prev) => [

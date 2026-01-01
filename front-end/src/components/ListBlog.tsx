@@ -5,7 +5,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import BlogCard from "./BlogCard";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ArticleProperties } from "@/types/article.type";
-
+import { useRouter } from "next/navigation";
 interface PropTypes {
   dataArticles: ArticleProperties[];
 }
@@ -16,7 +16,7 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
   const scrollByAmount = isMobile ? 250 : 700;
-
+  const router = useRouter();
   const handleScroll = () => {
     const el = carouselRef.current;
     if (!el) return;
@@ -75,9 +75,18 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
 
   return (
     <div className="py-4 w-full mt-4 relative">
-      <h4 className="font-bold text-sm tracking-wider sm:text-xl sm:!ml-10 ml-3">
-        Blog
-      </h4>
+      <div className="flex justify-between">
+        <h4 className="font-bold text-sm tracking-wider sm:text-xl sm:!ml-10 ml-3">
+          Blog
+        </h4>
+
+        <h4
+          onClick={() => router.push("/articles")}
+          className=" sm:hidden text-gray-500 font-normal mr-2 tracking-normal text-[11px] "
+        >
+          See All
+        </h4>
+      </div>
 
       {!isMobile && showLeft && (
         <button
