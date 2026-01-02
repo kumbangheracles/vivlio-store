@@ -183,7 +183,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
 
   return (
     <div className="w-screen h-screen sm:w-auto sm:h-auto">
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="max-w-7xl mx-auto p-2 sm:p-4">
         <Card className="rounded-lg overflow-hidden sm:!mt-4">
           <AppBreadcrumb isBook={true} bookName={book.title} />
 
@@ -376,7 +376,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   Description
                 </Title>
               </Divider>
-              <div className="bg-gray-50 p-4 rounded-md text-base">
+              <div className="bg-gray-50 p-2 rounded-md text-base">
                 <Paragraph className="text-gray-700 text-[10px]! text-base sm:text-sm! leading-relaxed">
                   <div
                     dangerouslySetInnerHTML={{ __html: book?.description }}

@@ -122,3 +122,14 @@ label {
   -ms-overflow-style: none; /* untuk IE dan Edge */
   scrollbar-width: none; /* untuk Firefox */
 }
+
+@media screen and (max-width: 720px) {
+  .ant-result-title {
+    font-size: 24px !important;
+  }
+}
+@media screen and (max-width: 420px) {
+  .ant-result-title {
+    font-size: 15px !important;
+  }
+}

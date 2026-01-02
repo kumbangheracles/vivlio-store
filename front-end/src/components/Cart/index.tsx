@@ -8,6 +8,7 @@ import {
   message,
   Modal,
   Result,
+  Spin,
 } from "antd";
 import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
@@ -90,10 +91,8 @@ const CartIndex = ({ books }: PropTypes) => {
         })) ?? [];
 
       setIsChecked(allBooks);
-      setCheckedAll(true);
     } else {
       setIsChecked([]);
-      setCheckedAll(false);
     }
   };
 
@@ -105,11 +104,20 @@ const CartIndex = ({ books }: PropTypes) => {
   }, [isChecked]);
 
   const handleBulkDelete = async (ids: Array<string>) => {
+    if (ids.length === 0) {
+      return message.error("Select at least one book to remove!.");
+    }
     try {
       setIsLoading(true);
 
       await myAxios.delete("/cart/bulk-remove", { data: { ids: ids } });
-      message.success("Success delete all books from cart");
+      if (ids.length === 1) {
+        message.success("Success delete book from cart.");
+      } else if (ids.length === isCheckedBooks.length) {
+        message.success("Success delete all books from cart.");
+      } else if (ids.length > 1) {
+        message.success("Success delete books from cart.");
+      }
     } catch (error) {
       ErrorHandler(error);
     } finally {
@@ -152,12 +160,15 @@ const CartIndex = ({ books }: PropTypes) => {
   );
 
   const handleBulkCheckout = async () => {
+    if (isCheckedBooks.length === 0) {
+      return message.error("Select at least one book to checkout!.");
+    }
     try {
       setIsLoading(true);
 
       const res = await myAxios.post<{ redirect_url: string; token: string }>(
         "/midtrans/bulk-checkout",
-        { books }
+        { isCheckedBooks }
       );
 
       console.log("Data sended: ", res.data);
@@ -199,6 +210,7 @@ const CartIndex = ({ books }: PropTypes) => {
           <div className="flex items-center justify-center h-screen w-full flex-col gap-3">
             <Result
               status={404}
+              className="cart-result"
               title={"Looks like you haven’t added anything to your cart yet."}
               extra={
                 <Button type="primary" onClick={() => router.push("/")}>
@@ -294,6 +306,8 @@ const CartIndex = ({ books }: PropTypes) => {
                   </div>
                   <Button
                     onClick={() => handleBulkCheckout()}
+                    loading={isLoading}
+                    disabled={isCheckedBooks.length === 0}
                     className="!bg-blue-500 !text-white !rounded-lg !w-full !border-none !shadow-md !py-6 !font-bold hover:!bg-blue-300"
                   >
                     Checkout
@@ -330,16 +344,28 @@ const CartIndex = ({ books }: PropTypes) => {
               {isChange ? (
                 <button
                   className="bg-red-500 px-4 !active:bg-blue-300 text-white rounded-md w-full border-none  py-2 font-bold hover:red-blue-300"
-                  onClick={() => setIsOpen(true)}
+                  onClick={() => {
+                    if (isCheckedBooks.length === 0) {
+                      return message.error(
+                        "Select at least one book to remove!."
+                      );
+                    }
+                    setIsOpen(true);
+                  }}
                 >
                   Delete
                 </button>
               ) : (
                 <button
                   onClick={() => handleBulkCheckout()}
+                  disabled={isCheckedBooks.length === 0}
                   className="bg-blue-500 !active:bg-blue-300 text-white rounded-md w-full border-none px-2 py-2 font-bold hover:bg-blue-300"
                 >
-                  Checkout {`(${totalQuantity})`}
+                  {isLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <>Checkout {`(${totalQuantity})`}</>
+                  )}
                 </button>
               )}
             </div>
@@ -347,7 +373,9 @@ const CartIndex = ({ books }: PropTypes) => {
 
           <Modal
             open={isOpen}
-            onCancel={() => setIsOpen(false)}
+            onCancel={() => {
+              setIsOpen(false);
+            }}
             onOk={() => handleBulkDelete(checkedIds)}
             title={
               <h1 className="flex justify-center p-2">Remove from cart</h1>

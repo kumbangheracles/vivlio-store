@@ -105,25 +105,34 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
       <div className="sm:flex hidden items-center gap-3 w-full">
         <Checkbox
           checked={isChecked?.some((item) => item.id === book.id)}
+          // children={isLoading && <Spin />}
           onChange={(e) => {
-            router.refresh();
             const checked = e.target.checked;
-            if (checked) {
-              setIsChecked?.((prev) => [
-                ...prev,
-                {
-                  id: book?.id as string,
-                  bookTitle: book?.title,
-                  idCart: book?.UserCart?.id as string,
-                },
-              ]);
-            } else {
-              setIsChecked?.((prev) =>
-                prev.filter((item) => item.id !== book?.id)
-              );
-            }
+            setIsLoading(true);
+            setTimeout(() => {
+              router.refresh();
+
+              if (checked) {
+                setIsChecked?.((prev) => [
+                  ...prev,
+                  {
+                    id: book?.id as string,
+                    bookTitle: book?.title,
+                    idCart: book?.UserCart?.id as string,
+                  },
+                ]);
+                setIsLoading(false);
+              } else {
+                setIsChecked?.((prev) =>
+                  prev.filter((item) => item.id !== book?.id)
+                );
+
+                setIsLoading(false);
+              }
+            }, 600);
           }}
         />
+
         <div className="flex items-center sm:justify-between w-full gap-4 ">
           {/* <p className="text-sm w-[100px] !font-medium">{book.author}</p> */}
           <div
