@@ -1,8 +1,9 @@
 import { ArticleProperties } from "@/types/article.type";
-import DefaultImage from "../../assets/images/default-img.png";
+import DefaultImage from "../../../assets/images/default-img.png";
 import Image from "next/image";
 import dayjs from "dayjs";
-import RichTextRenderer from "../RichText";
+import RichTextRenderer from "@/components/RichText";
+
 interface PropTypes {
   dataArticle: ArticleProperties;
 }

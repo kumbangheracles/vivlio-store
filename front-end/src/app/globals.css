@@ -101,7 +101,8 @@ label {
   padding: 0px 2rem;
   display: flex;
   gap: 1em;
-  scroll-behavior: smooth !important;
+  /* scroll-behavior: smooth !important; */
+  scroll-behavior: auto;
   transition: all 0.3s ease;
   will-change: scroll-position !important;
 }

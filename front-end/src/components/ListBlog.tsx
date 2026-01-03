@@ -6,6 +6,7 @@ import BlogCard from "./BlogCard";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ArticleProperties } from "@/types/article.type";
 import { useRouter } from "next/navigation";
+
 interface PropTypes {
   dataArticles: ArticleProperties[];
 }
@@ -15,37 +16,53 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
+  const [isScrolling, setIsScrolling] = useState(false);
   const scrollByAmount = isMobile ? 250 : 700;
   const router = useRouter();
+
   const handleScroll = () => {
     const el = carouselRef.current;
     if (!el) return;
 
-    const atStart = el.scrollLeft <= 0;
+    const atStart = el.scrollLeft <= 1;
     const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
 
     setShowLeft(!atStart);
     setShowRight(!atEnd);
   };
 
-  const smoothScroll = (target: number, duration = 400) => {
+  const easeInOutCubic = (t: number): number => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
+
+  const smoothScroll = (direction: "left" | "right") => {
     const el = carouselRef.current;
-    if (!el) return;
+    if (!el || isScrolling) return;
+
+    setIsScrolling(true);
 
     const start = el.scrollLeft;
+    const scrollAmount =
+      direction === "left" ? -scrollByAmount : scrollByAmount;
+    const target = Math.max(
+      0,
+      Math.min(start + scrollAmount, el.scrollWidth - el.clientWidth)
+    );
     const change = target - start;
+    const duration = 600;
     const startTime = performance.now();
 
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const ease = 0.5 - Math.cos(progress * Math.PI) / 2; // easeInOut
+      const easeProgress = easeInOutCubic(progress);
 
-      el.scrollLeft = start + change * ease;
+      el.scrollLeft = start + change * easeProgress;
 
-      if (elapsed < duration) {
+      if (progress < 1) {
         requestAnimationFrame(animateScroll);
       } else {
+        setIsScrolling(false);
         handleScroll();
       }
     };
@@ -53,36 +70,33 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
     requestAnimationFrame(animateScroll);
   };
 
-  const scrollLeft = () => {
-    const el = carouselRef.current;
-    if (!el) return;
-    smoothScroll(el.scrollLeft - scrollByAmount);
-  };
-
-  const scrollRight = () => {
-    const el = carouselRef.current;
-    if (!el) return;
-    smoothScroll(el.scrollLeft + scrollByAmount);
-  };
+  const scrollLeft = () => smoothScroll("left");
+  const scrollRight = () => smoothScroll("right");
 
   useEffect(() => {
     handleScroll();
     const el = carouselRef.current;
     if (!el) return;
+
     el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   return (
     <div className="py-4 w-full mt-4 relative">
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <h4 className="font-bold text-sm tracking-wider sm:text-xl sm:!ml-10 ml-3">
           Blog
         </h4>
 
         <h4
           onClick={() => router.push("/articles")}
-          className=" sm:hidden text-gray-500 font-normal mr-2 tracking-normal text-[11px] "
+          className=" text-gray-500 font-normal mr-2 sm:mr-4 sm:text-sm sm:hover:underline tracking-normal text-[11px] cursor-pointer"
         >
           See All
         </h4>
@@ -91,7 +105,8 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
       {!isMobile && showLeft && (
         <button
           onClick={scrollLeft}
-          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm left-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
+          disabled={isScrolling}
+          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm left-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Scroll left"
         >
           <LeftOutlined />
@@ -101,7 +116,8 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
       {!isMobile && showRight && (
         <button
           onClick={scrollRight}
-          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm right-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10"
+          disabled={isScrolling}
+          className="absolute cursor-pointer w-[30px] h-[30px] text-[10px] sm:text-sm right-2 top-1/2 -translate-y-1/2 sm:w-[50px] sm:h-[50px] bg-white border border-gray-600 rounded-full p-3 flex justify-center items-center shadow hover:bg-gray-200 transition-all z-10 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Scroll right"
         >
           <RightOutlined />

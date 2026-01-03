@@ -1,5 +1,6 @@
 import fetchArticleDetail from "@/app/actions/fetchArticleDetail";
-import ArticleDetail from "@/components/BlogDetail";
+import ArticleDetail from "@/components/Articles/BlogDetail";
+
 import myAxios from "@/libs/myAxios";
 import { ArticleProperties } from "@/types/article.type";
 import { Metadata } from "next";

@@ -5,9 +5,6 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 async function fetchUser() {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return;
-  }
   try {
     if (!session?.user) return null;
 

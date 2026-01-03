@@ -1,11 +1,11 @@
-import AppLayout from "@/components/Layout";
-
-const ArticlePage = () => {
-  return (
-    <div className="w-full min-h-screen flex justify-center items-center">
-      <h4>Article Pages</h4>
-    </div>
+import ArticleIndex from "@/components/Articles/ArticleIndex";
+import fetchArticles from "../actions/fetchArticles";
+const ArticlePage = async () => {
+  const dataArticle = await fetchArticles();
+  const filteredData = dataArticle.filter(
+    (item) => item.status === "PUBLISHED"
   );
+  return <ArticleIndex dataArticles={filteredData} />;
 };
 
 export default ArticlePage;
