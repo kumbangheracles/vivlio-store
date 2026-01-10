@@ -129,10 +129,9 @@ const Footer = () => {
             <AboutSection>
               <h1 className="font-bold">About the company</h1>
               <p className="mt-2.5">
-                Vivlio hadir sebagai teman membaca Anda. Kami menyediakan
-                beragam buku pilihan untuk semua kalangan, karena kami percaya
-                setiap halaman memiliki cerita dan makna yang layak untuk
-                ditemukan.
+                Vivlio is here to be your reading companion. We offer a wide
+                selection of books for all ages, believing every page holds a
+                story and meaning worth discovering.
               </p>
             </AboutSection>
           </Container>

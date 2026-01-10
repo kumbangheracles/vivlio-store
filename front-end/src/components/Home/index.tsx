@@ -99,13 +99,12 @@ export default function HomePage(prop: PropTypes) {
         </>
       ) : (
         <>
-          <div>
+          <div className="w-full !flex !justify-center">
             <Banner />
-
-            <div className="mt-7">
-              <TitleList>Popular Category</TitleList>
-              <ListCategory dataCategories={prop.dataCategories} />
-            </div>
+          </div>
+          <div className="mt-7">
+            <TitleList>Popular Category</TitleList>
+            <ListCategory dataCategories={prop.dataCategories} />
           </div>
           <div>
             <ListBook

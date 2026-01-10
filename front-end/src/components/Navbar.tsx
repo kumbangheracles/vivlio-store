@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "antd/es/dropdown/dropdown";
-import { Button, message } from "antd";
+import { Badge, Button, message } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,16 +11,25 @@ import AppInput from "./AppInput";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { signOut } from "next-auth/react";
-import { ArrowLeftOutlined, SearchOutlined } from "@ant-design/icons";
+import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import DropdownProfile from "./DropdownProfile";
 import { UserProperties } from "@/types/user.type";
 import { MdOutlineNavigateNext } from "react-icons/md";
+import { cn } from "@/libs/cn";
 import useDeviceType from "@/hooks/useDeviceType";
+import { CategoryProps } from "@/types/category.types";
+import { BookProps } from "@/types/books.type";
 interface PropTypes {
   dataUser?: UserProperties;
+  dataCategories?: CategoryProps[];
+  dataCartedBooks?: BookProps[];
 }
 
-export default function Navbar({ dataUser }: PropTypes) {
+export default function Navbar({
+  dataUser,
+  dataCategories,
+  dataCartedBooks,
+}: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathName = usePathname();
   const auth = useAuth();
@@ -30,6 +39,8 @@ export default function Navbar({ dataUser }: PropTypes) {
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
+  const [dropCategory, setIsDropCategory] = useState<boolean>(false);
+  const [totalLengthCart, setTotalLengthCart] = useState<number>(0);
   const handleLogout = async () => {
     try {
       setIsloading(true);
@@ -118,14 +129,136 @@ export default function Navbar({ dataUser }: PropTypes) {
         },
       ];
 
+  useEffect(() => {
+    setTotalLengthCart(dataCartedBooks?.length as number);
+  }, [dataCartedBooks]);
+
   return (
     <>
       {isMobile && path === "/cart" ? (
         <></>
       ) : (
-        <nav className="fixed top-0 w-full bg-white z-[999] shadow-sm transition-all">
-          {/* Top Navbar */}
-          <div className="flex justify-between items-center px-5 md:px-[100px] py-3">
+        <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">
+          {/* Desktop */}
+          <div className="hidden sm:flex relative flex-col justify-center items-center min-w-full">
+            <div className="flex justify-between w-full items-center px-5 z-[99] bg-[#d9eafd] md:px-[100px] py-4">
+              <span
+                className="font-extrabold tracking-widest text-xl logo cursor-pointer"
+                onClick={() => router.push("/")}
+              >
+                VIVLIO
+              </span>
+
+              <div className=" w-full flex  items-center gap-3 justify-center sm:w-[50%]">
+                <div
+                  // arrow
+                  // open={dropCategory}
+                  // trigger={["click"]}
+                  // menu={{ items: itemsCategory }}
+                  className="cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-[50px]"
+                >
+                  <div
+                    className="flex gap-3 items-center noselect font-semibold"
+                    onClick={() => setIsDropCategory((prev) => !prev)}
+                  >
+                    <DownOutlined
+                      className={`text-sm ${cn(
+                        !dropCategory ? "rotate-[0deg]" : "rotate-[180deg]"
+                      )} transition-all duration-400`}
+                    />
+                    <h4 className="text-[13px]">Category</h4>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 py-3 px-6 w-full bg-white rounded-[50px] border-white border">
+                  <input
+                    placeholder="Search Books, Blogs, etc"
+                    className="w-full outline-0 border-none"
+                  />
+                  <SearchOutlined />
+                </div>
+              </div>
+
+              <div className="hidden md:flex justify-around items-center gap-5">
+                <div
+                  onMouseEnter={() => setIshover(true)}
+                  onMouseLeave={() => setIshover(false)}
+                >
+                  <Dropdown trigger={["click"]} menu={{ items }}>
+                    <AccountIcon
+                      isTriggered={isHover}
+                      isAuth={auth?.authenticated}
+                    >
+                      <div
+                        className={` ${
+                          auth?.accessToken
+                            ? "w-[30px] h-[30px]"
+                            : "w-[25px] h-[25px]"
+                        }  overflow-hidden! rounded-full flex items-center justify-center cursor-pointer`}
+                      >
+                        <img
+                          className="object-cover w-full h-full"
+                          src={
+                            auth?.authenticated
+                              ? dataUser?.profileImage?.imageUrl
+                              : "/icons/account.svg"
+                          }
+                          alt="account-icon"
+                        />
+                      </div>
+                    </AccountIcon>
+                  </Dropdown>
+                </div>
+
+                {/* Cart */}
+                <div
+                  className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
+                  onClick={() => goToCart()}
+                >
+                  <Badge count={totalLengthCart} size="small">
+                    <img
+                      className="w-full h-full object-cover"
+                      src="/icons/chart.svg"
+                      alt="chart-icon"
+                    />
+                  </Badge>
+                </div>
+              </div>
+
+              {isMobile && (
+                <div
+                  className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
+                  onClick={() => goToCart()}
+                >
+                  <img
+                    className="w-full h-full object-cover"
+                    src="/icons/chart.svg"
+                    alt="chart-icon"
+                  />
+                </div>
+              )}
+            </div>
+            {/* Dropdown Category Desktop */}
+            <div
+              className={` ${cn(
+                dropCategory ? "max-h-[500px]" : "max-h-[0px]"
+              )}   bg-white shadow-2xl p-4 fixed top-1 z-[-10] w-[550px] transition-all duration-400 rounded-xl overflow-hidden`}
+            >
+              <div className="mt-[80px] flex gap-3 flex-wrap">
+                {dataCategories?.map((item) => (
+                  <div
+                    className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
+                    key={item.categoryId}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile */}
+          <div className=" sm:hidden flex justify-between items-center px-5 md:px-[100px] py-3">
             {/* Logo */}
 
             {!isMobile && (
@@ -167,9 +300,9 @@ export default function Navbar({ dataUser }: PropTypes) {
                     <div
                       className={` ${
                         auth?.accessToken
-                          ? "w-[35px] h-[35px]"
+                          ? "w-[30px] h-[30px]"
                           : "w-[25px] h-[25px]"
-                      }  overflow-hidden rounded-full flex items-center justify-center cursor-pointer`}
+                      }  overflow-hidden! rounded-full flex items-center justify-center cursor-pointer`}
                     >
                       <img
                         className="object-cover w-full h-full"
@@ -190,11 +323,13 @@ export default function Navbar({ dataUser }: PropTypes) {
                 className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
                 onClick={() => goToCart()}
               >
-                <img
-                  className="w-full h-full object-cover"
-                  src="/icons/chart.svg"
-                  alt="chart-icon"
-                />
+                <Badge count={totalLengthCart} size="small">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="/icons/chart.svg"
+                    alt="chart-icon"
+                  />
+                </Badge>
               </div>
             </div>
 
@@ -203,53 +338,15 @@ export default function Navbar({ dataUser }: PropTypes) {
                 className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
                 onClick={() => goToCart()}
               >
-                <img
-                  className="w-full h-full object-cover"
-                  src="/icons/chart.svg"
-                  alt="chart-icon"
-                />
+                <Badge count={totalLengthCart} size="small">
+                  <img
+                    className="w-full h-full object-cover"
+                    src="/icons/chart.svg"
+                    alt="chart-icon"
+                  />
+                </Badge>
               </div>
             )}
-            {/* Mobile Menu Button */}
-            {/* <div className="md:hidden flex items-center gap-4">
-            <div
-              className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
-              onClick={() => goToCart()}
-            >
-              <img
-                className="w-full h-full object-cover"
-                src="/icons/chart.svg"
-                alt="chart-icon"
-              />
-            </div>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-2xl transition-all"
-            >
-              {isMobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
-            </button>
-          </div> */}
-          </div>
-
-          {/* Bottom Navbar - Desktop */}
-          <div className="hidden md:block border-t">
-            <BottomNavbar>
-              <li>
-                <StyledLink href="/">HOME</StyledLink>
-              </li>
-              <li>
-                <StyledLink href="/blog">BLOG</StyledLink>
-              </li>
-              <li>
-                <StyledLink href="/shop">SHOP</StyledLink>
-              </li>
-              <li>
-                <StyledLink href="/about-us">ABOUT US</StyledLink>
-              </li>
-              <li>
-                <StyledLink href="/contact-us">CONTACT US</StyledLink>
-              </li>
-            </BottomNavbar>
           </div>
 
           {/* Mobile Dropdown Menu */}
@@ -321,6 +418,11 @@ export default function Navbar({ dataUser }: PropTypes) {
               <h1>Are you sure you want to logout?</h1>
             </div>
           </Modal>
+
+          {/* <Modal
+            style={{ position: "relative", zIndex: "-100", display: "hidden" }}
+            open={dropCategory}
+          /> */}
         </nav>
       )}
     </>

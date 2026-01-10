@@ -313,7 +313,9 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   type="primary"
                   size="large"
                   icon={<ShoppingCartOutlined />}
-                  onClick={handleAddToCart}
+                  onClick={() => {
+                    handleAddToCart(), router.refresh();
+                  }}
                   disabled={loading}
                   className="!flex-1 h-12 !font-semibold !p-3  !text-[12px] sm:!text-sm"
                 >

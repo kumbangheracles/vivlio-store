@@ -16,14 +16,24 @@ import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
 import AntdRegistry from "@/libs/AntdRegistry";
 import useDeviceType from "@/hooks/useDeviceType";
+import { CategoryProps } from "@/types/category.types";
+import { BookProps } from "@/types/books.type";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
   isAuthPageTampil?: boolean;
+  dataCategories?: CategoryProps[];
+  dataCartedBooks?: BookProps[];
 }
-const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
+const AppLayout: React.FC<LayoutProps> = ({
+  children,
+  dataUser,
+  dataCategories,
+  dataCartedBooks,
+}) => {
   const pathname = usePathname();
   const isMobile = useDeviceType();
+
   const isPageAuth = pathname.startsWith("/auth");
   const isResult = pathname.startsWith("/result");
   useEffect(() => {
@@ -54,7 +64,11 @@ const AppLayout: React.FC<LayoutProps> = ({ children, dataUser }) => {
               ) : (
                 <>
                   <WrapperLayout>
-                    <Navbar dataUser={dataUser} />
+                    <Navbar
+                      dataUser={dataUser}
+                      dataCategories={dataCategories}
+                      dataCartedBooks={dataCartedBooks}
+                    />
                     <WrapperChildren isMobile={isMobile}>
                       <Suspense fallback={<GlobalLoading />}>
                         {children}
