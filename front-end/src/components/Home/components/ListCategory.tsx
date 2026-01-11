@@ -2,8 +2,7 @@
 
 import React from "react";
 import CardCategory from "./CardCategory";
-import { Card } from "antd";
-import { styled } from "styled-components";
+
 import { ListCardWrapper } from "..";
 import { CategoryProps } from "@/types/category.types";
 

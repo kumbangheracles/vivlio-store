@@ -11,26 +11,27 @@ type PropTypes = CategoryProps & {
 
 const CardCategory = (prop: PropTypes) => {
   return (
-    <MyCard key={prop?.index}>
-      <div className="flex flex-col justify-center text-center items-center gap-3">
-        <WrapperImage className="wrapper-img-category">
-          {prop?.categoryImage ? (
-            <StyledImage
-              src={prop?.categoryImage.imageUrl!}
-              alt={`category-${prop?.name}`}
-              width={100}
-              height={100}
-            />
-          ) : (
-            <>
-              <StyledImage src={DefaultImage} alt={`category-${prop?.name}`} />
-            </>
-          )}
-        </WrapperImage>
+    <div
+      key={prop.index}
+      className="relative w-[340px] border-gray-300 border-2 h-[180px] rounded-xl overflow-hidden shadow-lg cursor-pointer group"
+    >
+      {/* Background Image */}
+      <Image
+        src={prop.categoryImage?.imageUrl || DefaultImage}
+        width={100}
+        height={100}
+        alt={"Test"}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
 
-        <TitleCategory>{prop?.name}</TitleCategory>
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex items-end p-4">
+        <h3 className="text-white text-lg font-semibold">{prop.name}</h3>
       </div>
-    </MyCard>
+    </div>
   );
 };
 
@@ -41,40 +42,6 @@ const TitleCategory = styled.h1`
   font-size: 16px;
   text-align: center;
   letter-spacing: 1px;
-`;
-
-const MyCard = styled(Card)`
-  padding: 1rem;
-  cursor: pointer;
-
-  border: 1px solid #cecbcb;
-  width: 200px;
-  height: 200px;
-  z-index: -10;
-  border-radius: 10px;
-
-  transition: 0.5s;
-
-  &:hover {
-    transform: scale(1.05);
-
-    padding: 0;
-  }
-`;
-
-const WrapperImage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
-  border: 2px solid #cecbcb;
-
-  border-radius: 50%;
-
-  transition: transform 0.5s ease;
 `;
 
 const StyledImage = styled(Image)`
