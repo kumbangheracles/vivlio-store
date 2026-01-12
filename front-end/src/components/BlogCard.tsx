@@ -23,7 +23,7 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
       {isMobile ? (
         <div
           onClick={() => handleGoToDetail(dataAricle?.id as string)}
-          className="relative rounded-md w-[100px] flex-none basis-[10em] overflow-hidden h-[200px] border border-[#cacaca]"
+          className="relative rounded-md flex-none basis-[8.5em] overflow-hidden h-[200px] border border-[#cacaca]"
         >
           <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
             {dayjs(dataAricle?.createdAt).format("YYYY-MM-DD") || "No Content"}
@@ -47,7 +47,7 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
               className="text-[10px] sm:text-sm text-gray-500"
               dangerouslySetInnerHTML={{
                 __html:
-                  truncateText(dataAricle?.description as string, 100) ||
+                  truncateText(dataAricle?.description as string, 80) ||
                   "No Content",
               }}
             ></div>

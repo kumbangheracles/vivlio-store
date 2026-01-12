@@ -8,8 +8,8 @@ interface PropTypes {
 }
 const ArticleIndex = ({ dataArticles }: PropTypes) => {
   return (
-    <div className="w-full min-h-screen">
-      <div className="mt-[100px]">
+    <div className="w-full">
+      <div className="mt-[40px] sm:mt-[100px] w-full">
         {!dataArticles ? (
           <div className="p-4 w-full h-full">
             <div className="flex items-center justify-center h-screen w-full flex-col gap-3">
@@ -27,7 +27,7 @@ const ArticleIndex = ({ dataArticles }: PropTypes) => {
             <h4 className="p-4 text-center font-semibold text-3xl text-sky-500 text-shadow-lg">
               VIVLIO BLOG
             </h4>
-            <div className="p-4 flex flex-wrap justify-center gap-5">
+            <div className="flex flex-wrap justify-center gap-2  py-3 mx-3 bg-gray-100 rounded-md">
               {dataArticles?.map((item) => (
                 <BlogCard dataAricle={item} />
               ))}

@@ -83,6 +83,22 @@ export default function Navbar({
     }
   };
 
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase() // huruf kecil
+      .trim() // hapus spasi depan/belakang
+      .replace(/[^a-z0-9\s-]/g, "") // hapus karakter aneh
+      .replace(/\s+/g, "-") // spasi → -
+      .replace(/-+/g, "-"); // -- → -
+  };
+
+  const goToCategory = (categoryName: string, categoryId: string) => {
+    const slug = slugify(categoryName);
+    router.push(`/category/${slug}/${categoryId}`);
+
+    setIsDropCategory(false);
+  };
+
   const items = auth.authenticated
     ? [
         {
@@ -249,6 +265,7 @@ export default function Navbar({
                   <div
                     className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
                     key={item.categoryId}
+                    onClick={() => goToCategory(item?.name, item?.categoryId)}
                   >
                     {item.name}
                   </div>

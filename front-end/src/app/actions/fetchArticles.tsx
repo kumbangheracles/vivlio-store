@@ -14,7 +14,11 @@ async function fetchArticles(): Promise<ArticleProperties[]> {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
 
-    return response.data.results;
+    const filteredArticles = response.data?.results?.filter(
+      (item: ArticleProperties) => item.status === "PUBLISHED"
+    );
+
+    return filteredArticles;
   } catch (err: any) {
     console.log("Error fetch articles:", err || err);
     return [];

@@ -289,7 +289,11 @@ router.patch(
         return res.status(400).json({ message: "ID is required" });
       }
       let profileImage = req.body.profileImage;
-      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      let hashedPassword;
+
+      if (req.body.password) {
+        hashedPassword = await bcrypt.hash(req.body.password, 10);
+      }
       const user = await User.findByPk(id, { transaction: t });
 
       if (
@@ -308,9 +312,9 @@ router.patch(
       await User.update(
         {
           ...req.body,
-          // password: hashedPassword // sementara gini dlu
+          ...(hashedPassword && { password: hashedPassword }),
         },
-        { where: { id } }
+        { where: { id }, transaction: t }
       );
 
       if (typeof profileImage === "string") {

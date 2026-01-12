@@ -71,8 +71,8 @@ const Category = () => {
     } catch (error) {
       ErrorHandler(error);
     } finally {
+      fetchCategory(page, limit);
       setloading(false);
-      await fetchCategory(page, limit);
     }
   };
 
@@ -131,7 +131,7 @@ const Category = () => {
           >
             <Image
               src={src}
-              alt={record.name}
+              alt={record?.name}
               style={{ objectFit: "cover", width: "100px", height: "100px" }}
             />
           </div>
@@ -148,8 +148,8 @@ const Category = () => {
       dataIndex: "description",
       key: "description",
       render: (text) =>
-        text.length > 80
-          ? text.slice(0, 80) + " . . . . ."
+        text?.length > 80
+          ? text?.slice(0, 80) + " . . . . ."
           : text || "No Content",
     },
     {
@@ -159,11 +159,11 @@ const Category = () => {
       render: (_: any, record: CategoryProps) => {
         return (
           <Switch
-            value={record.status!}
+            value={record?.status!}
             onChange={(value) => {
-              handleStatusChange(record.categoryId, value);
+              handleStatusChange(record?.categoryId, value);
             }}
-            style={{ backgroundColor: record.status ? "lightgreen" : "gray" }}
+            style={{ backgroundColor: record?.status ? "lightgreen" : "gray" }}
           />
         );
       },

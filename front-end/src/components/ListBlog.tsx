@@ -88,7 +88,7 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
   }, []);
 
   return (
-    <div className="py-4 w-full mt-4 relative">
+    <div className="py-4 w-full mt-4 relative bg-gray-100 rounded-md">
       <div className="flex justify-between items-center">
         <h4 className="font-bold text-sm tracking-wider sm:text-xl sm:!ml-10 ml-3">
           Blog

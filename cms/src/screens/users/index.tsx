@@ -94,7 +94,6 @@ const UserIndex = () => {
       );
 
       message.success("Success update status");
-      console.log("New data:", res.data.result);
     } catch (error) {
       ErrorHandler(error);
     } finally {

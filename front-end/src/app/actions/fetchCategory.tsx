@@ -12,7 +12,10 @@ async function fetchCategory(): Promise<CategoryProps[]> {
     const url = "/book-category/public";
     const response = await myAxios.get(url);
 
-    return response.data.results;
+    const filteredCategory = response.data.results.filter(
+      (item: CategoryProps) => item.status === true
+    );
+    return filteredCategory;
   } catch (err: any) {
     console.log("fetchBooks error:", err.message || err);
     return [];

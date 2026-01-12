@@ -10,6 +10,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import MobileBanner from "./components/MobileBanner";
 import ListBlog from "../ListBlog";
 import { ArticleProperties } from "@/types/article.type";
+import { useRouter } from "next/navigation";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -19,6 +20,7 @@ interface PropTypes {
 }
 
 export default function HomePage(prop: PropTypes) {
+  const router = useRouter();
   const isMobile = useDeviceType();
   const recentPopularBook = prop.dataBooks
     ?.filter((item) => item.isPopular)
@@ -43,11 +45,23 @@ export default function HomePage(prop: PropTypes) {
     ?.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return dateB - dateA; // terbaru dulu
+      return dateB - dateA;
     })
-    .slice(0, 5)
-    .filter((item) => item.status === "PUBLISHED");
+    .slice(0, 5);
 
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase() // huruf kecil
+      .trim() // hapus spasi depan/belakang
+      .replace(/[^a-z0-9\s-]/g, "") // hapus karakter aneh
+      .replace(/\s+/g, "-") // spasi → -
+      .replace(/-+/g, "-"); // -- → -
+  };
+
+  const goToCategory = (categoryName: string, categoryId: string) => {
+    const slug = slugify(categoryName);
+    router.push(`/category/${slug}/${categoryId}`);
+  };
   return (
     <>
       {isMobile ? (
@@ -62,39 +76,47 @@ export default function HomePage(prop: PropTypes) {
               </span>
             </div>
             <div className="w-full overflow-x-scroll py-2 scrollbar-hide px-1">
-              <div className="flex items-center gap-3 py-2 px-1 justify-center w-[450px]">
-                <span className="p-3 tracking-wider base-blue text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
-                  All
-                </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
-                  Fantasy
-                </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
-                  Sci-fi
-                </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
-                  Art
-                </span>
-                <span className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[80px] rounded-2xl text-[11px] sm:text-sm">
-                  Philosopy
-                </span>
+              <div className="flex items-center gap-3 py-2 px-1 justify-center">
+                {prop.dataCategories?.slice(0, 5).map((item) => (
+                  <span
+                    onClick={() => goToCategory(item?.name, item?.categoryId)}
+                    key={item.categoryId}
+                    className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
+                  >
+                    {item.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
 
           <MobileBanner />
           <div>
-            <ListBook
-              dataBooks={recentPopularBook}
-              titleSection={"Recently Popular"}
-              fetchBooks={prop.fetchBooks}
-            />
-
-            <ListBook titleSection={"Best Seller"} dataBooks={bestSellerBook} />
-
-            <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
-
-            <ListBlog dataArticles={prop.dataArticles as ArticleProperties[]} />
+            <div className="px-3">
+              <ListBook
+                dataBooks={recentPopularBook}
+                titleSection={"Recently Popular"}
+                fetchBooks={prop.fetchBooks}
+                isSeeAll={false}
+              />
+            </div>
+            <div className="px-3">
+              <ListBook
+                isSeeAll={false}
+                titleSection={"Best Seller"}
+                dataBooks={bestSellerBook}
+              />
+            </div>
+            <div className="px-3">
+              <ListBook
+                titleSection={"Newest Book"}
+                isSeeAll={false}
+                dataBooks={newestBooks}
+              />
+            </div>
+            <div className="px-3">
+              <ListBlog dataArticles={newestArticles as ArticleProperties[]} />
+            </div>
           </div>
         </>
       ) : (

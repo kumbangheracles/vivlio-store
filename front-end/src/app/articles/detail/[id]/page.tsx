@@ -14,11 +14,11 @@ export const metadata: Metadata = {
 
 export async function generateStaticParams() {
   try {
-    const res = await myAxios.get<{ result: ArticleProperties[] }>("/books");
+    const res = await myAxios.get<{ result: ArticleProperties[] }>("/articles");
     const articles = res.data.result;
 
-    return articles.map((book: ArticleProperties) => ({
-      id: book?.id,
+    return articles.map((article: ArticleProperties) => ({
+      id: article?.id,
     }));
   } catch (error) {
     console.log("Error fetching articles:", error);

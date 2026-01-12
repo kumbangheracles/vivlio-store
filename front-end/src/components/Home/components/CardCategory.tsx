@@ -1,19 +1,33 @@
 "use client";
 
 import { CategoryProps } from "@/types/category.types";
-import { Card } from "antd";
 import Image from "next/image";
-import { styled } from "styled-components";
+import { useRouter } from "next/navigation";
 import DefaultImage from "../../../assets/images/default-img.png";
 type PropTypes = CategoryProps & {
   index?: number;
 };
 
 const CardCategory = (prop: PropTypes) => {
+  const router = useRouter();
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase() // huruf kecil
+      .trim() // hapus spasi depan/belakang
+      .replace(/[^a-z0-9\s-]/g, "") // hapus karakter aneh
+      .replace(/\s+/g, "-") // spasi → -
+      .replace(/-+/g, "-"); // -- → -
+  };
+
+  const goToCategory = (categoryName: string, categoryId: string) => {
+    const slug = slugify(categoryName);
+    router.push(`/category/${slug}/${categoryId}`);
+  };
   return (
     <div
       key={prop.index}
-      className="relative w-[340px] border-gray-300 border-2 h-[180px] rounded-xl overflow-hidden shadow-lg cursor-pointer group"
+      onClick={() => goToCategory(prop.name, prop.categoryId)}
+      className="relative w-[200px] border-gray-300 border-2 h-[140px] rounded-xl overflow-hidden shadow-lg cursor-pointer group"
     >
       {/* Background Image */}
       <Image
@@ -36,20 +50,3 @@ const CardCategory = (prop: PropTypes) => {
 };
 
 export default CardCategory;
-
-const TitleCategory = styled.h1`
-  font-weight: 600;
-  font-size: 16px;
-  text-align: center;
-  letter-spacing: 1px;
-`;
-
-const StyledImage = styled(Image)`
-  transition: transform 0.3s ease-in-out;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-
-  /* border: 1px solid gray; */
-`;
