@@ -3,7 +3,8 @@
 import React, { Suspense } from "react";
 import styled from "styled-components";
 import type { BookProps } from "../../../types/books.type";
-import { Empty, Result } from "antd";
+import { Result } from "antd";
+import { cn } from "@/libs/cn";
 import GlobalLoading from "@/components/GlobalLoading";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
@@ -15,6 +16,7 @@ interface BookTypes {
   fetchBooks?: any;
   isSpace?: boolean;
   isSeeAll?: boolean;
+  isCategory?: boolean;
 }
 
 const ListBook: React.FC<BookTypes> = ({
@@ -23,6 +25,7 @@ const ListBook: React.FC<BookTypes> = ({
   fetchBooks,
   isSpace = false,
   isSeeAll = true,
+  isCategory = false,
 }) => {
   const isMobile = useDeviceType();
   return (
@@ -49,6 +52,8 @@ const ListBook: React.FC<BookTypes> = ({
                     key={item.id}
                     data-aos="fade-up"
                     data-aos-delay={index * 100}
+                    data-aos-offset="0"
+                    data-aos-anchor-placement="top-center"
                   >
                     <CardBook
                       title={item.title}
@@ -71,8 +76,12 @@ const ListBook: React.FC<BookTypes> = ({
               ) : (
                 <Result
                   status="404"
-                  title="Buku tidak ditemukan"
-                  subTitle="Belum ada buku pada kategori ini."
+                  title="Book not found"
+                  subTitle={
+                    isCategory
+                      ? "There are no books available in this category."
+                      : "There are no books related"
+                  }
                 />
               )}
             </div>
@@ -83,12 +92,20 @@ const ListBook: React.FC<BookTypes> = ({
       ) : (
         <>
           {" "}
-          <div style={{ marginTop: "50px" }}>
+          <div
+            className={`mt-10 pt-2 rounded-md ${cn(
+              isCategory ? "bg-gray-100" : "bg-white"
+            )}`}
+          >
             {dataBooks!?.length > 0 ? (
               <>
                 <TitleList>{titleSection}</TitleList>
                 <Suspense fallback={<GlobalLoading />}>
-                  <ListBookWrapper className="flex flex-wrap gap-5 justify-center">
+                  <ListBookWrapper
+                    className={`flex flex-wrap gap-5 justify-center ${cn(
+                      isCategory ? "!pt-5 !pb-10" : ""
+                    )}`}
+                  >
                     {dataBooks?.slice(0, 8).map((item, index) => (
                       <div
                         key={item?.id}
@@ -122,7 +139,15 @@ const ListBook: React.FC<BookTypes> = ({
             ) : (
               <>
                 <TitleList>{titleSection}</TitleList>
-                <Empty />
+                <Result
+                  status="404"
+                  title="Book not found"
+                  subTitle={
+                    isCategory
+                      ? "There are no books available in this category."
+                      : "There are no books related"
+                  }
+                />
               </>
             )}
           </div>

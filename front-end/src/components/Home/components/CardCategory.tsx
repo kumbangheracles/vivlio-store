@@ -27,7 +27,7 @@ const CardCategory = (prop: PropTypes) => {
     <div
       key={prop.index}
       onClick={() => goToCategory(prop.name, prop.categoryId)}
-      className="relative w-[200px] border-gray-300 border-2 h-[140px] rounded-xl overflow-hidden shadow-lg cursor-pointer group"
+      className="relative w-full sm:w-[200px] border-gray-300 border-2 h-[100px] sm:h-[140px] rounded-xl overflow-hidden shadow-lg cursor-pointer group"
     >
       {/* Background Image */}
       <Image
@@ -43,7 +43,9 @@ const CardCategory = (prop: PropTypes) => {
 
       {/* Content */}
       <div className="relative z-10 h-full flex items-end p-4">
-        <h3 className="text-white text-lg font-semibold">{prop.name}</h3>
+        <h3 className="text-white text-sm sm:text-lg font-semibold">
+          {prop.name}
+        </h3>
       </div>
     </div>
   );

@@ -37,7 +37,10 @@ const AppLayout: React.FC<LayoutProps> = ({
   const isPageAuth = pathname.startsWith("/auth");
   const isResult = pathname.startsWith("/result");
   useEffect(() => {
-    AOS.init();
+    AOS.init({
+      once: true, // animasi hanya sekali
+      mirror: false,
+    });
   }, []);
 
   useEffect(() => {

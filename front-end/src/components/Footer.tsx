@@ -57,7 +57,12 @@ const Footer = () => {
                   className={path === "/" ? classFoot : "w-[20px]"}
                 />
               </div>
-              <div className="flex items-center flex-col relative w-full">
+              <div
+                className="flex items-center flex-col relative w-full"
+                onClick={() => {
+                  router.push("/category");
+                }}
+              >
                 <Image
                   src={CategoryOutlined}
                   width={20}

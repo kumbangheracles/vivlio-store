@@ -155,8 +155,21 @@ export const ListCardWrapper = styled.div`
   width: 100%;
   margin: auto;
   justify-content: center;
+  flex-direction: column;
 
-  gap: 20px;
+  gap: 10px;
+  @media (min-width: 720px) {
+    padding: 1rem;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    margin: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 20px;
+  }
 `;
 
 export const TitleList = styled.h4`

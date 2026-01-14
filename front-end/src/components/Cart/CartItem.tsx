@@ -100,7 +100,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
   return (
     <div
       key={book?.id}
-      className="flex items-center gap-3 sm:justify-between p-3 mx-1 mt-2 sm:mt-0 sm:mx-0 sm:m-3 border border-gray-300 rounded-xl sm:shadow-md !w-full bg-white"
+      className="flex items-center gap-3 sm:justify-between p-3 mx-1 mt-2 sm:mt-0 sm:mx-0 sm:m-3 border border-gray-300 rounded-xl sm:shadow-md  bg-white"
     >
       <div className="sm:flex hidden items-center gap-3 w-full">
         <Checkbox
