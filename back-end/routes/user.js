@@ -4,9 +4,7 @@ const bcrypt = require("bcryptjs");
 const { User, UserImage } = require("../models/index");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
-const { Op, where } = require("sequelize");
 const { sequelize } = require("../config/database");
-const uploader = require("../config/uploader");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 router.get(
   "/public",
@@ -54,6 +52,11 @@ router.get(
     const { page = 1, limit = 10, id } = req.query;
     const offset = (page - 1) * limit;
     try {
+      if (!req.id)
+        return res.status(401).json({
+          status: 401,
+          message: "Unauthorized",
+        });
       const { count, rows } = await User.findAndCountAll({
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
@@ -67,15 +70,15 @@ router.get(
         offset,
       });
 
-      const filtersWithAdminId = req.id
-        ? rows.filter((item) => item.createdByAdminId === req.id)
-        : rows;
+      // const filtersWithAdminId = req.id
+      //   ? rows.filter((item) => item.createdByAdminId === req.id)
+      //   : rows;
 
       res.status(200).json({
         where: !!req.id,
         status: 200,
         message: "Success",
-        results: filtersWithAdminId,
+        results: rows,
         total: count,
         currentPage: parseInt(page, 10),
         totalPages: Math.ceil(count / limit),

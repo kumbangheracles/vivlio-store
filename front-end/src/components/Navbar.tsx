@@ -216,7 +216,8 @@ export default function Navbar({
                           className="object-cover w-full h-full"
                           src={
                             auth?.authenticated
-                              ? dataUser?.profileImage?.imageUrl
+                              ? dataUser?.profileImage?.imageUrl ??
+                                "/icons/account.svg"
                               : "/icons/account.svg"
                           }
                           alt="account-icon"

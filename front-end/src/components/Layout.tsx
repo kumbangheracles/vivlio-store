@@ -55,8 +55,8 @@ const AppLayout: React.FC<LayoutProps> = ({
   }, []);
   return (
     <>
-      <AntdRegistry>
-        <ConfigProvider>
+      <ConfigProvider>
+        <AntdRegistry>
           <StyleSheetManager shouldForwardProp={isPropValid}>
             <StyleProvider hashPriority="high">
               {isPageAuth || isResult ? (
@@ -80,8 +80,8 @@ const AppLayout: React.FC<LayoutProps> = ({
               )}
             </StyleProvider>
           </StyleSheetManager>
-        </ConfigProvider>
-      </AntdRegistry>
+        </AntdRegistry>
+      </ConfigProvider>
     </>
   );
 };

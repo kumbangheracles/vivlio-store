@@ -56,7 +56,7 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
       ) : (
         <div
           onClick={() => handleGoToDetail(dataAricle?.id as string)}
-          className="blog-card rounded-md border border-[#cacaca] w-[200px] h-[200px]  sm:w-[350px] sm:h-[300px] relative overflow-hidden cursor-pointer transition-all hover:shadow-xl "
+          className="blog-card rounded-md border bg-white border-[#cacaca] w-[200px] h-[200px]  sm:w-[350px] sm:h-[300px] relative overflow-hidden cursor-pointer transition-all hover:shadow-xl "
         >
           <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
             {dayjs(dataAricle?.createdAt).format("YYYY-MM-DD") || "No Content"}

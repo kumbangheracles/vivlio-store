@@ -26,10 +26,7 @@ import {
   TwitterCircleFilled,
 } from "@ant-design/icons";
 import AOS from "aos";
-interface OptionProps {
-  id: number;
-  label: string;
-}
+
 import { EUserRole } from "../../../types/user.type";
 
 import { RoleProperties } from "../../../types/role.type";
@@ -64,6 +61,21 @@ const RegisterForm: React.FC = () => {
         value: role.id,
       }))
     : [];
+  useEffect(() => {
+    if (Array.isArray(dataRole) && dataRole.length > 0) {
+      const customerRole = dataRole.find(
+        (role: RoleProperties) => role.name === "customer"
+      );
+
+      if (customerRole) {
+        setSelectedRole(customerRole.id);
+        setUser((prev) => ({
+          ...prev,
+          roleId: customerRole.id,
+        }));
+      }
+    }
+  }, [dataRole]);
 
   const handleSubmit = async (userData: UserProperties) => {
     try {
@@ -79,9 +91,9 @@ const RegisterForm: React.FC = () => {
       };
       console.log("BOdy:", body);
       localStorage.setItem("email", body.email!);
-      const res = await myAxios.post("auth/register", body);
+      const res = await myAxios.post("/auth/register", body);
       if (res) {
-        navigate.push("/register/verification-code");
+        navigate.push("/auth/register/verification-code");
       }
       console.log("Data terkirim: ", res.data);
 
@@ -91,7 +103,6 @@ const RegisterForm: React.FC = () => {
         "Success Registration! Please check your email for verification code."
       );
     } catch (error) {
-      console.log(error);
       ErrorHandler(error);
     } finally {
       setLoading(false);
@@ -209,6 +220,7 @@ const RegisterForm: React.FC = () => {
                 />
               </Form.Item>
               <Form.Item
+                hidden={true}
                 required={true}
                 label="Role"
                 style={{ width: "60%", letterSpacing: 1 }}

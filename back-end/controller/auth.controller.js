@@ -232,15 +232,16 @@ module.exports = {
           data: null,
         });
       }
-
+      console.log("Input Password:", password);
+      console.log("DB Password:", userByIdentifier.password);
       // validasi password
-      // const validatePassword = await bcrypt.compare(
-      //   password,
-      //   userByIdentifier.password
-      // );
+      const validatePassword = await bcrypt.compare(
+        password,
+        userByIdentifier.password
+      );
 
-      //untuk sementara
-      const validatePassword = password === userByIdentifier.password;
+      // untuk sementara
+      // const validatePassword = password === userByIdentifier.password;
 
       if (!validatePassword) {
         return res.status(403).json({

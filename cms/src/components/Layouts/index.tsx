@@ -227,6 +227,7 @@ const AppLayout = ({ children }: PropTypes) => {
                   display: "flex",
                   position: "absolute",
                   bottom: "0",
+
                   right: 0,
                 }}
               >
