@@ -48,7 +48,7 @@ const Footer = () => {
       {isMobile ? (
         <>
           {path !== "/cart" ? (
-            <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 py-5 px-7 z-50 m-2 !left-[-8px] rounded-xl">
+            <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 py-5 px-7 z-50">
               <div className="flex items-center flex-col relative w-full">
                 <HomeOutlined
                   onClick={() => {
@@ -134,7 +134,7 @@ const Footer = () => {
             <AboutSection>
               <h1 className="font-bold">About the company</h1>
               <p className="mt-2.5">
-                Vivlio is here to be your reading companion. We offer a wide
+                ViviBook is here to be your reading companion. We offer a wide
                 selection of books for all ages, believing every page holds a
                 story and meaning worth discovering.
               </p>
@@ -145,7 +145,7 @@ const Footer = () => {
 
           {/* Bottom Bar */}
           <BottomBar>
-            <p>© 2025 PT Vivlio Jaya Media</p>
+            <p>© 2025 kumbangheracles</p>
             <div className="social-icons">
               <FacebookOutlined />
               <InstagramOutlined />

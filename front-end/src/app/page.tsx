@@ -1,21 +1,10 @@
 import HomePage from "@/components/Home";
-import myAxios from "@/libs/myAxios";
-// import { BookProps } from "@/types/books.type";
-// import { getServerSession } from "next-auth";
-// import { cookies } from "next/headers";
-// import Image from "next/image";
-// import { authOptions } from "./api/auth/[...nextauth]/route";
-import { CategoryProps } from "@/types/category.types";
 import fetchBooksHome from "./actions/fetchBooksHome";
 import fetchArticles from "./actions/fetchArticles";
 import fetchCategory from "./actions/fetchCategory";
-// import { resolve } from "path";
-// import GlobalLoading from "@/components/GlobalLoading";
-// import { FaSpinner } from "react-icons/fa";
-// import { Spin } from "antd";
 
 export const metadata = {
-  title: "Vivlio - Home",
+  title: "ViviBook - Home",
   description: "Home page",
 };
 

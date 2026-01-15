@@ -19,6 +19,8 @@ import { cn } from "@/libs/cn";
 import useDeviceType from "@/hooks/useDeviceType";
 import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
+import MainLogo from "../assets/main-logo.png";
+import Image from "next/image";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
@@ -151,19 +153,32 @@ export default function Navbar({
 
   return (
     <>
-      {isMobile && path === "/cart" ? (
+      {(isMobile && path === "/cart") || (isMobile && path === "/account") ? (
         <></>
       ) : (
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">
           {/* Desktop */}
           <div className="hidden sm:flex relative flex-col justify-center items-center min-w-full">
             <div className="flex justify-between w-full items-center px-5 z-[99] bg-[#d9eafd] md:px-[100px] py-4">
-              <span
-                className="font-extrabold tracking-widest text-xl logo cursor-pointer"
+              <div
+                className="font-extrabold tracking-widest text-xl logo cursor-pointer "
                 onClick={() => router.push("/")}
               >
-                VIVLIO
-              </span>
+                <div className="flex items-center gap-3">
+                  <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-hidden">
+                    <Image
+                      width={100}
+                      height={100}
+                      className="w-full h-full object-cover"
+                      src={MainLogo}
+                      alt="main-logo"
+                    />
+                  </div>
+                  <h4 className="text-xl font-bold tracking-wide text-gray-600">
+                    ViviBook
+                  </h4>
+                </div>
+              </div>
 
               <div className=" w-full flex  items-center gap-3 justify-center sm:w-[50%]">
                 <div
@@ -278,15 +293,6 @@ export default function Navbar({
           {/* Mobile */}
           <div className=" sm:hidden flex justify-between items-center px-5 md:px-[100px] py-3">
             {/* Logo */}
-
-            {!isMobile && (
-              <span
-                className="font-extrabold tracking-widest text-xl logo cursor-pointer"
-                onClick={() => router.push("/")}
-              >
-                VIVLIO
-              </span>
-            )}
 
             <div className="input-search-navbar w-full sm:w-[70%] mr-4">
               <AppInput

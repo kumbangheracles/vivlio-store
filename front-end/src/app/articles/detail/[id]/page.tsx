@@ -8,7 +8,7 @@ interface PageProps {
   params: { id: string };
 }
 export const metadata: Metadata = {
-  title: "Vivlio - Article Detail",
+  title: "ViviBook - Article Detail",
   description: "Article Detail",
 };
 

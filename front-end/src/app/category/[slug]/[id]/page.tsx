@@ -6,7 +6,7 @@ interface PageProps {
   params: { id: string; slug: string };
 }
 export const metadata: Metadata = {
-  title: `Vivlio - Category`,
+  title: `ViviBook - Category`,
   description: "Category",
 };
 

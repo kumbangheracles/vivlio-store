@@ -11,7 +11,7 @@ interface BookDetailPageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Vivlio - Book Detail",
+  title: "ViviBook - Book Detail",
   description: "Book Detail",
 };
 

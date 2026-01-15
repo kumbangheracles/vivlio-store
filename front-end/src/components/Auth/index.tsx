@@ -58,7 +58,7 @@ const LoginForm: React.FC = () => {
       } else if (result?.ok) {
         const session = await getSession();
         console.log("Login successful:", session);
-        message.success("Login berhasil");
+        message.success("Login Success, Welcome to ViviBook!!.");
         navigate.push("/");
       }
     } catch (error) {

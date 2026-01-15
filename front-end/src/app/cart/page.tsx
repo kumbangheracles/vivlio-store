@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import fetchCartedBooks from "../actions/fetchCartedBooks";
 
 export const metadata: Metadata = {
-  title: "Vivlio - Cart",
+  title: "ViviBook - Cart",
   description: "Home page",
 };
 

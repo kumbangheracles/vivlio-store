@@ -1,5 +1,4 @@
 import AccountIndex from "@/components/Account";
-import AppLayout from "@/components/Layout";
 
 import { UserProperties } from "@/types/user.type";
 import fetchUser from "../actions/fetchUser";
@@ -7,7 +6,7 @@ import fetchUser from "../actions/fetchUser";
 import fetchWishlist from "../../components/Account/fetchWishlist";
 
 export const metadata = {
-  title: "Vivlio - Profile",
+  title: "ViviBook - Profile",
   description: "Profile page",
 };
 
