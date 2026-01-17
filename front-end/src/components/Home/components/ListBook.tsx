@@ -94,7 +94,7 @@ const ListBook: React.FC<BookTypes> = ({
           {" "}
           <div
             className={`mt-10 pt-2 rounded-md ${cn(
-              isCategory ? "bg-gray-100" : "bg-white"
+              isCategory ? "bg-gray-100" : "bg-white",
             )}`}
           >
             {dataBooks!?.length > 0 ? (
@@ -103,7 +103,7 @@ const ListBook: React.FC<BookTypes> = ({
                 <Suspense fallback={<GlobalLoading />}>
                   <ListBookWrapper
                     className={`flex flex-wrap gap-5 justify-center ${cn(
-                      isCategory ? "!pt-5 !pb-10" : ""
+                      isCategory ? "!pt-5 !pb-10" : "",
                     )}`}
                   >
                     {dataBooks?.slice(0, 8).map((item, index) => (

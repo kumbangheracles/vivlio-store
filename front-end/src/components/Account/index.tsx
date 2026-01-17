@@ -17,6 +17,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { FaRegMap } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
@@ -28,6 +29,7 @@ const AccountIndex: React.FC<AccountProps> = ({
   dataWishlist,
   fetchWishlist,
 }) => {
+  const router = useRouter();
   const LOCAL_STORAGE_KEY = "lastActiveTabKey";
   const isMobile = useDeviceType();
   const [activeTab, setActiveTab] = useState("account");
@@ -94,7 +96,7 @@ const AccountIndex: React.FC<AccountProps> = ({
       id: 2,
       title: "Wishlist",
       icon: <HeartOutlined />,
-      path: "/account/wishilist",
+      path: "/account/wishlist",
     },
     {
       id: 3,
@@ -119,7 +121,7 @@ const AccountIndex: React.FC<AccountProps> = ({
     <>
       {isMobile ? (
         <div>
-          <div className="fixed top-0 bg-white shadow-sm w-full p-5 z-[999]">
+          <div className="fixed top-0 bg-white shadow-sm w-full px-3 py-3 z-[999]">
             <h4 className="text-sm font-bold tracking-wide">Account</h4>
           </div>
 
@@ -154,7 +156,11 @@ const AccountIndex: React.FC<AccountProps> = ({
           <div className="p-4 flex flex-col gap-2">
             <>
               {listSection.map((item) => (
-                <div className="flex items-center gap-3 p-2" key={item.id}>
+                <div
+                  className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md"
+                  key={item.id}
+                  onClick={() => router.push(item.path)}
+                >
                   {item.icon}
                   <h4 className="font-normal tracking-wide text-[12px]">
                     {item.title}
@@ -163,7 +169,7 @@ const AccountIndex: React.FC<AccountProps> = ({
               ))}
             </>
 
-            <div className="flex items-center gap-3 p-2">
+            <div className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md">
               <LogoutOutlined />
               <h4 className="font-normal tracking-wide text-[12px]">Log Out</h4>
             </div>

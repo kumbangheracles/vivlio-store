@@ -11,4 +11,6 @@ export interface BookWithWishlist {
   id?: string;
   bookId?: string;
   userId?: string;
+  createdAt?: Date;
+  updateAt?: Date;
 }

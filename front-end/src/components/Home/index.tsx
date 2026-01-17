@@ -26,18 +26,18 @@ export default function HomePage(prop: PropTypes) {
     ?.filter((item) => item.isPopular)
     .sort(
       (a, b) =>
-        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
     )
-    .slice(0, 5);
+    .slice(0, 6);
 
-  const bestSellerBook = prop.dataBooks?.slice(0, 5);
+  const bestSellerBook = prop.dataBooks?.slice(0, 6);
   const newestBooks = prop.dataBooks
     ?.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA; // terbaru dulu
     })
-    .slice(0, 5); // ambil 5 teratas
+    .slice(0, 6); // ambil 6 teratas
 
   // const { titleSection } = prop;
 
@@ -47,7 +47,7 @@ export default function HomePage(prop: PropTypes) {
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA;
     })
-    .slice(0, 5);
+    .slice(0, 6);
 
   const slugify = (text: string) => {
     return text

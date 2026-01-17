@@ -153,7 +153,9 @@ export default function Navbar({
 
   return (
     <>
-      {(isMobile && path === "/cart") || (isMobile && path === "/account") ? (
+      {(isMobile && path === "/cart") ||
+      (isMobile && path === "/account") ||
+      (isMobile && path === "/account/wishlist") ? (
         <></>
       ) : (
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">
@@ -194,7 +196,7 @@ export default function Navbar({
                   >
                     <DownOutlined
                       className={`text-sm ${cn(
-                        !dropCategory ? "rotate-[0deg]" : "rotate-[180deg]"
+                        !dropCategory ? "rotate-[0deg]" : "rotate-[180deg]",
                       )} transition-all duration-400`}
                     />
                     <h4 className="text-[13px]">Category</h4>
@@ -231,8 +233,8 @@ export default function Navbar({
                           className="object-cover w-full h-full"
                           src={
                             auth?.authenticated
-                              ? dataUser?.profileImage?.imageUrl ??
-                                "/icons/account.svg"
+                              ? (dataUser?.profileImage?.imageUrl ??
+                                "/icons/account.svg")
                               : "/icons/account.svg"
                           }
                           alt="account-icon"
@@ -273,7 +275,7 @@ export default function Navbar({
             {/* Dropdown Category Desktop */}
             <div
               className={` ${cn(
-                dropCategory ? "max-h-[500px]" : "max-h-[0px]"
+                dropCategory ? "max-h-[500px]" : "max-h-[0px]",
               )}   bg-white shadow-2xl p-4 fixed top-1 z-[-10] w-[550px] transition-all duration-400 rounded-xl overflow-hidden`}
             >
               <div className="mt-[80px] flex gap-3 flex-wrap">
