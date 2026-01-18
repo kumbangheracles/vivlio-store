@@ -205,6 +205,7 @@ module.exports = {
       console.log("userId logined: ", req.id);
       const { count, rows } = await Book.findAndCountAll({
         where: whereCondition,
+        distinct: true,
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
         include: [
@@ -365,7 +366,7 @@ module.exports = {
           categoryId: req.body.categoryId || null,
           createdByAdminId: req.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await BookStats.create(
@@ -375,7 +376,7 @@ module.exports = {
           wishlistCount: 0,
           popularityScore: 0,
         },
-        { transaction: t }
+        { transaction: t },
       );
       const bookImagesData = parsedImages.map((img) => ({
         bookId: newBook.id,
@@ -493,14 +494,14 @@ module.exports = {
         });
         console.log(
           "Existing images in DB:",
-          existingImagesInDB.map((img) => img.id)
+          existingImagesInDB.map((img) => img.id),
         );
 
         // Update gambar yang sudah ada
         const existingImages = images.filter((img) => img.id && img.imageUrl);
         console.log(
           "Images to update:",
-          existingImages.map((img) => img.id)
+          existingImages.map((img) => img.id),
         );
 
         for (const img of existingImages) {
@@ -512,18 +513,18 @@ module.exports = {
             {
               where: { id: img.id, bookId: id },
               transaction: t,
-            }
+            },
           );
         }
 
         // Hapus gambar yang tidak dikirim
         const imagesToDelete = existingImagesInDB.filter(
-          (existingImg) => !sentImageIds.includes(existingImg.id)
+          (existingImg) => !sentImageIds.includes(existingImg.id),
         );
 
         console.log(
           "Images to delete:",
-          imagesToDelete.map((img) => img.id)
+          imagesToDelete.map((img) => img.id),
         );
 
         if (imagesToDelete.length > 0) {
@@ -531,7 +532,7 @@ module.exports = {
 
           console.log("Deleting from Cloudinary...");
           await Promise.all(
-            imagesToDelete.map((img) => deleteFromCloudinary(img.imageUrl))
+            imagesToDelete.map((img) => deleteFromCloudinary(img.imageUrl)),
           );
           const deleteResult = await BookImage.destroy({
             where: {
@@ -594,7 +595,7 @@ module.exports = {
       if (bookImages.length > 0) {
         console.log("Deleting from Cloudinary...");
         await Promise.all(
-          bookImages.map((img) => deleteFromCloudinary(img.imageUrl))
+          bookImages.map((img) => deleteFromCloudinary(img.imageUrl)),
         );
 
         console.log("Deleting images from database...");

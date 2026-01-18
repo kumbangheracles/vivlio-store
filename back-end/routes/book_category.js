@@ -69,6 +69,7 @@ router.get(
         where: whereCondition,
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
+        distinct: true,
         include: [
           {
             model: CategoryImage,
@@ -93,7 +94,7 @@ router.get(
         data: [],
       });
     }
-  }
+  },
 );
 
 router.get("/:categoryId", async (req, res) => {
@@ -136,7 +137,7 @@ router.post(
           ...req.body,
           createdByAdminId: req.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       const categoryImageData = imageArray.map((img) => ({
@@ -164,7 +165,7 @@ router.post(
         data: [],
       });
     }
-  }
+  },
 );
 
 router.patch(
@@ -225,7 +226,7 @@ router.patch(
             {
               where: { id: categoryImage.id, categoryId: categoryId },
               transaction: t,
-            }
+            },
           );
         } else if (!categoryImage.id && categoryImage.imageUrl) {
           console.log("Adding new Category image");
@@ -235,7 +236,7 @@ router.patch(
               imageUrl: categoryImage.imageUrl,
               public_id: categoryImage.public_id || null,
             },
-            { transaction: t }
+            { transaction: t },
           );
 
           if (existingImage) {
@@ -267,7 +268,7 @@ router.patch(
         data: [],
       });
     }
-  }
+  },
 );
 
 router.delete(
@@ -300,7 +301,7 @@ router.delete(
       if (categoryImage.length > 0) {
         console.log("Deleting from Cloudinary...");
         await Promise.all(
-          categoryImage.map((img) => deleteFromCloudinary(img.imageUrl))
+          categoryImage.map((img) => deleteFromCloudinary(img.imageUrl)),
         );
 
         console.log("Deleting images from database...");
@@ -322,7 +323,7 @@ router.delete(
         data: [],
       });
     }
-  }
+  },
 );
 
 module.exports = router;

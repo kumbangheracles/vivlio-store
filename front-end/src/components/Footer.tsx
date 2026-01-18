@@ -102,7 +102,7 @@ const Footer = () => {
                   height={20}
                   alt="location"
                 />
-                <p>Jln raya bayur kali</p>
+                <p>North of Westaros, Winterfell</p>
               </IconWrapper>
               <IconWrapper>
                 <PhoneFilled />
@@ -122,14 +122,14 @@ const Footer = () => {
               <Link className="link" href={"/blog"}>
                 Blog
               </Link>
-              <Link className="link" href={"/shop"}>
-                Shop
+              <Link className="link" href={"/cart"}>
+                Cart
               </Link>
-              <Link className="link" href={"/about-us"}>
-                About Us
+              <Link className="link" href={"/account"}>
+                Account Details
               </Link>
-              <Link className="link" href={"/contact-us"}>
-                Contact Us
+              <Link className="link" href={"/"}>
+                Browse Book
               </Link>
             </Navigation>
 

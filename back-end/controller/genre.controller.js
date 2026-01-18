@@ -41,11 +41,12 @@ module.exports = {
       const { count, rows } = await Genre.findAndCountAll({
         order: [["createdAt", "DESC"]],
         limit: parseInt(limit),
+        distinct: true,
         offset,
       });
 
       const rowsWithAdminId = rows.filter(
-        (item) => item.createdByAdminId === req.id
+        (item) => item.createdByAdminId === req.id,
       );
 
       res.status(200).json({

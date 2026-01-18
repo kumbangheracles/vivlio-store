@@ -43,24 +43,25 @@ const Books = () => {
   const auth = useAuthUser<UserProperties>();
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<BookProps[]>([]);
-  const fetchBooks = async (page: number, limit: number) => {
+  const fetchBooks = async (page: number, limit: number, search?: string) => {
     try {
       setloading(true);
       const res = await myAxios.get("/books/admin", {
-        params: { page, limit },
+        params: { page, limit, search },
       });
+
       setDataBooks(res.data.results);
       setTotalItems(res.data.total);
-      console.log("Data books: ", res.data);
     } catch (error) {
-      console.log("error fetch books: ", error);
+      console.log(error);
     } finally {
       setloading(false);
     }
   };
+
   useEffect(() => {
-    fetchBooks(page, limit);
-  }, [page, limit]);
+    fetchBooks(page, limit, debouncedSearch);
+  }, [page, limit, debouncedSearch]);
 
   const handleStatusChange = async (id: string, status: BookStatusType) => {
     try {
@@ -68,7 +69,7 @@ const Books = () => {
 
       const res = await myAxios.patch(`/books/${id}`, { status });
       setDataBooks((prev) =>
-        prev.map((item) => (item?.categoryId === id ? res.data : item))
+        prev.map((item) => (item?.categoryId === id ? res.data : item)),
       );
 
       message.success("Success update status");
@@ -110,7 +111,7 @@ const Books = () => {
   useEffect(() => {
     if (debouncedSearch) {
       const filtered = dataBooks.filter((item: BookProps) =>
-        item.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+        item.title.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setFilteredData(filtered);
     } else {
@@ -186,8 +187,8 @@ const Books = () => {
                 i === BookStatusType.PUBLISH
                   ? "success"
                   : i === BookStatusType.UNPUBLISH
-                  ? "normal"
-                  : "",
+                    ? "normal"
+                    : "",
             }))}
           />
         );

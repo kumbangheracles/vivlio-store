@@ -12,6 +12,7 @@ module.exports = {
     try {
       const { count, rows } = await Articles.findAndCountAll({
         limit: parseInt(limit),
+        distinct: true,
         include: [
           {
             model: ArticleImages,
@@ -84,7 +85,7 @@ module.exports = {
           ...req.body,
           createdByAdminId: req.id,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       const articleImageData = imageArray.map((img) => ({
@@ -132,7 +133,7 @@ module.exports = {
         {
           ...req.body,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       if (typeof articleImages === "string") {
@@ -167,7 +168,7 @@ module.exports = {
             {
               where: { id: articleImages.id, userId: id },
               transaction: t,
-            }
+            },
           );
         } else if (!articleImages.id && articleImages.imageUrl) {
           console.log("Adding new profile image");
@@ -177,7 +178,7 @@ module.exports = {
               imageUrl: articleImages.imageUrl,
               public_id: articleImages.public_id || null,
             },
-            { transaction: t }
+            { transaction: t },
           );
 
           if (existingImage) {
@@ -233,7 +234,7 @@ module.exports = {
       if (articleImages.length > 0) {
         console.log("Deleting from Cloudinary...");
         await Promise.all(
-          articleImages.map((img) => deleteFromCloudinary(img.imageUrl))
+          articleImages.map((img) => deleteFromCloudinary(img.imageUrl)),
         );
 
         console.log("Deleting images from database...");
