@@ -71,7 +71,10 @@ export default function HomePage(prop: PropTypes) {
               <span className="font-semibold tracking-wider text-sm">
                 Categories
               </span>
-              <span className=" tracking-wider text-[10px] text-gray-400">
+              <span
+                className=" tracking-wider text-[10px] text-gray-400"
+                onClick={() => router.push("/category")}
+              >
                 See All
               </span>
             </div>

@@ -29,10 +29,10 @@ const Footer = () => {
       pathName === "/" ||
       pathName === "/account" ||
       pathName === "/category" ||
-      pathName === "/wishlist"
+      pathName === "/account/wishlist"
     ) {
       setClassFoot(
-        "bg-white rounded-full w-[40px] h-[40px] p-1 flex items-center justify-center absolute top-[-20px]"
+        "bg-white rounded-full w-[40px] h-[40px] p-1 flex items-center transition-all justify-center absolute top-[-20px]",
       );
     } else {
       setClassFoot("w-[40px] h-[40px] p-1");
@@ -49,7 +49,7 @@ const Footer = () => {
         <>
           {path !== "/cart" ? (
             <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 py-5 px-7 z-50">
-              <div className="flex items-center flex-col relative w-full">
+              <div className="flex items-center transition-all flex-col relative w-full">
                 <HomeOutlined
                   onClick={() => {
                     router.push("/");
@@ -58,7 +58,7 @@ const Footer = () => {
                 />
               </div>
               <div
-                className="flex items-center flex-col relative w-full"
+                className="flex items-center transition-all flex-col relative w-full"
                 onClick={() => {
                   router.push("/category");
                 }}
@@ -71,12 +71,15 @@ const Footer = () => {
                   className={path === "/category" ? classFoot : "w-[20px]"}
                 />
               </div>
-              <div className="flex items-center flex-col relative w-full ">
+              <div className="flex items-center transition-all flex-col relative w-full ">
                 <HeartOutlined
-                  className={path === "/wishlist" ? classFoot : "w-[20px]"}
+                  className={
+                    path === "/account/wishlist" ? classFoot : "w-[20px]"
+                  }
+                  onClick={() => router.push("/account/wishlist")}
                 />
               </div>
-              <div className="flex items-center flex-col relative w-full ">
+              <div className="flex items-center transition-all flex-col relative w-full ">
                 <UserOutlined
                   className={path === "/account" ? classFoot : "w-[20px]"}
                   onClick={() => router.push("/account")}

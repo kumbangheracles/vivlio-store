@@ -37,7 +37,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
   }) => {
     const isMobile = useDeviceType();
     const [isInWishlist, setIsInWishlist] = useState(
-      wishlistUsers?.length! > 0
+      wishlistUsers?.length! > 0,
     );
     const { setIsWishlist, wishlist, isWishlist } = useIsWishlistStore();
     const { fetchBooksHome } = useWishlistStore();
@@ -107,7 +107,9 @@ const CardBook: React.FC<CardBookProps> = React.memo(
             >
               <div
                 className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[18px] h-[18px] flex justify-center items-center border-black border-1 p-[2px]"
-                onClick={() => handleWishlist()}
+                onClick={(e) => {
+                  (e.stopPropagation(), handleWishlist());
+                }}
               >
                 {loading ? (
                   <Spin size="small" />
@@ -156,10 +158,12 @@ const CardBook: React.FC<CardBookProps> = React.memo(
         ) : (
           <>
             {" "}
-            <StyledCard>
+            <StyledCard onClick={() => goToDetail(bookId as string)}>
               <div
                 className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
-                onClick={() => handleWishlist()}
+                onClick={(e) => {
+                  (e.stopPropagation(), handleWishlist());
+                }}
               >
                 {loading ? (
                   <Spin size="small" />
@@ -219,7 +223,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
         )}
       </>
     );
-  }
+  },
 );
 
 const StyledCard = styled(Card)`
@@ -235,7 +239,8 @@ const StyledCard = styled(Card)`
   transition: all ease 0.3s;
 
   &:hover {
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    box-shadow:
+      0 20px 25px -5px rgb(0 0 0 / 0.1),
       0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
   height: 300px;

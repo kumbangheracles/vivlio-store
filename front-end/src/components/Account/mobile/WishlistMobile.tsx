@@ -1,12 +1,12 @@
 "use client";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Result, Select } from "antd";
+import { Button, message, Modal, Result, Select } from "antd";
 import { useMemo, useState } from "react";
 import CardBookWishlist from "../CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/hooks/useAuth";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
@@ -18,8 +18,13 @@ type OptionType =
   | "harga_terendah";
 
 const WishlistMobile = ({ dataWishlists }: PropTypes) => {
-  const { books, loading, fetchBooks } = useWishlistStore();
+  const auth = useAuth();
   const router = useRouter();
+  if (!auth) {
+    message.info("You must login first");
+    router.push("/login");
+  }
+  const { loading, fetchBooks } = useWishlistStore();
   const [selectOption, setSelectedOption] =
     useState<OptionType>("terbaru_disimpan");
   const toTime = (date?: Date | string) => {
@@ -85,6 +90,7 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
           />
         </div>
       </div>
+
       <div>
         <>
           <div className="flex items-center justify-center bg-gray-100 py-3 mx-2 rounded-md gap-2.5 flex-wrap">

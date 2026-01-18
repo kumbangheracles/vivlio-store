@@ -1,5 +1,5 @@
 "use client";
-import { Card, Row, Tabs } from "antd";
+import { Card, message, Modal, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import Account from "./Account";
@@ -8,7 +8,6 @@ import Wishlist from "./Wishlist";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
-import BackgroundMobile from "../Account/assets/background-mobile.png";
 import DefaultImage from "../../assets/images/profile-default.jpg";
 import {
   FileDoneOutlined,
@@ -18,6 +17,9 @@ import {
 } from "@ant-design/icons";
 import { FaRegMap } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import myAxios from "@/libs/myAxios";
+import { signOut } from "next-auth/react";
+import { ErrorHandler } from "@/helpers/handleError";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
@@ -32,7 +34,9 @@ const AccountIndex: React.FC<AccountProps> = ({
   const router = useRouter();
   const LOCAL_STORAGE_KEY = "lastActiveTabKey";
   const isMobile = useDeviceType();
-  const [activeTab, setActiveTab] = useState("account");
+  const [activeTab, setActiveTab] = useState<string>("account");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   useEffect(() => {
     const savedTab = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedTab) {
@@ -84,7 +88,23 @@ const AccountIndex: React.FC<AccountProps> = ({
       ),
     },
   ];
-
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await myAxios.post("/auth/logout");
+      message.info("Logout Success");
+      await signOut({
+        callbackUrl: "/auth/login",
+      });
+    } catch (error) {
+      ErrorHandler(error);
+      await signOut({
+        callbackUrl: "/auth/login",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const listSection = [
     {
       id: 1,
@@ -109,12 +129,6 @@ const AccountIndex: React.FC<AccountProps> = ({
       title: "Account",
       icon: <UserOutlined />,
       path: "/account/profile",
-    },
-    {
-      id: 5,
-      title: "Transaction",
-      icon: <FileDoneOutlined />,
-      path: "/account/transaction",
     },
   ];
   return (
@@ -169,11 +183,29 @@ const AccountIndex: React.FC<AccountProps> = ({
               ))}
             </>
 
-            <div className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md">
+            <div
+              className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md"
+              onClick={() => setIsOpen(true)}
+            >
               <LogoutOutlined />
               <h4 className="font-normal tracking-wide text-[12px]">Log Out</h4>
             </div>
           </div>
+
+          <Modal
+            open={isOpen}
+            okText="Yes"
+            cancelText="Cancel"
+            onCancel={() => setIsOpen(false)}
+            onOk={handleLogout}
+            confirmLoading={isLoading}
+            title={<h1 className="text-center font-bold">Logout</h1>}
+            centered
+          >
+            <div className="text-center">
+              <h1>Are you sure you want to logout?</h1>
+            </div>
+          </Modal>
         </div>
       ) : (
         <CardContainer>
