@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-const { v4: uuidv4 } = require("uuid");
 const User = sequelize.define(
   "Users",
   {
@@ -32,6 +31,10 @@ const User = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -57,7 +60,7 @@ const User = sequelize.define(
   {
     tableName: "Users",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = User;

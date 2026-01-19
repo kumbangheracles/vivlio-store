@@ -37,7 +37,7 @@ const BookDetail = () => {
     if (!dataBook?.categoryId) return;
     try {
       const resCat = await myAxios.get(
-        `/book-category/${dataBook?.categoryId}`
+        `/book-category/${dataBook?.categoryId}`,
       );
       setDataCat(resCat.data);
     } catch (error) {
@@ -108,6 +108,10 @@ const BookDetail = () => {
             <DetailItem
               label="Price"
               value={`Rp ${Number(dataBook?.price).toLocaleString("id-ID")}`}
+            />
+            <DetailItem
+              label="Stock"
+              value={` ${Number(dataBook?.quantity)}`}
             />
             <DetailItem
               label="Book Type"

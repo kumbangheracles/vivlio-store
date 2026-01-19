@@ -5,6 +5,7 @@ export type BookProps = {
   title: string;
   author: string;
   price: number;
+  quantity?: number;
   status: string;
   book_type: BookType;
   book_cover?: string;

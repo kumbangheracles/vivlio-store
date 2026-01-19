@@ -17,7 +17,7 @@ export const isValidBookImageArray = (images?: BookImage[]): boolean => {
       typeof img.bookId === "string" &&
       img.bookId.trim() !== "" &&
       typeof img.imageUrl === "string" &&
-      img.imageUrl.trim() !== ""
+      img.imageUrl.trim() !== "",
   );
 };
 
@@ -25,8 +25,14 @@ export const isValidNumber = (val: unknown): boolean => {
   return typeof val === "number" && Number.isFinite(val);
 };
 
+export const isValidInteger = (val: any): boolean => {
+  return (
+    typeof val === "number" && Number.isInteger(val) && Number.isFinite(val)
+  );
+};
+
 export const anyFieldsValid = (data?: any): boolean => {
   return Object.values(data).some(
-    (value) => value === undefined || value === null || value === ""
+    (value) => value === undefined || value === null || value === "",
   );
 };

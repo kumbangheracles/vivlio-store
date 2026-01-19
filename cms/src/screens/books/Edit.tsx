@@ -7,7 +7,12 @@ import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
-import { isEmpty, isEmptyArray, isValidNumber } from "../../helper/validation";
+import {
+  isEmpty,
+  isEmptyArray,
+  isValidNumber,
+  isValidInteger,
+} from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
 import {
   BookImage,
@@ -90,6 +95,7 @@ const BookEdit = () => {
   const handleSubmit = async (data: BookProps, status: BookProps["status"]) => {
     form.validateFields();
     const parsed = Number(data.price);
+    const parsedStock = Number(data.quantity);
     if (
       isEmpty(data.title) ||
       isEmpty(data.description) ||
@@ -138,6 +144,10 @@ const BookEdit = () => {
       message.error("Price is required");
       return;
     }
+    if (!isValidInteger(Number(data.quantity))) {
+      message.error("Invalid stock");
+      return;
+    }
 
     if (!isValidNumber(parsed)) {
       message.error("Invalid price");
@@ -153,7 +163,7 @@ const BookEdit = () => {
         price: data.price as unknown as number,
         description: data.description,
         genres: data.genres,
-
+        quantity: data.quantity as unknown as number,
         status: status,
         book_type: data.book_type,
         categoryId: data.categoryId,
@@ -464,6 +474,23 @@ const BookEdit = () => {
                   setDataBook({
                     ...dataBook,
                     price: e.target.value as unknown as number,
+                  })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              name={"quantity"}
+              label="Stock"
+              rules={[{ required: true, message: "Stock are required" }]}
+            >
+              <AppInput
+                required
+                type="number"
+                placeholder="Input Stock"
+                onChange={(e) =>
+                  setDataBook({
+                    ...dataBook,
+                    quantity: e.target.value as unknown as number,
                   })
                 }
               />

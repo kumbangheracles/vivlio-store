@@ -62,7 +62,7 @@ const AppLayout = ({ children }: PropTypes) => {
 
   const getMatchingSidebarKey = (
     pathname: string,
-    sidebarItems: ItemType[] = []
+    sidebarItems: ItemType[] = [],
   ): string[] => {
     const flatKeys = sidebarItems.flatMap((item) => {
       if (!item || typeof item === "string") return [];
@@ -86,7 +86,7 @@ const AppLayout = ({ children }: PropTypes) => {
 
   const selectedKeys = useMemo(
     () => getMatchingSidebarKey(location.pathname, sidebarItems),
-    [location.pathname]
+    [location.pathname],
   );
 
   const items = isAuthenticated
@@ -147,16 +147,28 @@ const AppLayout = ({ children }: PropTypes) => {
         <Layout style={{ height: "100%", width: "100%" }}>
           <Header
             style={{
-              background: "#76b4e6",
-              padding: "0 20px",
+              background: "#d9eafd",
+              paddingInline: "30px",
               position: "sticky",
               top: 0,
-              zIndex: "9999",
+              zIndex: "50",
               display: "flex",
               justifyContent: "space-between",
             }}
           >
-            <Logo>VIVLIO CMS</Logo>
+            <div className="flex items-center gap-3">
+              <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={"/icons/icon.png"}
+                  alt="main-logo"
+                />
+              </div>
+              <h4 className="text-xl font-bold tracking-wide text-gray-600">
+                ViviBook CMS
+              </h4>
+            </div>
+
             <div
               onMouseEnter={() => setIshover(true)}
               onMouseLeave={() => setIshover(false)}
@@ -199,7 +211,7 @@ const AppLayout = ({ children }: PropTypes) => {
               onCollapse={(value) => setCollapsed(value)}
               trigger={null}
               style={{
-                background: "#76b4e6",
+                background: "#d9eafd",
 
                 display: "flex",
                 flexDirection: "column",
@@ -209,7 +221,7 @@ const AppLayout = ({ children }: PropTypes) => {
               }}
             >
               <Menu
-                style={{ backgroundColor: "#76b4e6" }}
+                style={{ backgroundColor: "#d9eafd" }}
                 mode="vertical"
                 selectedKeys={selectedKeys}
                 items={sidebarItems}

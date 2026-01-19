@@ -448,11 +448,13 @@ module.exports = {
         if (Array.isArray(genreIds)) {
           // Convert to integers and filter invalid ones
           const validGenreIds = genreIds
-            .map((id) => {
-              if (typeof id === "object" && id.id) return parseInt(id.id);
-              return parseInt(id);
+            .map((g) => {
+              if (typeof g === "object") {
+                return g.genreId || g.id;
+              }
+              return g;
             })
-            .filter((id) => !isNaN(id) && id > 0);
+            .filter((id) => typeof id === "string" && id.length > 10);
 
           console.log("Valid genre IDs:", validGenreIds);
 

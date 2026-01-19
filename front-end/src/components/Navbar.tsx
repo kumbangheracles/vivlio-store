@@ -180,13 +180,7 @@ export default function Navbar({
               </div>
 
               <div className=" w-full flex  items-center gap-3 justify-center sm:w-[50%]">
-                <div
-                  // arrow
-                  // open={dropCategory}
-                  // trigger={["click"]}
-                  // menu={{ items: itemsCategory }}
-                  className="cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-[50px]"
-                >
+                <div className="cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-[50px]">
                   <div
                     className="flex gap-3 items-center noselect font-semibold"
                     onClick={() => setIsDropCategory((prev) => !prev)}
@@ -417,11 +411,6 @@ export default function Navbar({
               <h1>Are you sure you want to logout?</h1>
             </div>
           </Modal>
-
-          {/* <Modal
-            style={{ position: "relative", zIndex: "-100", display: "hidden" }}
-            open={dropCategory}
-          /> */}
         </nav>
       )}
     </>
