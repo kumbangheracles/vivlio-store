@@ -1,4 +1,4 @@
-import { Space, Form, Input, Radio, message, Select, Image } from "antd";
+import { Space, Form, message, Image } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 
@@ -7,14 +7,7 @@ import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
-import {
-  isEmpty,
-  isBooleanUndefined,
-  isEmptyArray,
-  isValidBookImageArray,
-  isValidNumber,
-  anyFieldsValid,
-} from "../../helper/validation";
+import { isEmpty, isEmptyArray, isValidNumber } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
 import {
   BookImage,
@@ -24,19 +17,16 @@ import {
 } from "../../types/books.type";
 import AppSelect from "../../components/AppSelect";
 import Upload, {
-  RcFile,
   UploadChangeParam,
   UploadFile,
   UploadProps,
 } from "antd/es/upload";
-import defaultImg from "../../assets/images/default-img.png";
 import { PlusOutlined } from "@ant-design/icons";
 import { CategoryProps } from "../../types/category.types";
 import { v4 as uuidv4 } from "uuid";
 import FormEditor from "../../components/FormEditor";
 import { GenreProperties, GenreStatusType } from "../../types/genre.type";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
+
 import { UserProperties } from "../../types/user.type";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 const BookEdit = () => {
@@ -50,7 +40,6 @@ const BookEdit = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
   const [dataGenre, setDataGenre] = useState<GenreProperties[]>([]);
-  const [search, setSearch] = useState("");
   const auth = useAuthUser<UserProperties>();
   const getBase64 = (file: File | Blob): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -62,10 +51,10 @@ const BookEdit = () => {
 
   const fetchCategory = async () => {
     try {
-      const res = await myAxios.get("/book-category");
+      const res = await myAxios.get("/book-category/get-all");
       console.log("Fetched categories:", res.data.results);
       const activeCategories = res.data.results.filter(
-        (cat: CategoryProps) => cat.status === true
+        (cat: CategoryProps) => cat.status === true,
       );
 
       const options = activeCategories.map((cat: CategoryProps) => ({
@@ -79,10 +68,9 @@ const BookEdit = () => {
   };
   const fetchGenre = async () => {
     try {
-      const res = await myAxios.get("/genres");
-      console.log("Fetched genres:", res.data.results);
+      const res = await myAxios.get("/genres/get-all");
       const activeGenres = res.data.results.filter(
-        (cat: GenreProperties) => cat.status === GenreStatusType.PUBLISH
+        (cat: GenreProperties) => cat.status === GenreStatusType.PUBLISH,
       );
 
       const options = activeGenres.map((cat: GenreProperties) => ({
@@ -183,8 +171,6 @@ const BookEdit = () => {
 
       navigate(-1);
     } catch (error) {
-      console.log("error submit: ", error);
-
       if (!id) {
         ErrorHandler(error);
       } else {
@@ -220,7 +206,7 @@ const BookEdit = () => {
             secure_url: item.imageUrl,
             public_id: item.public_id,
           },
-        })
+        }),
       );
       // setDataGenre(res.data.result.genres);
       setFileList(imagePrev);
@@ -242,7 +228,7 @@ const BookEdit = () => {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();

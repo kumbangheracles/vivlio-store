@@ -17,6 +17,7 @@ interface BookTypes {
   isSpace?: boolean;
   isSeeAll?: boolean;
   isCategory?: boolean;
+  isGenre?: boolean;
 }
 
 const ListBook: React.FC<BookTypes> = ({
@@ -26,6 +27,7 @@ const ListBook: React.FC<BookTypes> = ({
   isSpace = false,
   isSeeAll = true,
   isCategory = false,
+  isGenre = false,
 }) => {
   const isMobile = useDeviceType();
   return (
@@ -94,7 +96,7 @@ const ListBook: React.FC<BookTypes> = ({
           {" "}
           <div
             className={`mt-10 pt-2 rounded-md ${cn(
-              isCategory ? "bg-gray-100" : "bg-white",
+              isCategory || isGenre ? "bg-gray-100" : "bg-white",
             )}`}
           >
             {dataBooks!?.length > 0 ? (
@@ -103,7 +105,7 @@ const ListBook: React.FC<BookTypes> = ({
                 <Suspense fallback={<GlobalLoading />}>
                   <ListBookWrapper
                     className={`flex flex-wrap gap-5 justify-center ${cn(
-                      isCategory ? "!pt-5 !pb-10" : "",
+                      isCategory || isGenre ? "!pt-5 !pb-10" : "",
                     )}`}
                   >
                     {dataBooks?.slice(0, 8).map((item, index) => (
@@ -145,7 +147,9 @@ const ListBook: React.FC<BookTypes> = ({
                   subTitle={
                     isCategory
                       ? "There are no books available in this category."
-                      : "There are no books related"
+                      : isGenre
+                        ? "There are no books available in this genre."
+                        : "There are no books related"
                   }
                 />
               </>

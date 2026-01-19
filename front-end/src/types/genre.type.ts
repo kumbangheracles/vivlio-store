@@ -1,5 +1,6 @@
 export type GenreProperties = {
-  genreId: string;
+  genreid: string;
+  genreId?: string;
   genre_title: string;
   status: string;
   description: string;
@@ -12,7 +13,7 @@ export enum GenreStatusType {
 }
 
 export const genreInitialValue: GenreProperties = {
-  genreId: "",
+  genreid: "",
   genre_title: "",
   status: "",
   description: "",

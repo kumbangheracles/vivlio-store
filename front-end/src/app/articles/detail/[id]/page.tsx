@@ -28,7 +28,7 @@ export async function generateStaticParams() {
 export const revalidate = 60;
 const ArticleDetailPage = async ({ params }: PageProps) => {
   const dataArticle = await fetchArticleDetail(params.id);
-  console.log("Data Article: ", dataArticle);
+  // console.log("Data Article: ", dataArticle);
   return (
     <div className="w-full min-h-screen">
       <ArticleDetail dataArticle={dataArticle} />

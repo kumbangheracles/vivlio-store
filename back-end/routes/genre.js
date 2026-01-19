@@ -6,39 +6,44 @@ const genreController = require("../controller/genre.controller");
 router.get(
   "/",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  genreController.getAll
+  genreController.getAll,
+);
+router.get(
+  "/get-all",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  genreController.getAllFull,
 );
 
 router.get(
   "/public",
 
-  genreController.publicGetAll
+  genreController.publicGetAll,
 );
 router.get(
   "/:genreId",
 
-  genreController.getOne
+  genreController.getOne,
 );
 
 // Create Genre
 router.post(
   "/",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  genreController.createGenre
+  genreController.createGenre,
 );
 
 // Update Genre
 router.patch(
   "/:genreId",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  genreController.updateGenre
+  genreController.updateGenre,
 );
 
 // Delete Genre
 router.delete(
   "/:genreId",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  genreController.deleteGenre
+  genreController.deleteGenre,
 );
 
 module.exports = router;

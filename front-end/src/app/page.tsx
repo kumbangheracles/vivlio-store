@@ -2,6 +2,7 @@ import HomePage from "@/components/Home";
 import fetchBooksHome from "./actions/fetchBooksHome";
 import fetchArticles from "./actions/fetchArticles";
 import fetchCategory from "./actions/fetchCategory";
+import fetchGenres from "./actions/fetchGenre";
 
 export const metadata = {
   title: "ViviBook - Home",
@@ -13,7 +14,6 @@ export default async function Home() {
   const books = await fetchBooksHome();
   const categories = await fetchCategory();
   const articles = await fetchArticles();
-
   console.log("Books: ", books);
 
   await new Promise((resolve) => {

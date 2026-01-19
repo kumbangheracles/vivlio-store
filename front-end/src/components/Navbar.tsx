@@ -21,23 +21,24 @@ import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
 import MainLogo from "../assets/main-logo.png";
 import Image from "next/image";
+import { GenreProperties } from "@/types/genre.type";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
+  dataGenres?: GenreProperties[];
 }
 
 export default function Navbar({
   dataUser,
   dataCategories,
   dataCartedBooks,
+  dataGenres,
 }: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const pathName = usePathname();
   const auth = useAuth();
   const router = useRouter();
   const isMobile = useDeviceType();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
@@ -75,28 +76,24 @@ export default function Navbar({
     router.push("/cart");
   };
 
-  const isActive = (page: string) => pathName === page;
-
-  const handleAuth = (type?: "login" | "logout") => {
-    if (type === "login") {
-      router.push("/auth/login");
-    } else if (type === "logout") {
-      setIsOpen(true);
-    }
-  };
-
   const slugify = (text: string) => {
     return text
-      .toLowerCase() // huruf kecil
-      .trim() // hapus spasi depan/belakang
-      .replace(/[^a-z0-9\s-]/g, "") // hapus karakter aneh
-      .replace(/\s+/g, "-") // spasi → -
-      .replace(/-+/g, "-"); // -- → -
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
   };
 
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
     router.push(`/category/${slug}/${categoryId}`);
+
+    setIsDropCategory(false);
+  };
+  const goToGenre = (genreTitle: string, genreId: string) => {
+    const slug = slugify(genreTitle);
+    router.push(`/genre/${slug}/${genreId}`);
 
     setIsDropCategory(false);
   };
@@ -199,7 +196,7 @@ export default function Navbar({
                         !dropCategory ? "rotate-[0deg]" : "rotate-[180deg]",
                       )} transition-all duration-400`}
                     />
-                    <h4 className="text-[13px]">Category</h4>
+                    <h4 className="text-[13px] tracking-wide">Filter</h4>
                   </div>
                 </div>
 
@@ -276,18 +273,48 @@ export default function Navbar({
             <div
               className={` ${cn(
                 dropCategory ? "max-h-[500px]" : "max-h-[0px]",
-              )}   bg-white shadow-2xl p-4 fixed top-1 z-[-10] w-[550px] transition-all duration-400 rounded-xl overflow-hidden`}
+              )}   base-blue shadow-2xl p-4 fixed top-1 z-[-10] w-[750px] transition-all duration-400 rounded-xl overflow-hidden`}
             >
-              <div className="mt-[80px] flex gap-3 flex-wrap">
-                {dataCategories?.map((item) => (
-                  <div
-                    className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
-                    key={item.categoryId}
-                    onClick={() => goToCategory(item?.name, item?.categoryId)}
-                  >
-                    {item.name}
+              <div
+                className="flex gap-5 mt-[70px]
+"
+              >
+                <div>
+                  <h4 className="px-2 pb-4 tracking-wide font-semibold">
+                    Category
+                  </h4>
+                  <div className=" flex gap-3 flex-wrap h-ful overflow-y-scroll scrollbar-hide">
+                    {dataCategories?.map((item) => (
+                      <div
+                        className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
+                        key={item.categoryId}
+                        onClick={() =>
+                          goToCategory(item?.name, item?.categoryId)
+                        }
+                      >
+                        {item.name}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+                <div>
+                  <h4 className="px-2 pb-4 tracking-wide font-semibold">
+                    Genre
+                  </h4>
+                  <div className=" flex gap-3 flex-wrap h-ful overflow-y-scroll scrollbar-hide">
+                    {dataGenres?.map((item) => (
+                      <div
+                        className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
+                        key={item.genreid}
+                        onClick={() =>
+                          goToGenre(item?.genre_title, item?.genreId as string)
+                        }
+                      >
+                        {item.genre_title}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -374,60 +401,6 @@ export default function Navbar({
               </div>
             )}
           </div>
-
-          {/* Mobile Dropdown Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden bg-white border-t flex flex-col items-center py-3 gap-3 transition-all">
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/")}
-                href="/"
-              >
-                HOME
-              </StyledLink>
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/blog")}
-                href="/blog"
-              >
-                BLOG
-              </StyledLink>
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/shop")}
-                href="/shop"
-              >
-                SHOP
-              </StyledLink>
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/about-us")}
-                href="/about-us"
-              >
-                ABOUT US
-              </StyledLink>
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/contact-us")}
-                href="/contact-us"
-              >
-                CONTACT US
-              </StyledLink>
-              <StyledLink
-                onClick={() => setIsMobileMenuOpen(false)}
-                isBlue={isActive("/account")}
-                href="/account"
-              >
-                ACCOUNT
-              </StyledLink>
-
-              {auth?.accessToken ? (
-                <Button onClick={() => handleAuth("logout")}>LOGOUT</Button>
-              ) : (
-                <Button onClick={() => handleAuth("login")}>LOGIN</Button>
-              )}
-            </div>
-          )}
 
           {/* Logout Modal */}
           <Modal

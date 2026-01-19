@@ -59,7 +59,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const auth = useAuth();
   const router = useRouter();
   const [isInWishlist, setIsInWishlist] = useState(
-    book?.wishlistUsers?.length! > 0
+    book?.wishlistUsers?.length! > 0,
   );
   const { fetchBooksHome } = useWishlistStore();
   const { setIsWishlist, isWishlist } = useIsWishlistStore();
@@ -162,7 +162,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
 
       const res = await myAxios.post<{ redirect_url: string; token: string }>(
         "/midtrans/checkout",
-        data
+        data,
       );
 
       console.log("Data sended: ", res.data);
@@ -228,9 +228,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               </div>
             </div>
 
-            {/* Right Column - Book Details */}
             <div className="space-y-6">
-              {/* Title and Author */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <UserOutlined className="text-gray-500" />
@@ -246,7 +244,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 </Title>
               </div>
 
-              {/* Tags and Status */}
               <div className="flex flex-wrap gap-2">
                 {book.categories && (
                   <Tag color="default" className="px-3 py-1">
@@ -264,15 +261,12 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 )}
               </div>
 
-              {/* Price */}
               <div className="bg-blue-50 p-4 rounded-lg">
-                {/* <Text className="text-sm text-gray-600">Price</Text> */}
                 <Title level={isMobile ? 4 : 2} className="!mb-0 text-blue-600">
                   {formatPrice(book.price)}
                 </Title>
               </div>
 
-              {/* Stats */}
               {book.stats && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {book.stats.popularityScore && (
@@ -306,7 +300,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 </div>
               )}
 
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   loading={loading}
@@ -314,13 +307,12 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   size="large"
                   icon={<ShoppingCartOutlined />}
                   onClick={() => {
-                    handleAddToCart(), router.refresh();
+                    (handleAddToCart(), router.refresh());
                   }}
                   disabled={loading}
                   className="!flex-1 h-12 !font-semibold !p-3  !text-[12px] sm:!text-sm"
                 >
                   {isCart ? "Remove From Cart" : "Add to Cart"}
-                  {/* Buy */}
                 </Button>
 
                 <div className="flex flex-wrap gap-2 w-full">
@@ -357,7 +349,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 </div>
               </div>
 
-              {/* Additional Info */}
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                 {book.createdAt && (
                   <div className="flex w-full gap-4">
@@ -370,7 +361,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
             </div>
           </div>
 
-          {/* Description */}
           {book.description && (
             <div className="w-full">
               <Divider orientation="left">

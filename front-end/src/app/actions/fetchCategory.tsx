@@ -13,7 +13,7 @@ async function fetchCategory(): Promise<CategoryProps[]> {
     const response = await myAxios.get(url);
 
     const filteredCategory = response.data.results.filter(
-      (item: CategoryProps) => item.status === true
+      (item: CategoryProps) => item.status === true,
     );
     return filteredCategory;
   } catch (err: any) {

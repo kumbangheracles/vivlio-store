@@ -1,26 +1,38 @@
-const { where } = require("sequelize");
 const Genre = require("../models/genre");
 
 module.exports = {
-  async publicGetAll(req, res) {
-    const { page = 1, limit = 10, genreId } = req.query;
-
-    const offset = (page - 1) * limit;
-
+  async getAllFull(req, res) {
     try {
-      const { count, rows } = await Genre.findAndCountAll({
+      if (!req.id)
+        return res.status(401).json({ status: 401, message: "Unauthorized" });
+
+      const allGenre = await Genre.findAll({
         order: [["createdAt", "DESC"]],
-        limit: parseInt(limit),
-        offset,
       });
 
       res.status(200).json({
         status: 200,
         message: "Success",
-        results: rows,
-        total: count,
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
+        results: allGenre,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+  async publicGetAll(req, res) {
+    try {
+      const allGenre = await Genre.findAll({
+        order: [["createdAt", "DESC"]],
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: allGenre,
       });
     } catch (error) {
       res.status(500).json({

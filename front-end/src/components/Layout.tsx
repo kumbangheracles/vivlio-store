@@ -18,18 +18,21 @@ import AntdRegistry from "@/libs/AntdRegistry";
 import useDeviceType from "@/hooks/useDeviceType";
 import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
+import { GenreProperties } from "@/types/genre.type";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
   isAuthPageTampil?: boolean;
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
+  dataGenres?: GenreProperties[];
 }
 const AppLayout: React.FC<LayoutProps> = ({
   children,
   dataUser,
   dataCategories,
   dataCartedBooks,
+  dataGenres,
 }) => {
   const pathname = usePathname();
   const isMobile = useDeviceType();
@@ -68,6 +71,7 @@ const AppLayout: React.FC<LayoutProps> = ({
                 <>
                   <WrapperLayout>
                     <Navbar
+                      dataGenres={dataGenres}
                       dataUser={dataUser}
                       dataCategories={dataCategories}
                       dataCartedBooks={dataCartedBooks}

@@ -6,7 +6,7 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { sequelize } = require("../config/database");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 router.get("/public", async (req, res) => {
-  const { isPopular, title, page = 1, limit = 10 } = req.query;
+  const { isPopular, title } = req.query;
 
   const filters = {};
   if (isPopular !== undefined) {
@@ -16,12 +16,10 @@ router.get("/public", async (req, res) => {
     filters.title = { [Op.like]: `%${title}%` };
   }
 
-  const offset = (parseInt(page) - 1) * parseInt(limit);
   try {
-    const { count, rows } = await BookCategory.findAndCountAll({
+    const allCategory = await BookCategory.findAll({
       where: filters,
       order: [["createdAt", "DESC"]],
-      limit: parseInt(limit),
       include: [
         {
           model: CategoryImage,
@@ -29,15 +27,11 @@ router.get("/public", async (req, res) => {
           attributes: ["id", "imageUrl", "public_id"],
         },
       ],
-      offset,
     });
 
     res.status(200).json({
       status: "Success",
-      results: rows,
-      total: count,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit),
+      results: allCategory,
     });
   } catch (error) {
     res.status(500).json({
@@ -47,6 +41,40 @@ router.get("/public", async (req, res) => {
     });
   }
 });
+
+router.get(
+  "/get-all",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  async (req, res) => {
+    try {
+      if (!req.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const allCategory = await BookCategory.findAll({
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: CategoryImage,
+            as: "categoryImage",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+        ],
+      });
+
+      res.status(200).json({
+        status: "Success",
+        results: allCategory,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+);
+
 router.get(
   "/",
   [authMiddleware, checkRole(["admin", "super_admin"])],
