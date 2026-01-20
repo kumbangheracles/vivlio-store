@@ -22,7 +22,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const dataCartedBooks = await fetchCartedBooks();
   const dataGenres = await fetchGenres();
 
-  console.log("Data Genre: ", dataGenres);
   return (
     <html lang="en">
       <body>

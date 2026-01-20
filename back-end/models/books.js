@@ -6,7 +6,6 @@ const Book = sequelize.define(
   {
     id: {
       type: DataTypes.STRING,
-      autoIncrement: true,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
@@ -41,7 +40,7 @@ const Book = sequelize.define(
     },
     //tinggal nambahin ENUM "Out of stock" dan field stock
     status: {
-      type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED"),
+      type: DataTypes.ENUM("PUBLISHED", "UNPUBLISHED", "OUT_OF_STOCK"),
       allowNull: false,
       defaultValue: "UNPUBLISHED",
     },
@@ -61,7 +60,7 @@ const Book = sequelize.define(
   {
     tableName: "Books",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = Book;

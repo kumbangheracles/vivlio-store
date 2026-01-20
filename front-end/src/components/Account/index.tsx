@@ -79,11 +79,11 @@ const AccountIndex: React.FC<AccountProps> = ({
     },
 
     {
-      label: <LabelText>Address</LabelText>,
-      key: "address",
+      label: <LabelText>Books Reviews</LabelText>,
+      key: "books_reviews",
       children: (
         <>
-          <h1>Address Page</h1>
+          <h1>Books Reviews Page</h1>
         </>
       ),
     },
@@ -237,4 +237,5 @@ const CardContainer = styled(Card)`
 const LabelText = styled.h1`
   font-weight: 600;
   font-size: 16;
+  letter-spacing: 0.5px;
 `;

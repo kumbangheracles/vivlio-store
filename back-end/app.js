@@ -5,6 +5,7 @@ const { sequelize, connectDB } = require("./config/database");
 const bookRoutes = require("./routes/book");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
+const bookReviewsRoutes = require("./routes/bookReviews");
 const genresRoutes = require("./routes/genre");
 const rolesRoutes = require("./routes/role");
 const authRoutes = require("./routes/auth");
@@ -50,7 +51,7 @@ async function init() {
           }
         },
         credentials: true,
-      })
+      }),
     );
 
     app.use(cookieParser());
@@ -67,6 +68,7 @@ async function init() {
     // Routes
     app.use("/auth", authRoutes);
     app.use("/books", bookRoutes);
+    app.use("/book-reviews", bookReviewsRoutes);
     app.use("/userWishlist", userWishlistRoutes);
 
     app.use("/cart", userCartRoutes);

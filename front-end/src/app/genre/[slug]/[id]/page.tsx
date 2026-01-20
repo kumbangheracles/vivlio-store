@@ -11,12 +11,9 @@ export const metadata: Metadata = {
 };
 const GenrePage = async ({ params }: PageProps) => {
   const dataBooks = await fetchBooksHome();
-  console.log("Data books in genre: ", dataBooks);
   const filteredBooksByGenre = dataBooks?.filter((item) =>
     item.genres?.some((genre) => genre.genreid === params.id),
   );
-
-  console.log("Filtered books by genre: ", filteredBooksByGenre);
 
   const titleList = deslugify(params.slug);
   return (

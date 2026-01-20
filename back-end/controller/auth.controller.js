@@ -237,7 +237,7 @@ module.exports = {
       // validasi password
       const validatePassword = await bcrypt.compare(
         password,
-        userByIdentifier.password
+        userByIdentifier.password,
       );
 
       // untuk sementara
@@ -349,7 +349,7 @@ module.exports = {
               },
             },
             process.env.ACCESS_TOKEN,
-            { expiresIn: "12h" }
+            { expiresIn: "12h" },
           );
 
           console.log("Cookies:", req.cookies);
@@ -361,7 +361,7 @@ module.exports = {
             message: "Success refresh token",
             token: accessToken,
           });
-        }
+        },
       );
     } catch (error) {
       res.status(500).json({

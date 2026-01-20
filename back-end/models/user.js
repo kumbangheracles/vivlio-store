@@ -32,8 +32,9 @@ const User = sequelize.define(
       unique: true,
     },
     address: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: {},
     },
     password: {
       type: DataTypes.STRING,

@@ -1,17 +1,4 @@
-import {
-  Badge,
-  Button,
-  Card,
-  ConfigProvider,
-  Dropdown,
-  Input,
-  Layout,
-  Menu,
-  type MenuProps,
-  message,
-  Modal,
-  Select,
-} from "antd";
+import { Card, Dropdown, Layout, Menu, message, Modal } from "antd";
 import {
   TbLayoutSidebarLeftCollapse,
   TbLayoutSidebarRightCollapse,
@@ -337,19 +324,5 @@ const Username = styled.h1`
   align-items: center;
   height: 30px;
   margin: auto;
-  letter-spacing: 1px;
-`;
-
-const Logo = styled.h1`
-  font-size: 16px;
-  background-color: white;
-  color: #76b4e6;
-  border-radius: 20px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  height: 50px;
-  margin-block: auto;
   letter-spacing: 1px;
 `;

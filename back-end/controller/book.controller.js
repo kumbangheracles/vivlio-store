@@ -6,6 +6,7 @@ const {
   BookStats,
   UserWishlist,
   UserCart,
+  BookReview,
 } = require("../models/index");
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
@@ -42,6 +43,16 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+            },
           },
           {
             model: BookStats,
@@ -114,6 +125,16 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+            },
           },
           {
             model: BookStats,
@@ -221,6 +242,16 @@ module.exports = {
             attributes: ["genreid", "genre_title"],
           },
           {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+            },
+          },
+          {
             model: BookStats,
             as: "stats",
             attributes: [
@@ -295,7 +326,16 @@ module.exports = {
             as: "genres",
             attributes: ["genreId", "genre_title"],
           },
-
+          {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+            },
+          },
           {
             model: User,
             as: "wishlistUsers",

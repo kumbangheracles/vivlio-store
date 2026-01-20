@@ -278,10 +278,10 @@ export default function Navbar({
                     Category
                   </h4>
                   <div className=" flex gap-3 flex-wrap h-ful overflow-y-scroll scrollbar-hide">
-                    {dataCategories?.map((item) => (
+                    {dataCategories?.map((item, index) => (
                       <div
                         className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
-                        key={item.categoryId}
+                        key={index}
                         onClick={() =>
                           goToCategory(item?.name, item?.categoryId)
                         }
@@ -296,10 +296,10 @@ export default function Navbar({
                     Genre
                   </h4>
                   <div className=" flex gap-3 flex-wrap h-ful overflow-y-scroll scrollbar-hide">
-                    {dataGenres?.map((item) => (
+                    {dataGenres?.map((item, index) => (
                       <div
                         className="text-gray-800 hover:bg-gray-200 transition-all cursor-pointer px-4 py-2 rounded-2xl bg-gray-100 max-w-auto"
-                        key={item.genreid}
+                        key={index}
                         onClick={() =>
                           goToGenre(item?.genre_title, item?.genreId as string)
                         }

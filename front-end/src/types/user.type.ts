@@ -4,6 +4,7 @@ export type UserProperties = {
   username?: string;
   password?: string;
   email?: string;
+  address?: string;
   roleId?: string;
   roleName?: string;
   confirmPassword?: string;

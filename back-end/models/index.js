@@ -13,7 +13,7 @@ const UserPurchases = require("./userPurchases");
 const CategoryImage = require("./categoryImage");
 const Articles = require("./Articles");
 const ArticleImages = require("./ArticleImages");
-
+const BookReview = require("./BookReviews");
 // Book ↔ Category
 BookCategory.hasMany(Book, {
   foreignKey: "categoryId",
@@ -182,6 +182,27 @@ ArticleImages.belongsTo(Articles, {
   as: "articles",
 });
 
+// Books ↔ BookReviews ↔ Users
+Book.hasMany(BookReview, {
+  foreignKey: "bookId",
+  as: "reviews",
+});
+
+BookReview.belongsTo(Book, {
+  foreignKey: "bookId",
+  as: "book",
+});
+
+User.hasMany(BookReview, {
+  foreignKey: "userId",
+  as: "reviews",
+});
+
+BookReview.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
+
 module.exports = {
   Book,
   BookCategory,
@@ -198,4 +219,5 @@ module.exports = {
   CategoryImage,
   Articles,
   ArticleImages,
+  BookReview,
 };
