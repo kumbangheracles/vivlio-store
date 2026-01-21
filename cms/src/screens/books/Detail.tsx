@@ -1,8 +1,7 @@
-import { Card, Image, Space, Tag } from "antd";
-import category from ".";
+import { Image, Space, Tag } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
-import { data, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../../components/HeaderSection";
 import DetailItem, { Label } from "../../components/DetailItem";
 import { useEffect, useState } from "react";
@@ -11,7 +10,6 @@ import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { BookImage, BookProps } from "../../types/books.type";
 import { styled } from "styled-components";
-import { GenreProperties } from "../../types/genre.type";
 
 const BookDetail = () => {
   const navigate = useNavigate();

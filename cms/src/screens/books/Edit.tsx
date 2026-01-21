@@ -95,7 +95,7 @@ const BookEdit = () => {
   const handleSubmit = async (data: BookProps, status: BookProps["status"]) => {
     form.validateFields();
     const parsed = Number(data.price);
-    const parsedStock = Number(data.quantity);
+    // const parsedStock = Number(data.quantity);
     if (
       isEmpty(data.title) ||
       isEmpty(data.description) ||

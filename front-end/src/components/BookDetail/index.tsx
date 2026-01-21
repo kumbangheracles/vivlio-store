@@ -6,7 +6,6 @@ import {
   Button,
   Tag,
   Typography,
-  Space,
   Card,
   Rate,
   Divider,
@@ -14,6 +13,8 @@ import {
   Carousel,
   message,
   Empty,
+  Select,
+  Modal,
 } from "antd";
 import {
   HeartOutlined,
@@ -21,6 +22,7 @@ import {
   ShareAltOutlined,
   ShoppingCartOutlined,
   UserOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import AppBreadcrumb from "../Breadcrumb";
 import { BookProps } from "@/types/books.type";
@@ -31,11 +33,11 @@ import myAxios from "@/libs/myAxios";
 import { useIsWishlistStore } from "@/zustand/isWishlist.store";
 import { ErrorHandler } from "@/helpers/handleError";
 import { useWishlistStore } from "@/zustand/wishlist.store";
-import { product } from "@/libs/product";
 import useCart from "@/hooks/useCart";
 import ListBook from "../Home/components/ListBook";
-import { TitleList } from "../Home";
 import useDeviceType from "@/hooks/useDeviceType";
+import { truncateText } from "@/helpers/truncateText";
+import StarLabel from "./StarLabel";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -48,6 +50,8 @@ interface BookDetailProps {
   onAddToCart?: (book: BookProps) => void;
   similiarBooks?: BookProps[];
 }
+type OptionTypeScore = "highest_score" | "lowest_score";
+type OptionTypeStar = "all_score" | 1 | 2 | 3 | 4 | 5;
 
 const BookDetailPage: React.FC<BookDetailProps> = ({
   book,
@@ -64,6 +68,10 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const { fetchBooksHome } = useWishlistStore();
   const { setIsWishlist, isWishlist } = useIsWishlistStore();
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
+  const [isMore, setIsMore] = useState<boolean>(false);
+  const [baseLength, setBaseLength] = useState<number>(300);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [baseLengthDesc, setBaseLengthDesc] = useState<number>(5000);
   const [loading, setLoading] = useState<boolean>(false);
   const bookId = book?.id;
   useEffect(() => {
@@ -116,31 +124,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     bookId: bookId as string,
   });
 
-  // const handleAddToCart = async () => {
-  //   if (!auth.accessToken) {
-  //     message.info("You must login first!!!");
-  //     router.push("/auth/login");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     if (!isCart) {
-  //       await myAxios.post("/cart", { bookId });
-  //       setIsCart(true);
-  //       message.success("Success add to cart");
-  //     } else {
-  //       await myAxios.delete(`/cart/${bookId}`);
-  //       setIsCart(false);
-  //       message.success("Success remove from cart");
-  //     }
-  //   } catch (error) {
-  //     ErrorHandler(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -150,39 +133,45 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     }).format(price);
   };
 
-  const handleCheckout = async () => {
-    try {
-      setLoading(true);
-      const data = {
-        id: book?.id,
-        productName: book?.title,
-        price: book?.price,
-        quantity: 1,
-      };
+  // const handleCheckout = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const data = {
+  //       id: book?.id,
+  //       productName: book?.title,
+  //       price: book?.price,
+  //       quantity: 1,
+  //     };
 
-      const res = await myAxios.post<{ redirect_url: string; token: string }>(
-        "/midtrans/checkout",
-        data,
-      );
+  //     const res = await myAxios.post<{ redirect_url: string; token: string }>(
+  //       "/midtrans/checkout",
+  //       data,
+  //     );
 
-      console.log("Data sended: ", res.data);
+  //     console.log("Data sended: ", res.data);
 
-      if (res) {
-        // router.push(res.data?.redirect_url);
-        window.snap.pay(res.data.token); // untuk menampilkan pop-up payment dari midtrans
-      }
+  //     if (res) {
+  //       // router.push(res.data?.redirect_url);
+  //       window.snap.pay(res.data.token); // untuk menampilkan pop-up payment dari midtrans
+  //     }
 
-      // message.info("checkout success you'll be redirect to midtrans payment");
-    } catch (error) {
-      console.log("Error checkout: ", error);
-      ErrorHandler(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // message.info("checkout success you'll be redirect to midtrans payment");
+  //   } catch (error) {
+  //     console.log("Error checkout: ", error);
+  //     ErrorHandler(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
+  const review = `This is a Great Book!
+                    text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500     This is a Great Book!
+                    text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500`;
+
+  const truncRev = truncateText(review, baseLength);
+  const truncDesc = truncateText(book?.description as string, baseLengthDesc);
   return (
-    <div className="w-screen h-screen sm:w-auto sm:h-auto">
+    <div className="w-screen h-screen sm:w-[80%] sm:h-auto">
       <div className="max-w-7xl mx-auto p-2 sm:p-4">
         <Card className="rounded-lg overflow-hidden sm:!mt-4">
           <AppBreadcrumb isBook={true} bookName={book.title} />
@@ -361,22 +350,166 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
             </div>
           </div>
 
-          {book.description && (
-            <div className="w-full">
-              <Divider orientation="left">
-                <Title level={4} className="!mb-0">
-                  Description
-                </Title>
-              </Divider>
-              <div className="bg-gray-50 p-2 rounded-md text-base">
-                <Paragraph className="text-gray-700 text-[10px]! text-base sm:text-sm! leading-relaxed">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: book?.description }}
-                  />
-                </Paragraph>
+          <div className="w-full">
+            <Divider orientation="left">
+              <Title level={4} className="!mb-0">
+                Description
+              </Title>
+            </Divider>
+            <div className="bg-gray-50 p-2 rounded-md text-base">
+              <Paragraph className="text-gray-700 text-[10px]! text-base sm:text-sm! leading-relaxed">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: truncDesc || "No Content",
+                  }}
+                />
+              </Paragraph>
+
+              <div className="pr-4 pb-2 flex justify-end ">
+                <p
+                  onClick={() => setIsOpen(true)}
+                  className="hover:text-sky-600 underline text-sm cursor-pointer text-gray-800"
+                >
+                  Read More
+                </p>
               </div>
             </div>
-          )}
+          </div>
+
+          <div className="mt-4 h-full">
+            <h4 className="text-xl sm:text-2xl font-semibold tracking-wide">
+              Book Reviews
+            </h4>
+            <div className="flex flex-col sm:flex-row justify-between">
+              <div className="flex  items-center justify-between sm:justify-start sm:gap-3 p-2">
+                <div className="flex items-baseline-last">
+                  <div className="flex items-center gap-2 text-xl sm:text-2xl font-semibold">
+                    <StarFilled className="!text-amber-300" />
+                    <h4>5.0</h4>
+                  </div>
+                  <h4 className="font-normal text-sm">/5</h4>
+                </div>
+                <div className=" hidden sm:block p-[0px] w-[1px] h-[50px] bg-black"></div>
+                <div>
+                  <h4 className="text-[11px] sm:text-sm">
+                    <b>3</b> Reviews
+                  </h4>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 text-[10px] sm:text-sm tracking-wide">
+                <h4>What do you think about this book?</h4>
+                <div>
+                  <Button className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm">
+                    Write a Review
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <Divider />
+
+            <div className="flex w-full justify-end gap-3 tracking-wide">
+              <Select
+                loading={loading}
+                className="!w-full sm:!w-[150px] !text-[10px] sm:!text-sm"
+                // value={selectOption}
+                options={[
+                  {
+                    value: "highest_score",
+                    label: "Highest Score",
+                  },
+                  {
+                    value: "lowest_score",
+                    label: "Lowest Score",
+                  },
+                ]}
+                // onChange={(value: OptionType) => setSelectedOption(value)}
+              />
+              <Select
+                loading={loading}
+                style={{ minWidth: 125 }}
+                className="!text-[10px]  sm:!text-sm"
+                // value={selectOption}
+                options={[
+                  {
+                    value: "all_score",
+                    label: "All Score",
+                  },
+                  {
+                    value: 1,
+                    label: <StarLabel total_star={1} />,
+                  },
+                  {
+                    value: 2,
+                    label: <StarLabel total_star={2} />,
+                  },
+                  {
+                    value: 3,
+                    label: <StarLabel total_star={3} />,
+                  },
+                  {
+                    value: 4,
+                    label: <StarLabel total_star={4} />,
+                  },
+                  {
+                    value: 5,
+                    label: <StarLabel total_star={5} />,
+                  },
+                ]}
+                // onChange={(value: OptionType) => setSelectedOption(value)}
+              />
+            </div>
+
+            <div className="p-4">
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between sm:flex-row flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
+                      <Image
+                        src={"/images/default-account.png"}
+                        width={100}
+                        height={100}
+                        className="w-full h-full object-cover text-white"
+                        alt="profile-img"
+                      />
+                    </div>
+                    <div className="flex items-start tracking-wide flex-col">
+                      <h4 className="font-semibold text-[12px] sm:text-sm">
+                        Nama
+                      </h4>
+                      <p className="text-gray-500 text-[11px]">
+                        02 januari 2026
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <StarLabel total_star={4} />
+                  </div>
+                </div>
+                <div className="relative">
+                  <p className="text-gray-700  text-[10px] sm:text-sm">
+                    {truncRev}
+                  </p>
+
+                  {baseLength <= 300 ? (
+                    <p
+                      onClick={() => setBaseLength(1000)}
+                      className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                    >
+                      Read More
+                    </p>
+                  ) : (
+                    <p
+                      onClick={() => setBaseLength(300)}
+                      className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                    >
+                      Hide More
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </Card>
       </div>
 
@@ -401,6 +534,23 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
           </>
         )}
       </div>
+
+      <Modal
+        open={isOpen}
+        closable
+        onCancel={() => setIsOpen(false)}
+        cancelText={"Close"}
+        className="!w-[800px]"
+        footer={false}
+      >
+        <div className="p-4">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: (book?.description as string) || "No Content",
+            }}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

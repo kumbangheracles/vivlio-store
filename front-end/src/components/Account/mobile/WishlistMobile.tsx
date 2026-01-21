@@ -12,10 +12,10 @@ interface PropTypes {
 }
 
 type OptionType =
-  | "terbaru_disimpan"
-  | "terlama_disimpan"
-  | "harga_tertinggi"
-  | "harga_terendah";
+  | "newest_saved"
+  | "oldest_saved"
+  | "highest_price"
+  | "lowest_price";
 
 const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   const auth = useAuth();
@@ -26,7 +26,7 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   }
   const { loading, fetchBooks } = useWishlistStore();
   const [selectOption, setSelectedOption] =
-    useState<OptionType>("terbaru_disimpan");
+    useState<OptionType>("newest_saved");
   const toTime = (date?: Date | string) => {
     if (!date) return 0;
     return date instanceof Date ? date.getTime() : new Date(date).getTime();
@@ -38,16 +38,16 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
     const sorted = [...dataWishlists];
 
     switch (selectOption) {
-      case "terbaru_disimpan":
+      case "newest_saved":
         return sorted.sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt));
 
-      case "terlama_disimpan":
+      case "oldest_saved":
         return sorted.sort((a, b) => toTime(a.createdAt) - toTime(b.createdAt));
 
-      case "harga_tertinggi":
+      case "highest_price":
         return sorted.sort((a, b) => b.book!.price - a.book!.price);
 
-      case "harga_terendah":
+      case "lowest_price":
         return sorted.sort((a, b) => a.book!.price - b.book!.price);
 
       default:
@@ -70,20 +70,20 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
             value={selectOption}
             options={[
               {
-                value: "terbaru_disimpan",
-                label: "Terbaru Disimpan",
+                value: "newest_saved",
+                label: "Newest Saved",
               },
               {
-                value: "terlama_disimpan",
-                label: "Terlama Disimpan",
+                value: "oldest_saved",
+                label: "Oldest Saved",
               },
               {
-                value: "harga_tertinggi",
-                label: "Harga Tertinggi",
+                value: "highest_price",
+                label: "Highest Price",
               },
               {
-                value: "harga_terendah",
-                label: "Herga Terendah",
+                value: "lowest_price",
+                label: "Lowest Price",
               },
             ]}
             onChange={(value: OptionType) => setSelectedOption(value)}

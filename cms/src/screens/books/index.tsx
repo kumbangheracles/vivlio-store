@@ -1,17 +1,4 @@
-import {
-  Button,
-  Col,
-  Dropdown,
-  Image,
-  Menu,
-  message,
-  Modal,
-  Pagination,
-  Row,
-  Space,
-  Switch,
-  Table,
-} from "antd";
+import { Col, Dropdown, Image, Menu, message, Modal, Row, Space } from "antd";
 import HeaderPage from "../../components/HeaderPage";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
@@ -22,7 +9,6 @@ import AppTable from "../../components/AppTable";
 import { useNavigate } from "react-router-dom";
 import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
-import { BaseResponseProps } from "../../types/base.type";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
 import { BookProps, BookStatusType } from "../../types/books.type";
@@ -86,7 +72,7 @@ const Books = () => {
   const handleDelete = async () => {
     try {
       setloading(true);
-      const res = await myAxios.delete(`books/${selectedId}`, {
+      await myAxios.delete(`books/${selectedId}`, {
         headers: {
           Authorization: `Bearer ${auth?.token}`,
         },

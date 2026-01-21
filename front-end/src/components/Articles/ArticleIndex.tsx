@@ -25,9 +25,9 @@ const ArticleIndex = ({ dataArticles }: PropTypes) => {
         ) : (
           <>
             <h4 className="p-4 text-center font-semibold text-3xl text-sky-500 text-shadow-lg">
-              VIVLIO BLOG
+              VIVI BLOG
             </h4>
-            <div className="flex flex-wrap justify-center gap-2  py-3 mx-3 bg-gray-100 rounded-md">
+            <div className="flex flex-wrap justify-center gap-2  py-5 mx-3 bg-gray-100 rounded-md">
               {dataArticles?.map((item) => (
                 <BlogCard dataAricle={item} />
               ))}
