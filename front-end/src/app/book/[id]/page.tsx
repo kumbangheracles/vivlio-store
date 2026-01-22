@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { Empty, message } from "antd";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 import { Metadata } from "next";
+import fetchCategory from "@/app/actions/fetchCategory";
 interface BookDetailPageProps {
   params: { id: string };
 }
@@ -33,6 +34,7 @@ export const revalidate = 60;
 export default async function BookDetail({ params }: BookDetailPageProps) {
   const { id } = params;
   const session = await getServerSession(authOptions);
+  const dataCategory = await fetchCategory();
   const accessToken = session?.accessToken;
   const allBooks = await fetchBooksHome();
   console.log("Allbooks: ", allBooks);
@@ -82,6 +84,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             isInCart: book?.isInCart,
             reviews: book?.reviews,
           }}
+          dataCategory={dataCategory}
           similiarBooks={similiarBooks}
         />
       </div>

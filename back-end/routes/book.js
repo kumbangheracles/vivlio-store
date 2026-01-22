@@ -1,5 +1,4 @@
 const express = require("express");
-const Book = require("../models/books");
 const router = express.Router();
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");

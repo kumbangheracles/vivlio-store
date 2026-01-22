@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import DefaultImage from "../../assets/images/bookDefault.png";
@@ -17,6 +17,7 @@ import {
   Select,
   Modal,
   Input,
+  Result,
 } from "antd";
 import {
   HeartOutlined,
@@ -24,6 +25,7 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   StarFilled,
+  EditOutlined,
 } from "@ant-design/icons";
 import AppBreadcrumb from "../Breadcrumb";
 import { BookProps } from "@/types/books.type";
@@ -44,12 +46,14 @@ import AppRate from "../AppRate";
 import { BookReviewsProps, initialBookReview } from "@/types/bookreview.type";
 import { isEmpty } from "@/helpers/validation";
 import dayjs from "dayjs";
+import { CategoryProps } from "@/types/category.types";
 
 const { Title, Text, Paragraph } = Typography;
 
 interface BookDetailProps {
   book: BookProps;
   isInWishlist?: boolean;
+  dataCategory?: CategoryProps[];
   onAddToWishlist?: (bookId: string) => void;
   onRemoveFromWishlist?: (bookId: string) => void;
   onShare?: (book: BookProps) => void;
@@ -61,7 +65,7 @@ type OptionTypeStar = "all_score" | 1 | 2 | 3 | 4 | 5;
 
 const BookDetailPage: React.FC<BookDetailProps> = ({
   book,
-
+  dataCategory,
   onShare,
   similiarBooks,
 }) => {
@@ -79,13 +83,21 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     useState<BookReviewsProps>(initialBookReview);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isModalReview, setIsModalReview] = useState<boolean>(false);
-  const [rating, setRating] = useState(3);
-
+  const [rating, setRating] = useState(0);
+  const [selectedIdRev, setSelectedIdRev] = useState<string>("");
+  const [scoreOrder, setScoreOrder] =
+    useState<OptionTypeScore>("highest_score");
+  const [starFilter, setStarFilter] = useState<OptionTypeStar>("all_score");
   const [loading, setLoading] = useState<boolean>(false);
   const bookId = book?.id;
   useEffect(() => {
     console.log("Book detail: ", book);
   }, [book]);
+
+  const findCat = dataCategory?.find(
+    (item) => item?.categoryId === book?.categoryId,
+  );
+
   const handleWishlistClick = async () => {
     if (!auth.accessToken) {
       message.info("You must login first.");
@@ -161,9 +173,19 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         userId: auth?.user?.id,
       };
 
-      const res = await myAxios.post(`/book-reviews/${bookId}`, payload);
-      if (res) {
-        message.success("Success create review");
+      if (!selectedIdRev) {
+        const res = await myAxios.post(`/book-reviews/${bookId}`, payload);
+        if (res) {
+          message.success("Success create review");
+        }
+      } else {
+        const res = await myAxios.patch(
+          `/book-reviews/${selectedIdRev}`,
+          payload,
+        );
+        if (res) {
+          message.success("Success update review");
+        }
       }
     } catch (error) {
       ErrorHandler(error);
@@ -174,6 +196,67 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     }
   };
 
+  const handleOpenEditModal = (selectedId: string) => {
+    const selectedRev = book?.reviews?.find((item) => item.id === selectedId);
+    if (selectedRev) {
+      setRating(selectedRev.rating as number);
+      setDataReview((prev) => ({
+        ...prev,
+        comment: selectedRev?.comment,
+      }));
+    }
+    setSelectedIdRev(selectedId);
+    setIsModalReview(true);
+  };
+  const filteredReviews = useMemo(() => {
+    if (!book?.reviews) return [];
+
+    let result = [...book.reviews];
+
+    if (starFilter !== "all_score") {
+      result = result.filter((review) => review.rating === starFilter);
+    }
+
+    if (scoreOrder === "highest_score") {
+      result.sort((a, b) => (b?.rating as number) - (a?.rating as number));
+    } else if (scoreOrder === "lowest_score") {
+      result.sort((a, b) => (a?.rating as number) - (b?.rating as number));
+    }
+
+    return result;
+  }, [book?.reviews, scoreOrder, starFilter]);
+  const averageRating = useMemo((): number => {
+    if (!book?.reviews || book.reviews.length === 0) return 0;
+
+    const total = book.reviews.reduce(
+      (sum, review) => sum + Number(review.rating || 0),
+      0,
+    );
+
+    return parseFloat((total / book.reviews.length).toFixed(1));
+  }, [book?.reviews]);
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase() // huruf kecil
+      .trim() // hapus spasi depan/belakang
+      .replace(/[^a-z0-9\s-]/g, "") // hapus karakter aneh
+      .replace(/\s+/g, "-") // spasi → -
+      .replace(/-+/g, "-"); // -- → -
+  };
+  const goToCategory = (categoryName: string, categoryId: string) => {
+    const slug = slugify(categoryName);
+    router.push(`/category/${slug}/${categoryId}`);
+  };
+  const goToGenre = (genreTitle: string, genreId: string) => {
+    const slug = slugify(genreTitle);
+    router.push(`/genre/${slug}/${genreId}`);
+  };
+
+  const handleCloseModalRev = () => {
+    setSelectedIdRev("");
+    (setDataReview(initialBookReview), setRating(0));
+    setIsModalReview(false);
+  };
   // useEffect(() => {
   //   setDefaultValueStar(5);
   // }, [isModalReview]);
@@ -209,12 +292,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   //   }
   // };
 
-  const review = `This is a Great Book!
-                    text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500     This is a Great Book!
-                    text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500`;
-
-  const truncRev = truncateText(review, baseLength);
   const truncDesc = truncateText(book?.description as string, 2000);
+
   return (
     <div className="w-screen h-screen sm:w-[80%] sm:h-auto">
       <div className="max-w-7xl mx-auto p-2 sm:p-4">
@@ -279,13 +358,29 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Tag color="default" className="px-3 py-1">
-                  {book?.categories?.categoryId}
+                <Tag
+                  onClick={() =>
+                    goToCategory(
+                      findCat?.name as string,
+                      findCat?.categoryId as string,
+                    )
+                  }
+                  color="default"
+                  className="px-3 py-1 !cursor-pointer"
+                >
+                  {findCat?.name}
                 </Tag>
 
                 {book.genres?.length! > 0 ? (
                   book.genres?.map((genre: GenreProperties, index) => (
-                    <Tag key={index} color="geekblue" className="px-3 py-1">
+                    <Tag
+                      onClick={() =>
+                        goToGenre(genre?.genre_title, genre?.genreId as string)
+                      }
+                      key={index}
+                      color="geekblue"
+                      className="px-3 py-1 !cursor-pointer"
+                    >
                       {genre?.genre_title}
                     </Tag>
                   ))
@@ -422,30 +517,197 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 h-full">
-            <h4 className="text-xl sm:text-2xl font-semibold tracking-wide">
-              Book Reviews
-            </h4>
-            <div className="flex flex-col sm:flex-row justify-between">
-              <div className="flex  items-center justify-between sm:justify-start sm:gap-3 p-2">
-                <div className="flex items-baseline-last">
-                  <div className="flex items-center gap-2 text-xl sm:text-2xl font-semibold">
-                    <StarFilled className="!text-amber-300" />
-                    <h4>5.0</h4>
+          {book?.reviews && book?.reviews.length > 0 ? (
+            <div className="mt-4 h-full">
+              <h4 className="text-xl sm:text-2xl font-semibold tracking-wide">
+                Book Reviews
+              </h4>
+              <div className="flex flex-col sm:flex-row justify-between">
+                <div className="flex  items-center justify-between sm:justify-start sm:gap-3 p-2">
+                  <div className="flex items-baseline-last">
+                    <div className="flex items-center gap-2 text-xl transition-all sm:text-2xl font-semibold">
+                      <StarFilled className="!text-amber-300" />
+                      <h4>{averageRating.toFixed(1)}</h4>
+                    </div>
+                    <h4 className="font-normal text-sm">/5</h4>
                   </div>
-                  <h4 className="font-normal text-sm">/5</h4>
+                  <div className=" hidden sm:block p-[0px] w-[1px] h-[50px] bg-gray-500"></div>
+                  <div>
+                    <h4 className="text-[11px] sm:text-sm">
+                      <b>{book?.reviews?.length}</b> Reviews
+                    </h4>
+                  </div>
                 </div>
-                <div className=" hidden sm:block p-[0px] w-[1px] h-[50px] bg-black"></div>
-                <div>
-                  <h4 className="text-[11px] sm:text-sm">
-                    <b>3</b> Reviews
-                  </h4>
+
+                <div className="flex items-center gap-4 text-[10px] sm:text-sm tracking-wide">
+                  <h4>What do you think about this book?</h4>
+                  <div>
+                    <Button
+                      onClick={() => {
+                        if (!auth?.authenticated) {
+                          message.info("You must login first!");
+                          router.push("/auth/login");
+                          return;
+                        }
+
+                        setIsModalReview(true);
+                      }}
+                      className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm"
+                    >
+                      Write a Review
+                    </Button>
+                  </div>
                 </div>
               </div>
+              <Divider />
 
-              <div className="flex items-center gap-4 text-[10px] sm:text-sm tracking-wide">
-                <h4>What do you think about this book?</h4>
-                <div>
+              <div className="flex w-full justify-end gap-3 tracking-wide">
+                <Select
+                  loading={loading}
+                  className="!w-full sm:!w-[150px] !text-[10px] sm:!text-sm"
+                  value={scoreOrder}
+                  onChange={(val: OptionTypeScore) => setScoreOrder(val)}
+                  options={[
+                    {
+                      value: "highest_score",
+                      label: "Highest Score",
+                    },
+                    {
+                      value: "lowest_score",
+                      label: "Lowest Score",
+                    },
+                  ]}
+                  // onChange={(value: OptionType) => setSelectedOption(value)}
+                />
+                <Select
+                  loading={loading}
+                  style={{ minWidth: 125 }}
+                  className="!text-[10px]  sm:!text-sm"
+                  value={starFilter}
+                  onChange={(val: OptionTypeStar) => setStarFilter(val)}
+                  options={[
+                    {
+                      value: "all_score",
+                      label: "All Score",
+                    },
+                    {
+                      value: 1,
+                      label: <StarLabel total_star={1} />,
+                    },
+                    {
+                      value: 2,
+                      label: <StarLabel total_star={2} />,
+                    },
+                    {
+                      value: 3,
+                      label: <StarLabel total_star={3} />,
+                    },
+                    {
+                      value: 4,
+                      label: <StarLabel total_star={4} />,
+                    },
+                    {
+                      value: 5,
+                      label: <StarLabel total_star={5} />,
+                    },
+                  ]}
+                  // onChange={(value: OptionType) => setSelectedOption(value)}
+                />
+              </div>
+
+              <div className="p-4">
+                <div className="flex flex-col gap-7">
+                  {filteredReviews && filteredReviews.length > 0 ? (
+                    filteredReviews.map((item) => (
+                      <div key={item?.id} className="flex flex-col gap-2">
+                        <div className="flex relative justify-between sm:flex-row flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
+                              <Image
+                                src={
+                                  item?.user?.profileImage?.imageUrl ||
+                                  "/images/default-account.png"
+                                }
+                                width={100}
+                                height={100}
+                                className="w-full h-full object-cover text-white"
+                                alt="profile-img"
+                              />
+                            </div>
+                            <div className="flex items-start tracking-wide flex-col">
+                              <h4 className="font-semibold text-[12px] sm:text-sm">
+                                {item?.user?.username}
+                              </h4>
+                              <p className="text-gray-500 text-[11px]">
+                                {dayjs(new Date(item?.createdAt!)).format(
+                                  "DD - MMM - YYYY",
+                                )}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col gap-4 sm:items-end">
+                            {!isMobile && (
+                              <Button
+                                onClick={() =>
+                                  handleOpenEditModal(item?.id as string)
+                                }
+                                className="active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full"
+                              >
+                                <EditOutlined />
+                              </Button>
+                            )}
+
+                            <StarLabel total_star={item?.rating} />
+                          </div>
+
+                          <Button
+                            onClick={() =>
+                              handleOpenEditModal(item?.id as string)
+                            }
+                            className="!absolute top-0 right-0 active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full !w-[40px] !h-[40px]"
+                          >
+                            <EditOutlined className="text-[15px]" />
+                          </Button>
+                        </div>
+
+                        <div className="relative">
+                          <p className="text-gray-700 text-[10px] sm:text-sm">
+                            {truncateText(item?.comment as string, baseLength)}
+                          </p>
+
+                          {item?.comment && item.comment.length > 300 && (
+                            <p
+                              onClick={() =>
+                                setBaseLength(
+                                  baseLength > 300
+                                    ? 300
+                                    : item?.comment!.length,
+                                )
+                              }
+                              className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                            >
+                              {baseLength > 300 ? "Hide" : "Read More"}
+                            </p>
+                          )}
+                        </div>
+
+                        <Divider className="!my-4" />
+                      </div>
+                    ))
+                  ) : (
+                    <Empty />
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 flex items-center justify-center">
+              <Result
+                status="404"
+                title="There are no reviews for this book yet."
+                subTitle="Be the first to leave a review!"
+                extra={
                   <Button
                     onClick={() => {
                       if (!auth?.authenticated) {
@@ -460,119 +722,10 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   >
                     Write a Review
                   </Button>
-                </div>
-              </div>
-            </div>
-            <Divider />
-
-            <div className="flex w-full justify-end gap-3 tracking-wide">
-              <Select
-                loading={loading}
-                className="!w-full sm:!w-[150px] !text-[10px] sm:!text-sm"
-                // value={selectOption}
-                options={[
-                  {
-                    value: "highest_score",
-                    label: "Highest Score",
-                  },
-                  {
-                    value: "lowest_score",
-                    label: "Lowest Score",
-                  },
-                ]}
-                // onChange={(value: OptionType) => setSelectedOption(value)}
-              />
-              <Select
-                loading={loading}
-                style={{ minWidth: 125 }}
-                className="!text-[10px]  sm:!text-sm"
-                // value={selectOption}
-                options={[
-                  {
-                    value: "all_score",
-                    label: "All Score",
-                  },
-                  {
-                    value: 1,
-                    label: <StarLabel total_star={1} />,
-                  },
-                  {
-                    value: 2,
-                    label: <StarLabel total_star={2} />,
-                  },
-                  {
-                    value: 3,
-                    label: <StarLabel total_star={3} />,
-                  },
-                  {
-                    value: 4,
-                    label: <StarLabel total_star={4} />,
-                  },
-                  {
-                    value: 5,
-                    label: <StarLabel total_star={5} />,
-                  },
-                ]}
-                // onChange={(value: OptionType) => setSelectedOption(value)}
+                }
               />
             </div>
-
-            <div className="p-4">
-              <div className="flex flex-col gap-7">
-                {book?.reviews?.map((item) => (
-                  <div key={item?.id} className="flex flex-col gap-2">
-                    <div className="flex justify-between sm:flex-row flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
-                          <Image
-                            src={
-                              item?.user?.profileImage?.imageUrl ||
-                              "/images/default-account.png"
-                            }
-                            width={100}
-                            height={100}
-                            className="w-full h-full object-cover text-white"
-                            alt="profile-img"
-                          />
-                        </div>
-                        <div className="flex items-start tracking-wide flex-col">
-                          <h4 className="font-semibold text-[12px] sm:text-sm">
-                            {item?.user?.username}
-                          </h4>
-                          <p className="text-gray-500 text-[11px]">
-                            {dayjs(new Date(item?.createdAt!)).format(
-                              "DD - MMM - YYYY",
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <StarLabel total_star={item?.rating} />
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <p className="text-gray-700  text-[10px] sm:text-sm">
-                        {truncateText(item?.comment as string, baseLength)}
-                      </p>
-
-                      {item?.comment && item.comment.length > 300 && (
-                        <p
-                          onClick={() =>
-                            setBaseLength(
-                              baseLength > 300 ? 300 : item?.comment?.length!,
-                            )
-                          }
-                          className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
-                        >
-                          {baseLength > 300 ? "Hide" : "Read More"}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          )}
         </Card>
       </div>
 
@@ -618,9 +771,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       <Modal
         open={isModalReview}
         closable={true}
-        onCancel={() => {
-          (setIsModalReview(false), setRating(0));
-        }}
+        onCancel={() => handleCloseModalRev()}
         footer={false}
         className="sm:!w-[650px] !w-full"
       >
@@ -690,6 +841,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   fontSize: isMobile ? 12 : 14,
                   minHeight: 150,
                 }}
+                defaultValue={dataReview?.comment}
+                value={dataReview?.comment}
                 onChange={(e) =>
                   setDataReview({
                     ...dataReview,
