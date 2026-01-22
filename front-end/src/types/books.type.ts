@@ -1,3 +1,4 @@
+import { BookReviewsProps } from "./bookreview.type";
 import { CategoryProps } from "./category.types";
 import { GenreProperties } from "./genre.type";
 
@@ -27,6 +28,7 @@ export type BookProps = {
   updateAt?: Date;
   isInCart?: boolean;
   quantity?: number;
+  reviews?: BookReviewsProps[];
   UserCart?: { quantity?: number; id?: string };
 };
 

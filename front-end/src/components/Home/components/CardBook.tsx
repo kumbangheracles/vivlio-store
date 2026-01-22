@@ -88,11 +88,11 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     }, [wishlistUsers]);
 
     const goToDetail = (id: string) => {
-      if (!auth.accessToken) {
-        message.info("You must login first!!!");
-        router.push("/auth/login");
-        return;
-      }
+      // if (!auth.accessToken) {
+      //   message.info("You must login first!!!");
+      //   router.push("/auth/login");
+      //   return;
+      // }
 
       router.push(`/book/${id}`);
     };

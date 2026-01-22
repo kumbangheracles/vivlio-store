@@ -6,6 +6,7 @@ const {
   BookStats,
   UserWishlist,
   UserCart,
+  UserImage,
   BookReview,
 } = require("../models/index");
 // const Book = require("../models/books");
@@ -52,6 +53,13 @@ module.exports = {
               model: User,
               as: "user",
               attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
             },
           },
           {
@@ -134,6 +142,13 @@ module.exports = {
               model: User,
               as: "user",
               attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
             },
           },
           {
@@ -249,6 +264,13 @@ module.exports = {
               model: User,
               as: "user",
               attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
             },
           },
           {
@@ -273,7 +295,7 @@ module.exports = {
           //         },
           //         where: { id: req.id },
           //         required: false,
-          //         attributes: ["id", "username"],
+          //
           //       },
           //     ]
           //   : []),
@@ -334,6 +356,13 @@ module.exports = {
               model: User,
               as: "user",
               attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
             },
           },
           {

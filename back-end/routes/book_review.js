@@ -13,7 +13,7 @@ router.get(
 router.get("/:id", authMiddleware, bookReviewsController.getOneReview);
 
 // Create Book Reviews
-router.post("/", authMiddleware, bookReviewsController.createReview);
+router.post("/:bookId", authMiddleware, bookReviewsController.createReview);
 
 // Update Book Reviews
 router.patch("/:id", authMiddleware, bookReviewsController.updateReview);

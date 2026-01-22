@@ -68,6 +68,7 @@ module.exports = {
   async createReview(req, res) {
     try {
       const { bookId } = req.params;
+      const userId = req.id;
 
       if (!bookId) {
         return res.status(400).json({
@@ -75,15 +76,30 @@ module.exports = {
           message: "bookId not found",
         });
       }
-      await BookReview.create({
-        ...req.body,
-        bookId: bookId,
-        userId: req.id,
+
+      const totalReview = await BookReview.count({
+        where: {
+          bookId,
+          userId,
+        },
       });
 
-      res.status(200).json({
-        status: 200,
-        message: "Success",
+      if (totalReview >= 3) {
+        return res.status(403).json({
+          status: 403,
+          message: "You can only create up to 3 reviews for this book",
+        });
+      }
+
+      await BookReview.create({
+        ...req.body,
+        bookId,
+        userId,
+      });
+
+      res.status(201).json({
+        status: 201,
+        message: "Success create review",
       });
     } catch (error) {
       res.status(500).json({

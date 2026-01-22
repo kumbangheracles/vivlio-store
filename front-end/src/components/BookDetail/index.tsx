@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+
 import DefaultImage from "../../assets/images/bookDefault.png";
 import {
   Button,
@@ -15,11 +16,11 @@ import {
   Empty,
   Select,
   Modal,
+  Input,
 } from "antd";
 import {
   HeartOutlined,
   HeartFilled,
-  ShareAltOutlined,
   ShoppingCartOutlined,
   UserOutlined,
   StarFilled,
@@ -38,6 +39,11 @@ import ListBook from "../Home/components/ListBook";
 import useDeviceType from "@/hooks/useDeviceType";
 import { truncateText } from "@/helpers/truncateText";
 import StarLabel from "./StarLabel";
+import styled from "styled-components";
+import AppRate from "../AppRate";
+import { BookReviewsProps, initialBookReview } from "@/types/bookreview.type";
+import { isEmpty } from "@/helpers/validation";
+import dayjs from "dayjs";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -68,16 +74,18 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const { fetchBooksHome } = useWishlistStore();
   const { setIsWishlist, isWishlist } = useIsWishlistStore();
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
-  const [isMore, setIsMore] = useState<boolean>(false);
   const [baseLength, setBaseLength] = useState<number>(300);
+  const [dataReview, setDataReview] =
+    useState<BookReviewsProps>(initialBookReview);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [baseLengthDesc, setBaseLengthDesc] = useState<number>(5000);
+  const [isModalReview, setIsModalReview] = useState<boolean>(false);
+  const [rating, setRating] = useState(3);
+
   const [loading, setLoading] = useState<boolean>(false);
   const bookId = book?.id;
   useEffect(() => {
     console.log("Book detail: ", book);
   }, [book]);
-  console.log("Similiar Books: ", similiarBooks);
   const handleWishlistClick = async () => {
     if (!auth.accessToken) {
       message.info("You must login first.");
@@ -107,7 +115,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     } finally {
       setLoading(false);
       // setModalOpen(false);
-
+      // router.refresh();
       await fetchBooksHome();
     }
   };
@@ -132,6 +140,43 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       maximumFractionDigits: 0,
     }).format(price);
   };
+
+  const handleSubmitReview = async (data: BookReviewsProps) => {
+    if (data?.comment?.length! < 10) {
+      message.error("Comment Atleast 10 characters!.");
+      return;
+    }
+    if (isEmpty(data.comment)) {
+      message.error("Comment are required!.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        rating: rating,
+        comment: data?.comment,
+        bookId: book?.id,
+        userId: auth?.user?.id,
+      };
+
+      const res = await myAxios.post(`/book-reviews/${bookId}`, payload);
+      if (res) {
+        message.success("Success create review");
+      }
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoading(false);
+      setIsModalReview(false);
+      router.refresh();
+    }
+  };
+
+  // useEffect(() => {
+  //   setDefaultValueStar(5);
+  // }, [isModalReview]);
 
   // const handleCheckout = async () => {
   //   try {
@@ -169,7 +214,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500text-gray-500`;
 
   const truncRev = truncateText(review, baseLength);
-  const truncDesc = truncateText(book?.description as string, baseLengthDesc);
+  const truncDesc = truncateText(book?.description as string, 2000);
   return (
     <div className="w-screen h-screen sm:w-[80%] sm:h-auto">
       <div className="max-w-7xl mx-auto p-2 sm:p-4">
@@ -234,11 +279,10 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {book.categories && (
-                  <Tag color="default" className="px-3 py-1">
-                    {book.categories.name}
-                  </Tag>
-                )}
+                <Tag color="default" className="px-3 py-1">
+                  {book?.categories?.categoryId}
+                </Tag>
+
                 {book.genres?.length! > 0 ? (
                   book.genres?.map((genre: GenreProperties, index) => (
                     <Tag key={index} color="geekblue" className="px-3 py-1">
@@ -296,7 +340,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   size="large"
                   icon={<ShoppingCartOutlined />}
                   onClick={() => {
-                    (handleAddToCart(), router.refresh());
+                    handleAddToCart();
                   }}
                   disabled={loading}
                   className="!flex-1 h-12 !font-semibold !p-3  !text-[12px] sm:!text-sm"
@@ -326,7 +370,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                       : "Add to Wishlist"}
                   </Button>
 
-                  <Button
+                  {/* <Button
                     type="default"
                     size="large"
                     icon={<ShareAltOutlined />}
@@ -334,7 +378,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     className="h-12 px-6 !text-[12px] sm:!text-sm w-full sm:w-auto"
                   >
                     Share
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
 
@@ -365,14 +409,16 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 />
               </Paragraph>
 
-              <div className="pr-4 pb-2 flex justify-end ">
-                <p
-                  onClick={() => setIsOpen(true)}
-                  className="hover:text-sky-600 underline text-sm cursor-pointer text-gray-800"
-                >
-                  Read More
-                </p>
-              </div>
+              {book?.description?.length! > 2000 && (
+                <div className="pr-4 pb-2 flex justify-end ">
+                  <p
+                    onClick={() => setIsOpen(true)}
+                    className="hover:text-sky-600 underline text-[12px] sm:text-sm cursor-pointer text-gray-800"
+                  >
+                    Read More
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -400,7 +446,18 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               <div className="flex items-center gap-4 text-[10px] sm:text-sm tracking-wide">
                 <h4>What do you think about this book?</h4>
                 <div>
-                  <Button className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm">
+                  <Button
+                    onClick={() => {
+                      if (!auth?.authenticated) {
+                        message.info("You must login first!");
+                        router.push("/auth/login");
+                        return;
+                      }
+
+                      setIsModalReview(true);
+                    }}
+                    className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm"
+                  >
                     Write a Review
                   </Button>
                 </div>
@@ -461,52 +518,58 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
             </div>
 
             <div className="p-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between sm:flex-row flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
-                      <Image
-                        src={"/images/default-account.png"}
-                        width={100}
-                        height={100}
-                        className="w-full h-full object-cover text-white"
-                        alt="profile-img"
-                      />
+              <div className="flex flex-col gap-7">
+                {book?.reviews?.map((item) => (
+                  <div key={item?.id} className="flex flex-col gap-2">
+                    <div className="flex justify-between sm:flex-row flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
+                          <Image
+                            src={
+                              item?.user?.profileImage?.imageUrl ||
+                              "/images/default-account.png"
+                            }
+                            width={100}
+                            height={100}
+                            className="w-full h-full object-cover text-white"
+                            alt="profile-img"
+                          />
+                        </div>
+                        <div className="flex items-start tracking-wide flex-col">
+                          <h4 className="font-semibold text-[12px] sm:text-sm">
+                            {item?.user?.username}
+                          </h4>
+                          <p className="text-gray-500 text-[11px]">
+                            {dayjs(new Date(item?.createdAt!)).format(
+                              "DD - MMM - YYYY",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <StarLabel total_star={item?.rating} />
+                      </div>
                     </div>
-                    <div className="flex items-start tracking-wide flex-col">
-                      <h4 className="font-semibold text-[12px] sm:text-sm">
-                        Nama
-                      </h4>
-                      <p className="text-gray-500 text-[11px]">
-                        02 januari 2026
+                    <div className="relative">
+                      <p className="text-gray-700  text-[10px] sm:text-sm">
+                        {truncateText(item?.comment as string, baseLength)}
                       </p>
+
+                      {item?.comment && item.comment.length > 300 && (
+                        <p
+                          onClick={() =>
+                            setBaseLength(
+                              baseLength > 300 ? 300 : item?.comment?.length!,
+                            )
+                          }
+                          className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                        >
+                          {baseLength > 300 ? "Hide" : "Read More"}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="flex gap-1">
-                    <StarLabel total_star={4} />
-                  </div>
-                </div>
-                <div className="relative">
-                  <p className="text-gray-700  text-[10px] sm:text-sm">
-                    {truncRev}
-                  </p>
-
-                  {baseLength <= 300 ? (
-                    <p
-                      onClick={() => setBaseLength(1000)}
-                      className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
-                    >
-                      Read More
-                    </p>
-                  ) : (
-                    <p
-                      onClick={() => setBaseLength(300)}
-                      className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
-                    >
-                      Hide More
-                    </p>
-                  )}
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -539,20 +602,137 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         open={isOpen}
         closable
         onCancel={() => setIsOpen(false)}
-        cancelText={"Close"}
         className="!w-[800px]"
         footer={false}
       >
         <div className="p-4">
           <div
+            className="leading-6"
             dangerouslySetInnerHTML={{
               __html: (book?.description as string) || "No Content",
             }}
           />
         </div>
       </Modal>
+
+      <Modal
+        open={isModalReview}
+        closable={true}
+        onCancel={() => {
+          (setIsModalReview(false), setRating(0));
+        }}
+        footer={false}
+        className="sm:!w-[650px] !w-full"
+      >
+        <div className="sm:p-4 p-0 noselect">
+          <h4 className="font-semibold text-center tracking-wide text-xl sm:text-2xl">
+            Book Reviews
+          </h4>
+
+          <div className="flex gap-4 items-center justify-center sm:justify-normal flex-col my-4 sm:mt-3">
+            <div>
+              {book?.images && book?.images.length > 0 ? (
+                <>
+                  {book?.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative w-[80px] h-[120px] h sm:w-[100px] sm:h-[150px] rounded-lg overflow-hidden"
+                    >
+                      <Image
+                        src={image?.imageUrl as string}
+                        alt={
+                          image?.bookId || `${book.title} - Image ${index + 1}`
+                        }
+                        fill
+                        className="object-cover w-full h-full "
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="relative h-96 w-full">
+                  <Image
+                    src={DefaultImage}
+                    alt={`${book.title} cover`}
+                    fill
+                    className="object-cover rounded-lg shadow-md"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="tracking-wide flex items-center justify-center flex-col">
+              <h4 className="text-gray-700">{book?.author || "No Content"}</h4>
+              <h4 className="font-semibold text-xl">
+                {book?.title || "No Content"}
+              </h4>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <AppRate
+              size={isMobile ? 25 : 37}
+              value={rating}
+              onChange={setRating}
+            />
+          </div>
+
+          <div className="mt-4">
+            <h4 className="text-center font-semibold text-sm sm:text-xl tracking-wide">
+              What do you think about this book?
+            </h4>
+            <div className="mt-2">
+              <Input.TextArea
+                minLength={10}
+                style={{
+                  border: "1px solid gray",
+                  padding: 10,
+                  fontSize: isMobile ? 12 : 14,
+                  minHeight: 150,
+                }}
+                onChange={(e) =>
+                  setDataReview({
+                    ...dataReview,
+                    comment: e.target.value,
+                  })
+                }
+                placeholder="Tell us about your experience with this book, minimum 10 characters"
+              />
+            </div>
+          </div>
+
+          <Button
+            type="primary"
+            onClick={() => handleSubmitReview(dataReview)}
+            className="!w-full mt-2"
+          >
+            Submit
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };
+
+const StyledRate = styled(Rate)`
+  /* STAR YANG BELUM DIPILIH */
+  .ant-rate-star-zero svg {
+    fill: #a9a9a9;
+  }
+
+  /* STAR YANG SUDAH DIPILIH */
+  /* .ant-rate-star-full svg {
+    fill: oklch(87.9% 0.169 91.605) !important;
+  } */
+
+  /* STAR SAAT HOVER */
+
+  .ant-rate-star:active svg {
+    fill: #a9a9a9;
+  }
+  /* .ant-rate-star-hover svg {
+    fill: #a9a9a9 !important;
+  } */
+`;
 
 export default BookDetailPage;

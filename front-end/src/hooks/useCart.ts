@@ -2,7 +2,7 @@
 import { message } from "antd";
 import { useAuth } from "./useAuth";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 
@@ -43,6 +43,7 @@ const useCart = (prop: PropTypes) => {
     } finally {
       await fetchCart?.();
       setLoading(false);
+      router.refresh();
     }
   };
 

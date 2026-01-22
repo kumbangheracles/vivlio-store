@@ -13,7 +13,7 @@ router.get("/common-all", bookController.getAllCommon);
 router.get(
   "/admin",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  bookController.cmsGetAll
+  bookController.cmsGetAll,
 );
 
 router.get("/:id", authMiddleware, bookController.getOne);
@@ -26,7 +26,7 @@ router.post(
     checkRole(["admin", "super_admin"]),
     uploadMiddleware.multiple("images"),
   ],
-  bookController.createBook
+  bookController.createBook,
 );
 
 // Update book
@@ -37,7 +37,7 @@ router.patch(
     checkRole(["admin", "super_admin"]),
     uploadMiddleware.multiple("images"),
   ],
-  bookController.updateBook
+  bookController.updateBook,
 );
 
 // add and remove wishlist
@@ -46,7 +46,7 @@ router.patch(
 router.delete(
   "/:id",
   [authMiddleware, checkRole(["admin", "super_admin"])],
-  bookController.deleteBook
+  bookController.deleteBook,
 );
 
 module.exports = router;

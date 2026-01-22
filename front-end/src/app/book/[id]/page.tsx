@@ -47,9 +47,9 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
         item.id !== book.id &&
         item.genres?.some((genre) =>
           book.genres?.some(
-            (bookGenre) => bookGenre.genre_title === genre.genre_title
-          )
-        )
+            (bookGenre) => bookGenre.genre_title === genre.genre_title,
+          ),
+        ),
     );
 
     if (!book) {
@@ -80,6 +80,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             createdAt: book?.createdAt,
             updateAt: book?.updateAt,
             isInCart: book?.isInCart,
+            reviews: book?.reviews,
           }}
           similiarBooks={similiarBooks}
         />
