@@ -11,8 +11,6 @@ exports.authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   jwt.verify(token, process.env.ACCESS_TOKEN, async (err, decoded) => {
-    // console.log("decoded", decoded.UserInfo);
-
     if (err) return res.status(403).json({ message: "Forbidden" });
 
     const { username, role, id } = decoded.UserInfo;
@@ -23,6 +21,7 @@ exports.authMiddleware = (req, res, next) => {
 
     const userData = await User.findOne({ where: { username } });
     if (!userData) return res.status(404).json({ message: "Admin not found" });
+    console.log("decoded", decoded.UserInfo);
     req.id = userData.id;
     req.user = username;
     req.role = role;

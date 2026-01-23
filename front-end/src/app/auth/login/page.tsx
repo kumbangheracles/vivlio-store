@@ -1,15 +1,11 @@
-import LoginForm from "@/components/Auth";
-import AppLayout from "@/components/Layout";
-import AuthProvider from "@/context/AuthProvider";
+"use client";
 
-export default async function LoginPage() {
-  return (
-    <>
-      {/* <AppLayout isAuthPageTampil={true}> */}
-      {/* <AuthProvider> */}
-      <LoginForm />
-      {/* </AuthProvider> */}
-      {/* </AppLayout> */}
-    </>
-  );
+import dynamic from "next/dynamic";
+
+const LoginForm = dynamic(() => import("@/components/Auth"), {
+  ssr: false,
+});
+
+export default function LoginClient() {
+  return <LoginForm />;
 }

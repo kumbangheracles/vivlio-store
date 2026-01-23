@@ -19,7 +19,7 @@ myAxios.interceptors.request.use(
       // console.log("Added Bearer token to request");
       // console.log("token: ", session.accessToken);
     } else {
-      console.log("No access token found in session");
+      // console.log("No access token found in session");
     }
 
     return config;
@@ -27,7 +27,7 @@ myAxios.interceptors.request.use(
   (error: AxiosError) => {
     console.log("Request error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 myAxios.interceptors.response.use(
@@ -49,7 +49,7 @@ myAxios.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default myAxios;

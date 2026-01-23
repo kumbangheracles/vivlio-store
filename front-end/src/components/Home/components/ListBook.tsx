@@ -140,34 +140,47 @@ const ListBook: React.FC<BookTypes> = ({
                 <>
                   {isCategory || isGenre ? (
                     <>
-                      {filteredDataBooks?.map((item, index) => (
-                        <div
-                          key={item?.id}
-                          data-aos="fade-up"
-                          data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                        >
-                          <CardBook
+                      {filteredDataBooks && filteredDataBooks.length > 0 ? (
+                        filteredDataBooks.map((item, index) => (
+                          <div
                             key={item?.id}
-                            title={item?.title}
-                            id={item.id}
-                            price={item?.price}
-                            author={item?.author}
-                            categoryId={item?.categoryId}
-                            book_type={item?.book_type}
-                            book_cover={
-                              item?.book_cover || "/images/no-image.png"
-                            }
-                            description={item?.description}
-                            status={item?.status}
-                            genres={item?.genres}
-                            images={item?.images}
-                            stats={item.stats}
-                            wishlistUsers={item.wishlistUsers}
-                            fetchBooks={fetchBooks}
-                            quantity={item?.quantity}
-                          />
-                        </div>
-                      ))}
+                            data-aos="fade-up"
+                            data-aos-delay={index * 100}
+                          >
+                            <CardBook
+                              title={item?.title}
+                              id={item.id}
+                              price={item?.price}
+                              author={item?.author}
+                              categoryId={item?.categoryId}
+                              book_type={item?.book_type}
+                              book_cover={
+                                item?.book_cover || "/images/no-image.png"
+                              }
+                              description={item?.description}
+                              status={item?.status}
+                              genres={item?.genres}
+                              images={item?.images}
+                              stats={item.stats}
+                              wishlistUsers={item.wishlistUsers}
+                              fetchBooks={fetchBooks}
+                              quantity={item?.quantity}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <Result
+                          status="404"
+                          title="Book not found"
+                          subTitle={
+                            isCategory
+                              ? "There are no books available in this category."
+                              : isGenre
+                                ? "There are no books available in this genre."
+                                : "There are no books related"
+                          }
+                        />
+                      )}
                     </>
                   ) : (
                     <>
@@ -225,7 +238,7 @@ const ListBook: React.FC<BookTypes> = ({
           {/* Desktop */}
           <div
             className={`mt-10 pt-4 rounded-md ${cn(
-              isCategory || isGenre ? "bg-gray-100" : "bg-white",
+              isCategory || isGenre ? "bg-gray-200" : "bg-white",
             )}`}
           >
             {dataBooks!?.length > 0 ? (
@@ -284,34 +297,47 @@ const ListBook: React.FC<BookTypes> = ({
                     <>
                       {isCategory || isGenre ? (
                         <>
-                          {filteredDataBooks?.map((item, index) => (
-                            <div
-                              key={item?.id}
-                              data-aos="fade-up"
-                              data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                            >
-                              <CardBook
+                          {filteredDataBooks && filteredDataBooks.length > 0 ? (
+                            filteredDataBooks.map((item, index) => (
+                              <div
                                 key={item?.id}
-                                title={item?.title}
-                                id={item.id}
-                                price={item?.price}
-                                author={item?.author}
-                                categoryId={item?.categoryId}
-                                book_type={item?.book_type}
-                                book_cover={
-                                  item?.book_cover || "/images/no-image.png"
-                                }
-                                description={item?.description}
-                                status={item?.status}
-                                genres={item?.genres}
-                                images={item?.images}
-                                stats={item.stats}
-                                wishlistUsers={item.wishlistUsers}
-                                fetchBooks={fetchBooks}
-                                quantity={item?.quantity}
-                              />
-                            </div>
-                          ))}
+                                data-aos="fade-up"
+                                data-aos-delay={index * 100}
+                              >
+                                <CardBook
+                                  title={item?.title}
+                                  id={item.id}
+                                  price={item?.price}
+                                  author={item?.author}
+                                  categoryId={item?.categoryId}
+                                  book_type={item?.book_type}
+                                  book_cover={
+                                    item?.book_cover || "/images/no-image.png"
+                                  }
+                                  description={item?.description}
+                                  status={item?.status}
+                                  genres={item?.genres}
+                                  images={item?.images}
+                                  stats={item.stats}
+                                  wishlistUsers={item.wishlistUsers}
+                                  fetchBooks={fetchBooks}
+                                  quantity={item?.quantity}
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <Result
+                              status="404"
+                              title="Book not found"
+                              subTitle={
+                                isCategory
+                                  ? "There are no books available in this category."
+                                  : isGenre
+                                    ? "There are no books available in this genre."
+                                    : "There are no books related"
+                              }
+                            />
+                          )}
                         </>
                       ) : (
                         <>

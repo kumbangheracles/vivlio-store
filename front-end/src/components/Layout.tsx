@@ -43,6 +43,7 @@ const AppLayout: React.FC<LayoutProps> = ({
     AOS.init({
       once: true, // animasi hanya sekali
       mirror: false,
+      duration: 800,
     });
   }, []);
 

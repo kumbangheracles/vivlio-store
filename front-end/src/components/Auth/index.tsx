@@ -33,7 +33,6 @@ const LoginForm: React.FC = () => {
     error: "",
   });
 
-  // Handle form submission dengan Ant Design
   const handleSubmit = async (values: LoginFormValues) => {
     setLoading(true);
     setFormState((prev) => ({ ...prev, error: "" }));
@@ -46,8 +45,6 @@ const LoginForm: React.FC = () => {
         password: values.password,
         redirect: false,
       });
-
-      console.log("SignIn result:", result);
 
       if (result?.error) {
         setFormState((prev) => ({
@@ -79,16 +76,9 @@ const LoginForm: React.FC = () => {
     message.error("Please fill in all required fields correctly");
   };
 
-  // useEffect(() => {
-  //   AOS.init();
-  // }, []);
-
   return (
     <>
-      <Container
-
-      // data-aos="fade-up"
-      >
+      <Container>
         <CardRegister className="shadow-md">
           <WrapperHeader>
             <TitleRegister>Sign in</TitleRegister>
@@ -100,7 +90,6 @@ const LoginForm: React.FC = () => {
             </WrapperDeviderTop>
           </WrapperHeader>
 
-          {/* Error message display */}
           {formState.error && (
             <div
               style={{
@@ -329,5 +318,4 @@ const WrapperSignIn = styled.div`
   }
 `;
 
-const WrapperContent = styled.div``;
 const WrapperHeader = styled.div``;

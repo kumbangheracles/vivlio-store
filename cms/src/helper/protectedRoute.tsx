@@ -1,8 +1,7 @@
-import React, { type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
-import GlobalLoading from "../components/GlobalLoading";
 import { type UserProperties } from "../types/user.type";
 
 type ProtectedRouteProps = {
