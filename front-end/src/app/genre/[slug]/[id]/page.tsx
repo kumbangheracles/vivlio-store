@@ -24,6 +24,9 @@ const GenrePage = async ({ params }: PageProps) => {
         dataBooks={filteredBooksByGenre}
         titleSection={titleList}
         isSeeAll={false}
+        isDisplayFilter={true}
+        isDisplayStockable={true}
+        isDisplayOnlyAvailbleStock={true}
       />
     </div>
   );

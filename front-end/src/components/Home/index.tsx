@@ -97,6 +97,7 @@ export default function HomePage(prop: PropTypes) {
           <div>
             <div className="px-3">
               <ListBook
+                isDisplayOnlyAvailbleStock={true}
                 dataBooks={recentPopularBook}
                 titleSection={"Recently Popular"}
                 fetchBooks={prop.fetchBooks}
@@ -105,6 +106,7 @@ export default function HomePage(prop: PropTypes) {
             </div>
             <div className="px-3">
               <ListBook
+                isDisplayOnlyAvailbleStock={true}
                 isSeeAll={false}
                 titleSection={"Best Seller"}
                 dataBooks={bestSellerBook}
@@ -112,6 +114,7 @@ export default function HomePage(prop: PropTypes) {
             </div>
             <div className="px-3">
               <ListBook
+                isDisplayOnlyAvailbleStock={true}
                 titleSection={"Newest Book"}
                 isSeeAll={false}
                 dataBooks={newestBooks}
@@ -133,16 +136,25 @@ export default function HomePage(prop: PropTypes) {
           </div>
           <div>
             <ListBook
+              isDisplayOnlyAvailbleStock={true}
               dataBooks={recentPopularBook}
               titleSection={"Recently Popular"}
               fetchBooks={prop.fetchBooks}
             />
           </div>
           <div>
-            <ListBook titleSection={"Best Seller"} dataBooks={bestSellerBook} />
+            <ListBook
+              isDisplayOnlyAvailbleStock={true}
+              titleSection={"Best Seller"}
+              dataBooks={bestSellerBook}
+            />
           </div>
           <div>
-            <ListBook titleSection={"Newest Book"} dataBooks={newestBooks} />
+            <ListBook
+              isDisplayOnlyAvailbleStock={true}
+              titleSection={"Newest Book"}
+              dataBooks={newestBooks}
+            />
           </div>
 
           <ListBlog dataArticles={prop.dataArticles as ArticleProperties[]} />

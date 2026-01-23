@@ -158,7 +158,7 @@ export default function Navbar({
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">
           {/* Desktop */}
           <div className="hidden sm:flex relative flex-col justify-center items-center min-w-full">
-            <div className="flex justify-between w-full items-center px-5 z-[99] bg-[#d9eafd] md:px-[100px] py-4">
+            <div className="flex justify-between w-full items-center px-5 z-[99] bg-[#d9eafd] md:px-[20px] lg:px-[100px] py-4">
               <div
                 className="font-extrabold tracking-widest text-xl logo cursor-pointer "
                 onClick={() => router.push("/")}
@@ -180,11 +180,11 @@ export default function Navbar({
               </div>
 
               <div className=" w-full flex  items-center gap-3 justify-center sm:w-[50%]">
-                <div className="cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-[50px]">
-                  <div
-                    className="flex gap-3 items-center noselect font-semibold"
-                    onClick={() => setIsDropCategory((prev) => !prev)}
-                  >
+                <div
+                  onClick={() => setIsDropCategory((prev) => !prev)}
+                  className="cursor-pointer bg-white border border-white px-3 py-2 rounded-[50px]"
+                >
+                  <div className="flex gap-3 items-center noselect font-semibold">
                     <DownOutlined
                       className={`text-sm ${cn(
                         !dropCategory ? "rotate-[0deg]" : "rotate-[180deg]",
@@ -267,7 +267,7 @@ export default function Navbar({
             <div
               className={` ${cn(
                 dropCategory ? "max-h-[500px]" : "max-h-[0px]",
-              )}   base-blue shadow-2xl p-4 fixed top-1 z-[-10] w-[750px] transition-all duration-400 rounded-xl overflow-hidden`}
+              )}   base-blue shadow-2xl p-4 fixed top-1 z-[-10] w-full sm:w-[750px] transition-all duration-400 rounded-xl overflow-hidden`}
             >
               <div
                 className="flex gap-5 mt-[70px]

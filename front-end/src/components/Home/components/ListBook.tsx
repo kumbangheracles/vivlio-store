@@ -1,14 +1,16 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import type { BookProps } from "../../../types/books.type";
-import { Result } from "antd";
+import { Result, Select } from "antd";
 import { cn } from "@/libs/cn";
 import GlobalLoading from "@/components/GlobalLoading";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
+import { CloseOutlined } from "@ant-design/icons";
+import { useRouter, useSearchParams } from "next/navigation";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -18,7 +20,12 @@ interface BookTypes {
   isSeeAll?: boolean;
   isCategory?: boolean;
   isGenre?: boolean;
+  isDisplayFilter?: boolean;
+  isDisplayOnlyAvailbleStock?: boolean;
+  isDisplayStockable?: boolean;
 }
+type OptionType = "newest" | "oldest" | "highest_price" | "lowest_price";
+type StockOption = "all" | "available";
 
 const ListBook: React.FC<BookTypes> = ({
   titleSection,
@@ -28,12 +35,65 @@ const ListBook: React.FC<BookTypes> = ({
   isSeeAll = true,
   isCategory = false,
   isGenre = false,
+  isDisplayFilter = false,
+  isDisplayOnlyAvailbleStock = false,
+  isDisplayStockable = false,
 }) => {
   const isMobile = useDeviceType();
+  const [isDisplayStock, setDisplayStock] = useState<boolean>(
+    isDisplayOnlyAvailbleStock,
+  );
+  const [selectOption, setSelectedOption] = useState<OptionType>("newest");
+  const toTime = (date?: Date | string) => {
+    if (!date) return 0;
+    return date instanceof Date ? date.getTime() : new Date(date).getTime();
+  };
+
+  const stockSelectValue: StockOption = isDisplayStock ? "available" : "all";
+
+  const handleStockChange = (value: StockOption) => {
+    if (value === "available") {
+      setDisplayStock(true);
+    } else {
+      setDisplayStock(false);
+    }
+  };
+
+  const filteredDataBooks = useMemo(() => {
+    if (!dataBooks) return [];
+
+    const stockedBooks = isDisplayStock
+      ? (dataBooks?.filter((item) => item.quantity !== 0) ?? [])
+      : (dataBooks ?? []);
+
+    const sorted = [...stockedBooks];
+
+    switch (selectOption) {
+      case "newest":
+        return sorted.sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt));
+
+      case "oldest":
+        return sorted.sort((a, b) => toTime(a.createdAt) - toTime(b.createdAt));
+
+      case "highest_price":
+        return sorted.sort((a, b) => b.price - a.price);
+
+      case "lowest_price":
+        return sorted.sort((a, b) => a.price - b.price);
+
+      default:
+        return sorted;
+    }
+  }, [dataBooks, selectOption, isDisplayStock]);
+  useEffect(() => {
+    setDisplayStock(isDisplayOnlyAvailbleStock);
+  }, [isDisplayOnlyAvailbleStock]);
+
   return (
     <>
       {isMobile ? (
         <>
+          {/* Mobile */}
           <div className="mt-3 pt-2 bg-gray-100 rounded-md">
             <div className="flex justify-between pl-3 pt-2">
               <h4 className="font-semibold tracking-wider text-[11px] px-2">
@@ -45,36 +105,103 @@ const ListBook: React.FC<BookTypes> = ({
                   See All
                 </h4>
               )}
+
+              {isDisplayFilter && (
+                <div className="flex flex-wrap gap-2 px-2 text-[11px] tracking-wider w-[150px]">
+                  <Select
+                    size="small"
+                    className="w-full sm:w-auto"
+                    value={stockSelectValue}
+                    options={[
+                      { value: "all", label: "All Stock" },
+                      { value: "available", label: "Available Only" },
+                    ]}
+                    onChange={handleStockChange}
+                  />
+
+                  <Select
+                    size="small"
+                    className="w-full sm:w-auto"
+                    value={selectOption}
+                    options={[
+                      { value: "newest", label: "Newest" },
+                      { value: "oldest", label: "Oldest" },
+                      { value: "highest_price", label: "Highest Price" },
+                      { value: "lowest_price", label: "Lowest Price" },
+                    ]}
+                    onChange={(value: OptionType) => setSelectedOption(value)}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 flex-wrap justify-center rounded-md p-4">
               {dataBooks && dataBooks.length !== 0 ? (
-                dataBooks.slice(0, 8).map((item, index) => (
-                  <div
-                    key={item.id}
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                    data-aos-offset="0"
-                    data-aos-anchor-placement="top-center"
-                  >
-                    <CardBook
-                      title={item.title}
-                      id={item.id}
-                      price={item.price}
-                      author={item.author}
-                      categoryId={item.categoryId}
-                      book_type={item.book_type}
-                      book_cover={item.book_cover || "/images/no-image.png"}
-                      description={item.description}
-                      status={item.status}
-                      genres={item.genres}
-                      images={item.images}
-                      stats={item.stats}
-                      wishlistUsers={item.wishlistUsers}
-                      fetchBooks={fetchBooks}
-                    />
-                  </div>
-                ))
+                <>
+                  {isCategory || isGenre ? (
+                    <>
+                      {filteredDataBooks?.map((item, index) => (
+                        <div
+                          key={item?.id}
+                          data-aos="fade-up"
+                          data-aos-delay={index * 100} // delay 100ms bertahap tiap card
+                        >
+                          <CardBook
+                            key={item?.id}
+                            title={item?.title}
+                            id={item.id}
+                            price={item?.price}
+                            author={item?.author}
+                            categoryId={item?.categoryId}
+                            book_type={item?.book_type}
+                            book_cover={
+                              item?.book_cover || "/images/no-image.png"
+                            }
+                            description={item?.description}
+                            status={item?.status}
+                            genres={item?.genres}
+                            images={item?.images}
+                            stats={item.stats}
+                            wishlistUsers={item.wishlistUsers}
+                            fetchBooks={fetchBooks}
+                            quantity={item?.quantity}
+                          />
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      {dataBooks?.slice(0, 8).map((item, index) => (
+                        <div
+                          key={item?.id}
+                          data-aos="fade-up"
+                          data-aos-delay={index * 100} // delay 100ms bertahap tiap card
+                        >
+                          <CardBook
+                            key={item?.id}
+                            title={item?.title}
+                            id={item.id}
+                            price={item?.price}
+                            author={item?.author}
+                            categoryId={item?.categoryId}
+                            book_type={item?.book_type}
+                            book_cover={
+                              item?.book_cover || "/images/no-image.png"
+                            }
+                            description={item?.description}
+                            status={item?.status}
+                            genres={item?.genres}
+                            images={item?.images}
+                            stats={item.stats}
+                            wishlistUsers={item.wishlistUsers}
+                            fetchBooks={fetchBooks}
+                            quantity={item?.quantity}
+                          />
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </>
               ) : (
                 <Result
                   status="404"
@@ -82,7 +209,9 @@ const ListBook: React.FC<BookTypes> = ({
                   subTitle={
                     isCategory
                       ? "There are no books available in this category."
-                      : "There are no books related"
+                      : isGenre
+                        ? "There are no books available in this genre."
+                        : "There are no books related"
                   }
                 />
               )}
@@ -93,48 +222,130 @@ const ListBook: React.FC<BookTypes> = ({
         </>
       ) : (
         <>
-          {" "}
+          {/* Desktop */}
           <div
-            className={`mt-10 pt-2 rounded-md ${cn(
+            className={`mt-10 pt-4 rounded-md ${cn(
               isCategory || isGenre ? "bg-gray-100" : "bg-white",
             )}`}
           >
             {dataBooks!?.length > 0 ? (
               <>
-                <TitleList>{titleSection}</TitleList>
+                <div className="flex justify-between">
+                  <div>
+                    <TitleList>{titleSection}</TitleList>
+                  </div>
+
+                  {isDisplayFilter && (
+                    <div className=" flex gap-2.5 mr-[50px]">
+                      <Select
+                        className="ml-[50px]"
+                        style={{ minWidth: 150 }}
+                        value={stockSelectValue}
+                        options={[
+                          { value: "all", label: "All Stock" },
+                          { value: "available", label: "Stock Available Only" },
+                        ]}
+                        onChange={handleStockChange}
+                      />
+                      <Select
+                        style={{ minWidth: 140 }}
+                        value={selectOption}
+                        options={[
+                          {
+                            value: "newest",
+                            label: "Newest",
+                          },
+                          {
+                            value: "oldest",
+                            label: "Oldest",
+                          },
+                          {
+                            value: "highest_price",
+                            label: "Highest Price",
+                          },
+                          {
+                            value: "lowest_price",
+                            label: "Lowest Price",
+                          },
+                        ]}
+                        onChange={(value: OptionType) =>
+                          setSelectedOption(value)
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
                 <Suspense fallback={<GlobalLoading />}>
                   <ListBookWrapper
                     className={`flex flex-wrap gap-5 justify-center ${cn(
                       isCategory || isGenre ? "!pt-5 !pb-10" : "",
                     )}`}
                   >
-                    {dataBooks?.slice(0, 8).map((item, index) => (
-                      <div
-                        key={item?.id}
-                        data-aos="fade-up"
-                        data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                      >
-                        <CardBook
-                          key={item?.id}
-                          title={item?.title}
-                          id={item.id}
-                          price={item?.price}
-                          author={item?.author}
-                          categoryId={item?.categoryId}
-                          book_type={item?.book_type}
-                          book_cover={
-                            item?.book_cover || "/images/no-image.png"
-                          }
-                          description={item?.description}
-                          status={item?.status}
-                          genres={item?.genres}
-                          images={item?.images}
-                          stats={item.stats}
-                          wishlistUsers={item.wishlistUsers}
-                          fetchBooks={fetchBooks}
-                        />
-                      </div>
-                    ))}
+                    <>
+                      {isCategory || isGenre ? (
+                        <>
+                          {filteredDataBooks?.map((item, index) => (
+                            <div
+                              key={item?.id}
+                              data-aos="fade-up"
+                              data-aos-delay={index * 100} // delay 100ms bertahap tiap card
+                            >
+                              <CardBook
+                                key={item?.id}
+                                title={item?.title}
+                                id={item.id}
+                                price={item?.price}
+                                author={item?.author}
+                                categoryId={item?.categoryId}
+                                book_type={item?.book_type}
+                                book_cover={
+                                  item?.book_cover || "/images/no-image.png"
+                                }
+                                description={item?.description}
+                                status={item?.status}
+                                genres={item?.genres}
+                                images={item?.images}
+                                stats={item.stats}
+                                wishlistUsers={item.wishlistUsers}
+                                fetchBooks={fetchBooks}
+                                quantity={item?.quantity}
+                              />
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          {dataBooks?.slice(0, 8).map((item, index) => (
+                            <div
+                              key={item?.id}
+                              data-aos="fade-up"
+                              data-aos-delay={index * 100} // delay 100ms bertahap tiap card
+                            >
+                              <CardBook
+                                key={item?.id}
+                                title={item?.title}
+                                id={item.id}
+                                price={item?.price}
+                                author={item?.author}
+                                categoryId={item?.categoryId}
+                                book_type={item?.book_type}
+                                book_cover={
+                                  item?.book_cover || "/images/no-image.png"
+                                }
+                                description={item?.description}
+                                status={item?.status}
+                                genres={item?.genres}
+                                images={item?.images}
+                                stats={item.stats}
+                                wishlistUsers={item.wishlistUsers}
+                                fetchBooks={fetchBooks}
+                                quantity={item?.quantity}
+                              />
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </>
                   </ListBookWrapper>
                 </Suspense>
               </>

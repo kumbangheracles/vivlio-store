@@ -561,10 +561,10 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
               </div>
               <Divider />
 
-              <div className="flex w-full justify-end gap-3 tracking-wide">
+              <div className="flex w-full justify-center sm:justify-end gap-3 tracking-wide">
                 <Select
                   loading={loading}
-                  className="!w-full sm:!w-[150px] !text-[10px] sm:!text-sm"
+                  className=" sm:!w-[150px] !text-[10px] sm:!text-sm"
                   value={scoreOrder}
                   onChange={(val: OptionTypeScore) => setScoreOrder(val)}
                   options={[
@@ -615,11 +615,14 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 />
               </div>
 
-              <div className="p-4">
+              <div className="sm:p-4 p-0 mt-4 sm:mt-0">
                 <div className="flex flex-col gap-7">
                   {filteredReviews && filteredReviews.length > 0 ? (
                     filteredReviews.map((item) => (
-                      <div key={item?.id} className="flex flex-col gap-2">
+                      <div
+                        key={item?.id}
+                        className="flex bg-gray-50 p-4 rounded-2xl flex-col gap-2"
+                      >
                         <div className="flex relative justify-between sm:flex-row flex-col gap-2">
                           <div className="flex items-center gap-2">
                             <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
@@ -671,7 +674,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                           </Button>
                         </div>
 
-                        <div className="relative">
+                        <div className="relative mb-2">
                           <p className="text-gray-700 text-[10px] sm:text-sm">
                             {truncateText(item?.comment as string, baseLength)}
                           </p>
@@ -692,11 +695,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                           )}
                         </div>
 
-                        <Divider className="!my-4" />
+                        <Divider className="sm:!my-4 !hidden sm:block" />
                       </div>
                     ))
                   ) : (
-                    <Empty />
+                    <Empty description={"There's no review"} />
                   )}
                 </div>
               </div>
@@ -773,7 +776,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
         closable={true}
         onCancel={() => handleCloseModalRev()}
         footer={false}
-        className="sm:!w-[650px] !w-full"
+        className="sm:!w-[650px]  !w-full"
       >
         <div className="sm:p-4 p-0 noselect">
           <h4 className="font-semibold text-center tracking-wide text-xl sm:text-2xl">

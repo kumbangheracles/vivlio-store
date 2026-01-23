@@ -23,6 +23,10 @@ type CardBookProps = BookProps & {
   fetchBooks?: () => void;
 };
 
+interface StyledCardProps {
+  quantity: BookProps["quantity"];
+}
+
 const CardBook: React.FC<CardBookProps> = React.memo(
   ({
     author,
@@ -32,7 +36,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
 
     id,
     images,
-
+    quantity,
     wishlistUsers,
   }) => {
     const isMobile = useDeviceType();
@@ -101,10 +105,15 @@ const CardBook: React.FC<CardBookProps> = React.memo(
       <>
         {isMobile ? (
           <>
-            <div
-              className="flex items-center flex-col overflow-hidden cursor-pointer relative bg-white rounded-md gap-1 w-[120px] h-[200px]"
+            <MobileBookCard
+              quantity={quantity}
               onClick={() => goToDetail(bookId as string)}
             >
+              {quantity === 0 && (
+                <h4 className="absolute p-2 rounded-2xl text-[10px] top-15 left-6 z-[20] opacity-[1] text-red-700 bg-red-200">
+                  Out of Stock
+                </h4>
+              )}
               <div
                 className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[18px] h-[18px] flex justify-center items-center border-black border-1 p-[2px]"
                 onClick={(e) => {
@@ -153,12 +162,20 @@ const CardBook: React.FC<CardBookProps> = React.memo(
                   })}
                 </span>
               </div>
-            </div>
+            </MobileBookCard>
           </>
         ) : (
           <>
-            {" "}
-            <StyledCard onClick={() => goToDetail(bookId as string)}>
+            <StyledCard
+              quantity={quantity}
+              onClick={() => goToDetail(bookId as string)}
+            >
+              {quantity === 0 && (
+                <h4 className="absolute p-3 rounded-2xl top-20 left-8 z-[20] opacity-[1] text-red-700 bg-red-200">
+                  Out of Stock
+                </h4>
+              )}
+
               <div
                 className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
                 onClick={(e) => {
@@ -225,27 +242,70 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     );
   },
 );
+const MobileBookCard = styled.div<StyledCardProps>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 
-const StyledCard = styled(Card)`
+  width: 120px;
+  height: 200px;
+
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 6px;
+
+  background-color: ${({ quantity }) => (quantity === 0 ? "#a8a8a8" : "white")};
+
+  /* jangan pakai opacity langsung */
+  ${({ quantity }) =>
+    quantity === 0 &&
+    `
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.6);
+      z-index: 5;
+    }
+  `}
+`;
+const StyledCard = styled(Card)<StyledCardProps>`
+  position: relative;
+  cursor: pointer;
+  border: 1px solid #cacaca;
+  height: 300px;
+  width: 170px;
+  overflow: hidden;
+
   .ant-card-body {
     position: relative;
     height: 100%;
     width: 100%;
+    background-color: ${({ quantity }) =>
+      quantity === 0 ? "#e1e1e1" : "white"};
   }
-  cursor: pointer;
 
-  border: 1px solid #cacaca;
-
-  transition: all ease 0.3s;
+  ${({ quantity }) =>
+    quantity === 0 &&
+    `
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.6);
+      z-index: 5;
+    }
+  `}
 
   &:hover {
     box-shadow:
       0 20px 25px -5px rgb(0 0 0 / 0.1),
       0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
-  height: 300px;
-  width: 170px;
-  overflow: hidden;
+
+  transition: all ease 0.3s;
 `;
 
 const WrapperImage = styled.div`

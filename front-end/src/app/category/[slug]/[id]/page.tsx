@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const CategoryPage = async ({ params }: PageProps) => {
   const dataBooks = await fetchBooksHome();
   const filteredBooksByCategoryId = dataBooks.filter(
-    (item) => item.categoryId === params.id
+    (item) => item.categoryId === params.id,
   );
 
   const titleList = deslugify(params.slug);
@@ -26,6 +26,9 @@ const CategoryPage = async ({ params }: PageProps) => {
         dataBooks={filteredBooksByCategoryId}
         titleSection={titleList}
         isSeeAll={false}
+        isDisplayFilter={true}
+        isDisplayStockable={true}
+        isDisplayOnlyAvailbleStock={true}
       />
     </div>
   );
