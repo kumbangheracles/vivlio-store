@@ -11,8 +11,9 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "npx nodemon",
+    "dev": "nodemon server.js",
     "prod": "pm2 start app.js --watch",
     "stop:prod": "pm2 stop app",
     "docs": "node docs/swagger.js"
@@ -40,7 +41,9 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "jest": "^30.2.0",
     "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.3"
+    "sequelize-cli": "^6.6.3",
+    "supertest": "^7.2.2"
   }
 }

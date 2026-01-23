@@ -19,7 +19,13 @@ const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 
 module.exports = {
   async getAllCommon(req, res) {
-    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+    const {
+      isPopular,
+      title,
+      categoryId,
+      page = 1,
+      limit = 10,
+    } = req.query || {};
 
     const filters = {};
     if (isPopular !== undefined) {
