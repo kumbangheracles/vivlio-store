@@ -283,3 +283,57 @@ This guide provides a structured way to use Sequelize in the Vivlio Store API pr
                                                       |
                                                       v
                                                 New accessToken
+
+# Pagination
+
+### Visualisasi Lengkap
+
+Total Data: 100 buku
+Limit: 10 buku per halaman
+
+### Page 1
+
+page = 1
+limit = 10
+offset = (1 - 1) × 10 = 0
+
+### Page 2
+
+page = 2
+limit = 10
+offset = (2 - 1) × 10 = 10
+
+### Page 3
+
+page = 3
+limit = 10
+offset = (3 - 1) × 10 = 20
+
+// SQL: SELECT \* FROM books LIMIT 10 OFFSET 20
+// Artinya: Skip 20 data pertama, lalu ambil 10 data berikutnya
+// Hasil: Buku 21-30
+
+| Index | Buku                   |
+| ----- | ---------------------- |
+| 0-19  | Buku 1-20 ❌ (di-skip) |
+| 20    | Buku 21 ✅             |
+| 21    | Buku 22 ✅             |
+| ...   | ... ✅                 |
+| 29    | Buku 30 ✅             |
+
+┌─────────────────────────────────────────────┐
+│ Page 1: offset=0 → Ambil buku 1-10 │
+│ [1][2][3][4][5][6][7][8][9][10] │
+├─────────────────────────────────────────────┤
+│ Page 2: offset=10 → Skip 10, ambil 11-20 │
+│ [11][12][13][14][15][16][17][18][19][20] │
+├─────────────────────────────────────────────┤
+│ Page 3: offset=20 → Skip 20, ambil 21-30 │
+│ [21][22][23][24][25][26][27][28][29][30] │
+├─────────────────────────────────────────────┤
+│ ... dan seterusnya hingga halaman 10 │
+└─────────────────────────────────────────────┘
+
+```
+
+```

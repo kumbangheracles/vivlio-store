@@ -102,6 +102,197 @@ module.exports = {
     }
   },
 
+  async getAllClient(req, res) {
+    const {
+      isPopular,
+      title,
+      categoryId,
+      page = 1,
+      limit = 10,
+      sortBy = "newest", // newest, oldest, priceAsc, priceDesc, popular
+      minPrice,
+      maxPrice,
+      stockAvailble = true,
+      search, // Search by title or author
+    } = req.query;
+
+    const filters = {};
+
+    // Filter by popularity
+    if (isPopular !== undefined) {
+      filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+
+    // Filter by category
+    if (categoryId) {
+      filters.categoryId = categoryId;
+    }
+
+    // Search by title
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
+
+    // Universal search (title, author, description)
+    if (search) {
+      filters[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { author: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    if (!stockAvailble) {
+      filters.stockAvailble = false;
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      filters.price = {};
+      if (minPrice) filters.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) filters.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    const userId = req.id;
+    const offset = (page - 1) * limit;
+
+    console.log(">>> Filters:", JSON.stringify(filters, null, 2));
+    console.log(">>> Sort By:", sortBy);
+
+    try {
+      // Determine sorting order
+      let orderClause;
+      switch (sortBy) {
+        case "popular":
+          orderClause = [[{ model: BookStats, as: "stats" }, "views", "DESC"]];
+          break;
+        case "priceAsc":
+          orderClause = [["price", "ASC"]];
+          break;
+        case "priceDesc":
+          orderClause = [["price", "DESC"]];
+          break;
+        case "oldest":
+          orderClause = [["createdAt", "ASC"]];
+          break;
+        case "newest":
+        default:
+          orderClause = [["createdAt", "DESC"]];
+          break;
+      }
+
+      const { count, rows } = await Book.findAndCountAll({
+        where: filters,
+        order: orderClause,
+        limit: parseInt(limit),
+        include: [
+          {
+            model: BookImage,
+            as: "images",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+          {
+            model: Genre,
+            as: "genres",
+            through: { attributes: [] },
+            attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
+            },
+          },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: [
+              "id",
+              "views",
+              "wishlistCount",
+              "cartCount",
+              "purchases",
+            ],
+          },
+          ...(req.id
+            ? [
+                {
+                  model: User,
+                  as: "wishlistUsers",
+                  through: {
+                    model: UserWishlist,
+                    where: { userId },
+                    attributes: [],
+                  },
+                  required: false,
+                  attributes: ["id"],
+                },
+                {
+                  model: User,
+                  as: "cartUsers",
+                  through: {
+                    model: UserCart,
+                    where: { userId },
+                    attributes: [],
+                  },
+                  required: false,
+                  attributes: ["id"],
+                },
+              ]
+            : []),
+        ],
+        offset,
+        distinct: true,
+        // logging: console.log,
+      });
+
+      const results = rows.map((book) => {
+        const bookJson = book.toJSON();
+        return {
+          ...bookJson,
+          isWishlisted:
+            bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+          isInCart: bookJson.cartUsers && bookJson.cartUsers.length > 0,
+        };
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: results,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
+        filters: {
+          search,
+          sortBy,
+          minPrice,
+          maxPrice,
+          stockAvailble,
+          categoryId,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+
   async getAll(req, res) {
     const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
 
@@ -357,6 +548,8 @@ module.exports = {
           {
             model: BookReview,
             as: "reviews",
+            // where: { status: "APPROVED" },
+            // required: false,
             attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
             include: {
               model: User,
@@ -394,14 +587,11 @@ module.exports = {
         return res.status(404).json({ message: "Book not found" });
       }
 
-      // pastikan convert ke object plain
       const bookData = book.toJSON();
 
-      // bikin flag isInCart
       const isInCart =
         bookData.cartUsers && bookData.cartUsers.length > 0 ? true : false;
 
-      // opsional: hapus field cartUsers biar responsenya lebih clean
       delete bookData.cartUsers;
       res.status(200).json({
         message: "Success",

@@ -20,14 +20,18 @@ import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
 import { signOut } from "next-auth/react";
 import { ErrorHandler } from "@/helpers/handleError";
+import BookReviews from "./BookReviews";
+import { BookReviewsProps } from "@/types/bookreview.type";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
   fetchWishlist: () => void;
+  dataBookReviews?: BookReviewsProps[];
 }
 
 const AccountIndex: React.FC<AccountProps> = ({
   dataUser,
+  dataBookReviews,
   dataWishlist,
   fetchWishlist,
 }) => {
@@ -83,7 +87,7 @@ const AccountIndex: React.FC<AccountProps> = ({
       key: "books_reviews",
       children: (
         <>
-          <h1>Books Reviews Page</h1>
+          <BookReviews bookReviews={dataBookReviews} />
         </>
       ),
     },

@@ -3,14 +3,14 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import type { BookProps } from "../../../types/books.type";
-import { Result, Select } from "antd";
+import { Input, Result, Select } from "antd";
 import { cn } from "@/libs/cn";
 import GlobalLoading from "@/components/GlobalLoading";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
-import { CloseOutlined } from "@ant-design/icons";
-import { useRouter, useSearchParams } from "next/navigation";
+import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -88,6 +88,50 @@ const ListBook: React.FC<BookTypes> = ({
   useEffect(() => {
     setDisplayStock(isDisplayOnlyAvailbleStock);
   }, [isDisplayOnlyAvailbleStock]);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [filters, setFilters] = useState({
+    search: searchParams.get("search") || "",
+    sortBy: searchParams.get("sortBy") || "newest",
+    minPrice: searchParams.get("minPrice") || "",
+    maxPrice: searchParams.get("maxPrice") || "",
+  });
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Apply filters to URL
+  const applyFilters = () => {
+    const params = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      search: "",
+      sortBy: "newest",
+      minPrice: "",
+      maxPrice: "",
+    });
+    router.push(pathname);
+  };
+
+  // Auto-apply on search change (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      applyFilters();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [filters.search]);
 
   return (
     <>

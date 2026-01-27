@@ -21,6 +21,11 @@ const BookReview = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    status: {
+      type: DataTypes.ENUM("APPROVED", "IS_UNDER_APPROVAL", "REJECTED"),
+      allowNull: false,
+      defaultValue: "IS_UNDER_APPROVAL",
+    },
     bookId: {
       type: DataTypes.UUID,
       allowNull: false,

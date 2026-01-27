@@ -58,76 +58,112 @@ const Account = ({ dataUser }: PropsType) => {
   };
 
   const handleSubmit = async (data: UserProperties) => {
-    form.validateFields();
-
-    if (activeKey === "fullName") {
-      if (isEmpty(data?.fullName) && isEmpty(dataUser?.fullName)) {
-        message.error("Full name are required");
-        return;
-      }
+    try {
+      await form.validateFields();
+    } catch (error) {
+      message.error("Validation failed");
+      return;
     }
 
-    if (activeKey === "email") {
-      if (isEmpty(data?.email) && isEmpty(dataUser?.email)) {
-        message.error("Email are required");
-        return;
-      }
-    }
+    // Password specific validations
     if (activeKey === "password") {
-      if (data?.oldPassword !== dataUser?.password) {
-        message.error("Old Password wrong!!");
+      if (!data?.oldPassword) {
+        message.error("Old password is required");
         return;
       }
 
-      if (data?.confirmPassword !== data.password) {
+      if (!data?.password) {
+        message.error("New password is required");
+        return;
+      }
+
+      if (!data?.confirmPassword) {
+        message.error("Confirm password is required");
+        return;
+      }
+
+      if (data?.confirmPassword !== data?.password) {
         message.error("Password did not match");
         return;
       }
 
-      if (isEmpty(data?.password) && isEmpty(dataUser?.password)) {
-        message.error("Password are required");
-        return;
-      }
-    }
-    if (activeKey === "username") {
-      if (isEmpty(data?.username) && isEmpty(dataUser?.username)) {
-        message.error("Username are required");
-        return;
-      }
+      // Validasi old password harus dilakukan di backend
+      // Karena password di dataUser sudah ter-hash
     }
 
-    if (dataUser?.isActive === false) {
-      message.info("This user hasn't been activated yet");
+    // Other field validations
+    if (activeKey === "fullName" && !data?.fullName && !dataUser?.fullName) {
+      message.error("Full name is required");
       return;
     }
+
+    if (activeKey === "email" && !data?.email && !dataUser?.email) {
+      message.error("Email is required");
+      return;
+    }
+
+    if (activeKey === "username" && !data?.username && !dataUser?.username) {
+      message.error("Username is required");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const payload = {
-        fullName: data.fullName || dataUser?.fullName,
-        username: data.username || dataUser?.username,
-        password: data.password || dataUser?.password,
-        email: data.email || dataUser?.email,
-        isActive: true || dataUser?.isActive,
+      // const payload = {
+      //   fullName: data.fullName || dataUser?.fullName,
+      //   username: data.username || dataUser?.username,
+      //   password: data.password || dataUser?.password,
+      //   email: data.email || dataUser?.email,
+      //   isActive: true || dataUser?.isActive,
+      //   profileImage:
+      //     JSON.stringify(data.profileImage) ||
+      //     JSON.stringify(dataUser?.profileImage),
+      // };
+      let payload: Record<string, any> = {
         profileImage:
-          JSON.stringify(data.profileImage) ||
+          JSON.stringify(data.profileImage) ??
           JSON.stringify(dataUser?.profileImage),
       };
 
+      if (activeKey === "fullName") {
+        payload = {
+          ...payload,
+          fullName: data.fullName,
+        };
+      } else if (activeKey === "username") {
+        payload = {
+          ...payload,
+          username: data.username,
+        };
+      } else if (activeKey === "email") {
+        payload = {
+          ...payload,
+          email: data.email,
+        };
+      } else if (activeKey === "password") {
+        payload = {
+          ...payload,
+          password: data.password,
+        };
+      }
+
       console.log("Payload", payload);
 
-      if (!dataUser?.id) {
-        await myAxios.post("/users", payload);
-        message.success("Success submit data");
-      } else {
-        const res = await myAxios.patch(`/users/${dataUser?.id}`, payload);
-
-        if (res) {
-          message.success("Success update data");
-
-          PostUser(payload?.username as string, payload?.password as string);
-        }
+      // if (!dataUser?.id) {
+      //   await myAxios.post("/users", payload);
+      //   message.success("Success submit data");
+      // } else {
+      const res = await myAxios.patch(`/users/${dataUser?.id}`, payload);
+      if (res) {
+        message.success("Success update data");
       }
+      //   if (res) {
+      //     message.success("Success update data");
+
+      //     PostUser(payload?.username as string, payload?.password as string);
+      //   }
+      // }
 
       if (payload.password || payload.username) {
         await signOut({ redirect: false });
@@ -180,7 +216,7 @@ const Account = ({ dataUser }: PropsType) => {
       setLoading(true);
       const croppedImage = await getCroppedImg(
         selectedImage,
-        croppedAreaPixels
+        croppedAreaPixels,
       );
       setCropModalOpen(false);
 
@@ -194,7 +230,7 @@ const Account = ({ dataUser }: PropsType) => {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();
@@ -273,9 +309,9 @@ const Account = ({ dataUser }: PropsType) => {
 
     return true;
   };
-  // useEffect(() => {
-  //   form.setFieldsValue(dataUser);
-  // }, [dataUser]);
+  useEffect(() => {
+    form.setFieldsValue(dataUser);
+  }, [dataUser]);
   return (
     <Card className="shadow-md">
       <TitleTab>Account Setting</TitleTab>
@@ -403,7 +439,7 @@ const Account = ({ dataUser }: PropsType) => {
           )}
           <Form.Item
             label={fieldMap[activeKey]?.label}
-            name={fieldMap[activeKey]?.name}
+            name={activeKey === "password" ? "" : fieldMap[activeKey]?.name}
             // rules={[
             //   {
             //     required: true,
@@ -482,7 +518,7 @@ const Account = ({ dataUser }: PropsType) => {
       <Modal
         open={cropModalOpen}
         onCancel={() => {
-          setCropModalOpen(false), setPreviewImage("");
+          (setCropModalOpen(false), setPreviewImage(""));
         }}
         onOk={handleCropSave}
         okText="Save"

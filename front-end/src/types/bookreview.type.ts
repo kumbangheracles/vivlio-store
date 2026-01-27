@@ -1,3 +1,4 @@
+import { BookProps } from "./books.type";
 import { UserProperties } from "./user.type";
 
 export interface BookReviewsProps {
@@ -7,6 +8,7 @@ export interface BookReviewsProps {
   bookId?: string;
   userId?: string;
   user?: UserProperties;
+  book?: BookProps;
   createdAt?: Date;
   updatedAt?: Date;
 }

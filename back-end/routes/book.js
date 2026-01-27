@@ -6,6 +6,8 @@ const bookController = require("../controller/book.controller");
 // Get all books
 router.get("/", authMiddleware, bookController.getAll);
 
+router.get("/client", authMiddleware, bookController.getAllClient);
+
 router.get("/common-all", bookController.getAllCommon);
 
 // Cms get All Books

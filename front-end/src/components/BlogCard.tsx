@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import TestImage from "../assets/images/test-blog.png";
+import TestImage from "../assets/images/default-img.png";
 import useDeviceType from "@/hooks/useDeviceType";
 import { ArticleProperties } from "@/types/article.type";
 import { truncateText } from "@/helpers/truncateText";

@@ -1,5 +1,14 @@
 import { CategoryProps } from "./category.types";
-
+export interface BookFilters {
+  search?: string;
+  sortBy?: "newest" | "oldest" | "priceAsc" | "priceDesc" | "popular";
+  minPrice?: number;
+  maxPrice?: number;
+  categoryId?: string;
+  page?: number;
+  stockAvailble?: boolean;
+  limit?: number;
+}
 export type BookProps = {
   id?: string;
   title: string;

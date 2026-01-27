@@ -53,7 +53,7 @@ const UserEdit = () => {
 
       if (auth?.role === "admin") {
         data = data.filter(
-          (cat: RoleProperties) => cat.name.toLowerCase() === "customer"
+          (cat: RoleProperties) => cat.name.toLowerCase() === "customer",
         );
       }
 
@@ -74,7 +74,7 @@ const UserEdit = () => {
 
   const handleSubmit = async (
     data: UserProperties,
-    status: UserProperties["isActive"]
+    status: UserProperties["isActive"],
   ) => {
     form.validateFields();
 
@@ -102,8 +102,8 @@ const UserEdit = () => {
         fullName: data.fullName,
         username: data.username,
         email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
+        // password: data.password,
+        // confirmPassword: data.confirmPassword,
         isActive: status,
         roleId: data.roleId,
         profileImage: JSON.stringify(data.profileImage),
@@ -178,7 +178,7 @@ const UserEdit = () => {
     try {
       const croppedImage = await getCroppedImg(
         selectedImage,
-        croppedAreaPixels
+        croppedAreaPixels,
       );
       setCropModalOpen(false);
 
@@ -192,7 +192,7 @@ const UserEdit = () => {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       const data = await res.json();
@@ -488,6 +488,54 @@ const UserEdit = () => {
             onCropComplete={onCropComplete}
           />
         </div>
+      </Modal>
+
+      <Modal
+        // key={activeKey}
+        // onCancel={() => setModalOpen(false)}
+        open={false}
+        footer={
+          <div className="w-full">
+            <AppButton
+              className="w-full"
+              style={{ height: 40 }}
+              label="Save"
+              customColor="primary"
+              // onClick={() => handleSubmit(isDataUser as UserProperties)}
+              // loading={loading}
+            />
+          </div>
+        }
+      >
+        <Form
+          layout="vertical"
+          form={form}
+          // onFinish={handleSubmit}
+          // onFinishFailed={handleSubmitFailed}
+        >
+          <Form.Item
+            label="Old Password"
+            name={"oldPassword"}
+            // rules={[
+            //   {
+            //     required: true,
+            //     message: `Old password are required`,
+            //   },
+            // ]}
+          >
+            <Input.Password
+              variant="filled"
+              style={{ height: "50px" }}
+              placeholder="Input Old Password . . ."
+              onChange={(e) =>
+                setUser({
+                  ...user,
+                  password: e.target.value,
+                })
+              }
+            />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );

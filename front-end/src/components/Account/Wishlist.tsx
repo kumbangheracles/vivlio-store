@@ -1,13 +1,11 @@
 "use client";
-import myAxios from "@/libs/myAxios";
-import { BookWithWishlist, WishlistProps } from "@/types/wishlist.type";
-import { Card, Empty, Spin, Typography } from "antd";
+import { BookWithWishlist } from "@/types/wishlist.type";
+import { Card, Empty } from "antd";
 import { Suspense, useEffect, useState } from "react";
 import GlobalLoading from "../GlobalLoading";
 import React from "react";
 import CardBookWishlist from "./CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
-const { Title, Text } = Typography;
 
 type PropTypes = {
   dataWish?: BookWithWishlist[];
@@ -61,9 +59,11 @@ const Wishlist = ({ dataWish, fetchWishlist }: PropTypes) => {
 
   return (
     <>
-      <Card className="w-full shadow-md">
+      <div className="p-4">
         <Suspense fallback={<GlobalLoading />}>
-          <Title>Wishlist Page</Title>
+          <h4 className="tracking-wide font-semibold text-2xl mb-5">
+            Wishlist Page
+          </h4>
 
           <div className="flex gap-2.5 flex-wrap">
             {filteredData.length > 0 ? (
@@ -88,7 +88,7 @@ const Wishlist = ({ dataWish, fetchWishlist }: PropTypes) => {
             )}
           </div>
         </Suspense>
-      </Card>
+      </div>
     </>
   );
 };

@@ -203,6 +203,17 @@ BookReview.belongsTo(User, {
   as: "user",
 });
 
+// Hashed password user
+// User.beforeCreate(async (user) => {
+//   user.password = await bcrypt.hash(user.password, 10);
+// });
+
+// User.beforeUpdate(async (user) => {
+//   if (user.changed("password")) {
+//     user.password = await bcrypt.hash(user.password, 10);
+//   }
+// });
+
 module.exports = {
   Book,
   BookCategory,

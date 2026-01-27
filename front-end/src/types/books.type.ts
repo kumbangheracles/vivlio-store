@@ -2,6 +2,15 @@ import { BookReviewsProps } from "./bookreview.type";
 import { CategoryProps } from "./category.types";
 import { GenreProperties } from "./genre.type";
 
+export interface BookFilters {
+  search?: string;
+  sortBy?: "newest" | "oldest" | "priceAsc" | "priceDesc" | "popular";
+  minPrice?: number;
+  maxPrice?: number;
+  categoryId?: string;
+  page?: number;
+  limit?: number;
+}
 export type BookProps = {
   id?: string;
   title: string;

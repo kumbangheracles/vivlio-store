@@ -1,24 +1,57 @@
-const { BookReview, Book, User } = require("../models/index");
+const {
+  BookReview,
+  Book,
+  User,
+  BookImage,
+  UserImage,
+} = require("../models/index");
 module.exports = {
   async getAllReview(req, res) {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
     try {
-      const bookReviews = await BookReview.findAll({
-        include: {
-          model: Book,
-          as: "book",
-          attributes: ["id", "title"],
-        },
-        include: {
-          model: User,
-          as: "user",
-          attributes: ["id", "username"],
-        },
+      const { count, rows } = await BookReview.findAndCountAll({
+        distinct: true,
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        include: [
+          {
+            model: Book,
+            as: "book",
+            attributes: ["id", "title"],
+            required: false,
+            include: [
+              {
+                model: BookImage,
+                as: "images",
+                attributes: ["id", "imageUrl", "public_id"],
+              },
+            ],
+          },
+          {
+            model: User,
+            as: "user",
+            required: false,
+            attributes: ["id", "username"],
+            include: [
+              {
+                model: UserImage,
+                as: "profileImage",
+                attributes: ["id", "imageUrl", "public_id"],
+              },
+            ],
+          },
+        ],
+        offset,
       });
 
       res.status(200).json({
         status: 200,
         message: "Success",
-        results: bookReviews,
+        results: rows,
+        total: count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(count / limit),
       });
     } catch (error) {
       res.status(500).json({
