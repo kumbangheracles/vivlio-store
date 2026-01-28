@@ -87,7 +87,7 @@ const AccountIndex: React.FC<AccountProps> = ({
       key: "books_reviews",
       children: (
         <>
-          <BookReviews bookReviews={dataBookReviews} />
+          <BookReviews bookReviews={dataBookReviews as BookReviewsProps[]} />
         </>
       ),
     },

@@ -7,12 +7,27 @@ const {
 } = require("../models/index");
 module.exports = {
   async getAllReview(req, res) {
-    const { page = 1, limit = 10 } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+    } = req.query;
     const offset = (page - 1) * limit;
+    // WHERE hanya kolom valid
+    const where = {};
+    if (status) {
+      where.status = status;
+    }
+
+    // ORDER dipisah
+    const order = [[sortBy, sortOrder.toUpperCase()]];
     try {
       const { count, rows } = await BookReview.findAndCountAll({
         distinct: true,
-        order: [["createdAt", "DESC"]],
+        where,
+        order,
         limit: parseInt(limit),
         include: [
           {

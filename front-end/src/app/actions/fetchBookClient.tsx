@@ -23,7 +23,7 @@ async function fetchBookClient(
       params.append("minPrice", options.minPrice.toString());
     if (options.maxPrice)
       params.append("maxPrice", options.maxPrice.toString());
-    if (options.categoryId) params.append("categoryId", options.categoryId);
+    if (options.id) params.append("id", options.id);
     if (options.page) params.append("page", options.page.toString());
     if (options.limit) params.append("limit", options.limit.toString());
 

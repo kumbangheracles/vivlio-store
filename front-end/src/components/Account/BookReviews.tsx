@@ -1,5 +1,9 @@
 "use client";
-import { BookReviewsProps, initialBookReview } from "@/types/bookreview.type";
+import {
+  BookReviewsProps,
+  BookReviewStatus,
+  initialBookReview,
+} from "@/types/bookreview.type";
 import Image from "next/image";
 import BookDefaultImg from "../../assets/images/bookDefault.png";
 import StarLabel from "../BookDetail/StarLabel";
@@ -7,35 +11,52 @@ import { EditOutlined } from "@ant-design/icons";
 import { truncateText } from "@/helpers/truncateText";
 
 import dayjs from "dayjs";
-import { Button, Input, message, Modal, Spin } from "antd";
-import { submitReview } from "@/helpers/submitReview";
-import { useEffect, useMemo, useState } from "react";
+import { Button, message, Spin, Tag } from "antd";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AppRate from "../AppRate";
-import useDeviceType from "@/hooks/useDeviceType";
 import { isEmpty } from "@/helpers/validation";
 import { ErrorHandler } from "@/helpers/handleError";
 import myAxios from "@/libs/myAxios";
 import { cn } from "@/libs/cn";
+import ModalReview from "../ModalReview";
 interface PropTypes {
-  bookReviews?: BookReviewsProps[];
+  bookReviews: BookReviewsProps[];
 }
 
 const BookReviews = ({ bookReviews }: PropTypes) => {
-  const isMobile = useDeviceType();
   const router = useRouter();
   const [dataReview, setDataReview] =
     useState<BookReviewsProps>(initialBookReview);
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [reviews, setReviews] = useState<BookReviewsProps[]>(bookReviews);
+  const [loadingLoad, setLoadingLoad] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const [selectedId, setSelectedId] = useState<string>("");
   const [isModalReview, setIsModalReview] = useState<boolean>(false);
-  const memoizedReview = useMemo(() => {
-    return bookReviews?.find((item) => item.id === selectedId);
-  }, [selectedId]);
 
-  const selectedReview = bookReviews?.find((item) => item.id === selectedId);
+  const selectedReview = reviews?.find((item) => item.id === selectedId);
+  const handleLoadMore = async () => {
+    setLoadingLoad(true);
+    const nextPage = page + 1;
 
+    try {
+      const response = await fetch(`/api/reviews?page=${nextPage}`);
+      const newData = await response.json();
+
+      if (newData.length === 0) {
+        setHasMore(false);
+      } else {
+        setReviews((prev) => [...prev!, ...newData]);
+        setPage(nextPage);
+      }
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoadingLoad(false);
+      router.refresh();
+    }
+  };
   const handleSubmitReview = async (data: BookReviewsProps) => {
     if (data?.comment?.length! < 10) {
       message.error("Comment Atleast 10 characters!.");
@@ -59,6 +80,13 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
       const res = await myAxios.patch(`/book-reviews/${selectedId}`, payload);
       if (res) {
         message.success("Success update review");
+        setReviews((prev) =>
+          prev.map((review) =>
+            review.id === selectedId
+              ? { ...review, rating: data.rating, comment: data.comment }
+              : review,
+          ),
+        );
       }
     } catch (error) {
       ErrorHandler(error);
@@ -70,7 +98,7 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
   };
 
   const handleOpenModalRev = (id: string) => {
-    const review = bookReviews?.find((item) => item.id === id);
+    const review = reviews?.find((item) => item.id === id);
     if (review) {
       setSelectedId(id);
       setDataReview(review);
@@ -84,8 +112,8 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
   };
 
   // useEffect(() => {
-  //   setDataReview(memoizedReview as BookReviewsProps);
-  // }, [memoizedReview]);
+  //   router.refresh();
+  // }, [reviews]);
   return (
     <div className="p-4">
       <h4 className="font-semibold tracking-wide text-2xl mb-5">
@@ -93,18 +121,41 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
       </h4>
 
       <div className="flex flex-wrap gap-3">
-        {bookReviews?.map((item) => (
+        {reviews?.map((item) => (
           <div
             key={item?.id}
-            className={`"card-wish p-4 rounded-xl border max-w-[300px] border-gray-300 hover:shadow-xl cursor-pointer relative transition-all" ${cn(loading ? "flex items-center justify-center min-w-[300px]" : "")}`}
+            // data-aos="fade-up"
+            // data-aos-delay={index * 100}
+            // data-aos-duration={800}
+            className={`p-4 rounded-xl border !w-[300px] min-h-[190px] max-w-[300px] border-gray-300 hover:shadow-xl cursor-pointer relative transition-all ${cn(loading ? "flex items-center justify-center min-w-[300px]" : "")}`}
           >
             {loading ? (
               <Spin size="large" />
             ) : (
               <>
+                <Tag
+                  className="!absolute right-0 bottom-5"
+                  color={
+                    item?.status === BookReviewStatus.APPROVED
+                      ? "green"
+                      : item?.status === BookReviewStatus.IS_UNDER_APPROVAL
+                        ? "orange"
+                        : "red"
+                  }
+                >
+                  {item?.status === BookReviewStatus.APPROVED
+                    ? "Approved"
+                    : item?.status === BookReviewStatus.IS_UNDER_APPROVAL
+                      ? "Under Approval"
+                      : "Rejected"}
+                </Tag>
+
                 <div
                   className="flex text-[15px] items-center absolute top-2 transition-all right-2 hover:bg-gray-200 rounded-full p-2"
-                  onClick={() => handleOpenModalRev(item?.id as string)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModalRev(item?.id as string);
+                  }}
                 >
                   <EditOutlined />
                 </div>
@@ -116,6 +167,7 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
                       width={100}
                       height={100}
                       alt="book-img"
+                      loading="lazy"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -141,90 +193,25 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
           </div>
         ))}
       </div>
-
-      <Modal
-        open={isModalReview}
-        closable={true}
-        onCancel={() => handleCloseModalRev()}
-        footer={false}
-        className="sm:!w-[650px]  !w-full"
-      >
-        <div className="sm:p-4 p-0 noselect">
-          <h4 className="font-semibold text-center tracking-wide text-xl sm:text-2xl">
-            Book Reviews
-          </h4>
-
-          <div className="flex gap-4 items-center justify-center sm:justify-normal flex-col my-4 sm:mt-3">
-            <div className="relative w-[80px] h-[120px] h sm:w-[100px] sm:h-[150px] rounded-lg overflow-hidden">
-              <Image
-                src={
-                  (dataReview?.book?.images![0]?.imageUrl as string) ||
-                  BookDefaultImg
-                }
-                alt={"book-img"}
-                fill
-                className="object-cover w-full h-full "
-              />
-            </div>
-
-            <div className="tracking-wide flex items-center justify-center flex-col">
-              <h4 className="text-gray-700">
-                {dataReview?.book?.author || "No Content"}
-              </h4>
-              <h4 className="font-semibold text-xl">
-                {dataReview?.book?.title || "No Content"}
-              </h4>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center">
-            <AppRate
-              size={isMobile ? 25 : 37}
-              value={dataReview?.rating}
-              onChange={(e) =>
-                setDataReview({
-                  ...dataReview,
-                  rating: e,
-                })
-              }
-            />
-          </div>
-
-          <div className="mt-4">
-            <h4 className="text-center font-semibold text-sm sm:text-xl tracking-wide">
-              What do you think about this book?
-            </h4>
-            <div className="mt-2">
-              <Input.TextArea
-                minLength={10}
-                style={{
-                  border: "1px solid gray",
-                  padding: 10,
-                  fontSize: isMobile ? 12 : 14,
-                  minHeight: 150,
-                }}
-                defaultValue={dataReview?.comment}
-                value={dataReview?.comment}
-                onChange={(e) =>
-                  setDataReview({
-                    ...dataReview,
-                    comment: e.target.value,
-                  })
-                }
-                placeholder="Tell us about your experience with this book, minimum 10 characters"
-              />
-            </div>
-          </div>
-
-          <Button
-            type="primary"
-            onClick={() => handleSubmitReview(dataReview)}
-            className="!w-full mt-2"
-          >
-            Submit
-          </Button>
-        </div>
-      </Modal>
+      {hasMore && (
+        <Button
+          onClick={handleLoadMore}
+          disabled={loadingLoad}
+          loading={loadingLoad}
+          type="primary"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+        >
+          Load More
+        </Button>
+      )}
+      <ModalReview
+        handleSubmitReview={() => handleSubmitReview(dataReview)}
+        isModalReview={isModalReview}
+        dataReview={dataReview}
+        handleCloseModalRev={() => handleCloseModalRev()}
+        setDataReview={setDataReview}
+        loading={loading}
+      />
     </div>
   );
 };

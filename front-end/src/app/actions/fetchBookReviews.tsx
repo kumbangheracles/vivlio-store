@@ -3,7 +3,13 @@ import { BookReviewsProps } from "@/types/bookreview.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
-async function fetchBookReviews(): Promise<BookReviewsProps[]> {
+interface PropTypesFetch {
+  page: number;
+}
+
+async function fetchBookReviews(
+  { page = 1 }: PropTypesFetch = { page: 1 },
+): Promise<BookReviewsProps[]> {
   try {
     const session = await getServerSession(authOptions);
     // const session = await getServerSession(authOptions);
@@ -14,7 +20,7 @@ async function fetchBookReviews(): Promise<BookReviewsProps[]> {
 
     const serverAxios = createServerAxios(session?.accessToken);
 
-    const url = "/book-reviews";
+    const url = `/book-reviews?page=${page}&limit=6`;
     const response = await serverAxios.get(url);
     console.log("Response book reviews: ", response);
 

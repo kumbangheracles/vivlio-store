@@ -49,6 +49,7 @@ interface StatusDropdownProps {
   onChange: (value: string) => void;
   options: StatusOption[];
   disabled?: boolean;
+  loading?: boolean;
 }
 
 const AppStatusSelect: React.FC<StatusDropdownProps> = ({
@@ -56,6 +57,7 @@ const AppStatusSelect: React.FC<StatusDropdownProps> = ({
   onChange,
   options,
   // disabled = false,
+  loading,
 }) => {
   const selected = options.find((opt) => opt.value === value);
   const style = getStatusStyle(selected?.color);
@@ -72,6 +74,7 @@ const AppStatusSelect: React.FC<StatusDropdownProps> = ({
           borderRadius: 6,
           ...style,
         }}
+        loading={loading}
       >
         {options.map((opt) => (
           <Option key={opt.value} value={opt.value}>

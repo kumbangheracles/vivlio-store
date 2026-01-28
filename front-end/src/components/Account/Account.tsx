@@ -1,31 +1,17 @@
 "use client";
-import {
-  Button,
-  Card,
-  Divider,
-  Form,
-  Input,
-  message,
-  Modal,
-  Upload,
-} from "antd";
+import { Card, Form, Input, message, Modal, Upload } from "antd";
 import Cropper from "react-easy-crop";
-import HeaderPage from "../HeaderPage";
 import Image from "next/image";
 import styled from "styled-components";
 import DefaultImage from "../../assets/images/profile-default.jpg";
 import AppButton from "../AppButton";
 import DetailItem from "../DetailItem";
 import { useCallback, useEffect, useState } from "react";
-import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
-import { useAuth } from "@/hooks/useAuth";
+import { EditOutlined } from "@ant-design/icons";
 import { initialUser, UserImage, UserProperties } from "@/types/user.type";
 import myAxios from "@/libs/myAxios";
-import { ErrorHandler } from "@/helpers/handleError";
 import { signIn, signOut } from "next-auth/react";
-import PostUser from "./postUser";
 import { useRouter } from "next/navigation";
-import { isEmpty } from "@/helpers/validation";
 import getCroppedImg from "@/helpers/getCroppedImage";
 import { v4 as uuidv4 } from "uuid";
 import { RcFile, UploadChangeParam, UploadFile } from "antd/es/upload";
@@ -36,7 +22,6 @@ interface PropsType {
 }
 
 const Account = ({ dataUser }: PropsType) => {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [activeKey, setActiveKey] = useState<FieldKey>("");
   const [loading, setLoading] = useState<boolean>(false);

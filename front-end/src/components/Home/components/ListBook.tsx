@@ -89,49 +89,49 @@ const ListBook: React.FC<BookTypes> = ({
     setDisplayStock(isDisplayOnlyAvailbleStock);
   }, [isDisplayOnlyAvailbleStock]);
 
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // const router = useRouter();
+  // const pathname = usePathname();
+  // const searchParams = useSearchParams();
 
-  const [filters, setFilters] = useState({
-    search: searchParams.get("search") || "",
-    sortBy: searchParams.get("sortBy") || "newest",
-    minPrice: searchParams.get("minPrice") || "",
-    maxPrice: searchParams.get("maxPrice") || "",
-  });
+  // const [filters, setFilters] = useState({
+  //   search: searchParams.get("search") || "",
+  //   sortBy: searchParams.get("sortBy") || "newest",
+  //   minPrice: searchParams.get("minPrice") || "",
+  //   maxPrice: searchParams.get("maxPrice") || "",
+  // });
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Apply filters to URL
-  const applyFilters = () => {
-    const params = new URLSearchParams();
+  // // Apply filters to URL
+  // const applyFilters = () => {
+  //   const params = new URLSearchParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+  //   Object.entries(filters).forEach(([key, value]) => {
+  //     if (value) params.set(key, value);
+  //   });
 
-    router.push(`${pathname}?${params.toString()}`);
-  };
+  //   router.push(`${pathname}?${params.toString()}`);
+  // };
 
-  // Clear all filters
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      sortBy: "newest",
-      minPrice: "",
-      maxPrice: "",
-    });
-    router.push(pathname);
-  };
+  // // Clear all filters
+  // const clearFilters = () => {
+  //   setFilters({
+  //     search: "",
+  //     sortBy: "newest",
+  //     minPrice: "",
+  //     maxPrice: "",
+  //   });
+  //   router.push(pathname);
+  // };
 
-  // Auto-apply on search change (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      applyFilters();
-    }, 500);
+  // // Auto-apply on search change (debounced)
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     applyFilters();
+  //   }, 500);
 
-    return () => clearTimeout(timer);
-  }, [filters.search]);
+  //   return () => clearTimeout(timer);
+  // }, [filters.search]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../helper/protectedRoute";
 import React, { Suspense } from "react";
 import GlobalLoading from "../components/GlobalLoading";
@@ -12,7 +12,7 @@ const RouteNavigation = () => {
   const RegisterForm = React.lazy(() => import("../screens/auth/register"));
   const LoginForm = React.lazy(() => import("../screens/auth/login"));
   const Verification = React.lazy(
-    () => import("../screens/auth/register/Verification")
+    () => import("../screens/auth/register/Verification"),
   );
   // Dashboard
   const DashboardIndex = React.lazy(() => import("../screens/dashboard/index"));
@@ -37,6 +37,9 @@ const RouteNavigation = () => {
   const Articleindex = React.lazy(() => import("../screens/articles/index"));
   const ArticleEdit = React.lazy(() => import("../screens/articles/Edit"));
   const ArticleDetail = React.lazy(() => import("../screens/articles/Detail"));
+
+  // Book Reviews
+  const BookReviewsIndex = React.lazy(() => import("../screens/reviews/index"));
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -268,6 +271,47 @@ const RouteNavigation = () => {
           />
           <Route
             path="/article/:id/detail"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <ArticleDetail />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/book-reviews"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <BookReviewsIndex />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book-reviews/add"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <ArticleEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book-reviews/:id/edit"
+            element={
+              <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
+                <AppLayout>
+                  <ArticleEdit />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book-reviews/:id/detail"
             element={
               <ProtectedRoute roles={[EUserRole.ADMIN, EUserRole.SUPER_ADMIN]}>
                 <AppLayout>

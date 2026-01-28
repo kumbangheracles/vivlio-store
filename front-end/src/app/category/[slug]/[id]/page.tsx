@@ -1,9 +1,9 @@
-// app/category/[id]/[slug]/page.tsx
 import { Metadata } from "next";
 import ListBook from "@/components/Home/components/ListBook";
 import deslugify from "@/libs/deslugyfy";
 import fetchBookClient from "@/app/actions/fetchBookClient";
 import { BookFilters } from "@/types/books.type";
+import fetchBooksHome from "@/app/actions/fetchBooksHome";
 interface PageProps {
   params: { id: string; slug: string };
   searchParams: {
@@ -26,17 +26,20 @@ export async function generateMetadata({
 }
 
 const CategoryPage = async ({ params, searchParams }: PageProps) => {
-  const filterOptions: BookFilters = {
-    categoryId: params.id,
-    search: searchParams.search,
-    sortBy: searchParams.sortBy as any,
-    minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
-    page: searchParams.page ? Number(searchParams.page) : 1,
-    limit: 20,
-  };
+  // const filterOptions: BookFilters = {
+  //   id: params.id,
+  //   search: searchParams.search,
+  //   sortBy: searchParams.sortBy as any,
+  //   minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
+  //   maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
+  //   page: searchParams.page ? Number(searchParams.page) : 1,
+  //   limit: 20,
+  // };
 
-  const dataBooks = await fetchBookClient(filterOptions);
+  const dataBooks = await fetchBooksHome();
+  const filteredBooksByCategoryId = dataBooks.filter(
+    (item) => item.categoryId === params.id,
+  );
 
   const titleList = deslugify(params.slug);
 
@@ -44,7 +47,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
     <div className="w-full p-4 mt-[-20px]">
       <ListBook
         isCategory={true}
-        dataBooks={dataBooks}
+        dataBooks={filteredBooksByCategoryId}
         titleSection={titleList}
         isSeeAll={false}
         isDisplayFilter={true}

@@ -19,6 +19,7 @@ const BookReview = sequelize.define(
     },
     comment: {
       type: DataTypes.TEXT,
+
       allowNull: true,
     },
     status: {

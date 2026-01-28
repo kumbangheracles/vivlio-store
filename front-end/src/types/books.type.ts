@@ -7,7 +7,7 @@ export interface BookFilters {
   sortBy?: "newest" | "oldest" | "priceAsc" | "priceDesc" | "popular";
   minPrice?: number;
   maxPrice?: number;
-  categoryId?: string;
+  id?: string;
   page?: number;
   limit?: number;
 }
