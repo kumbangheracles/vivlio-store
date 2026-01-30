@@ -2,7 +2,6 @@ import HomePage from "@/components/Home";
 import fetchBooksHome from "./actions/fetchBooksHome";
 import fetchArticles from "./actions/fetchArticles";
 import fetchCategory from "./actions/fetchCategory";
-import fetchGenres from "./actions/fetchGenre";
 
 export const metadata = {
   title: "ViviBook - Home",

@@ -1,5 +1,16 @@
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { Row, Col, Modal, Image, Dropdown, Menu, Tabs, message } from "antd";
+import {
+  Row,
+  Col,
+  Modal,
+  Image,
+  Dropdown,
+  Menu,
+  Tabs,
+  message,
+  Badge,
+  Tag,
+} from "antd";
 import AppInput from "../../components/AppInput";
 import AppTable from "../../components/AppTable";
 import HeaderPage from "../../components/HeaderPage";
@@ -8,15 +19,21 @@ import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import BookDefaultImg from "../../assets/images/bookDefault.png";
-import AppStatusSelect from "../../components/AppStatusSelect";
+import AppStatusSelect, {
+  getStatusStyle,
+  getStatusStyleByStatus,
+} from "../../components/AppStatusSelect";
 import dayjs from "dayjs";
 import { UserProperties } from "../../types/user.type";
 import { useDebounce } from "../../hooks/useDebounce";
 import {
   BookReviewsProps,
   BookReviewStatus,
+  initialBookReview,
 } from "../../types/bookReview.type";
 import AppSelect from "../../components/AppSelect";
+import DetailItem, { Label } from "../../components/DetailItem";
+import StarLabel from "../../components/StarLabel";
 type OptionType = "newest" | "oldest";
 
 const ReviewsIndex = () => {
@@ -24,7 +41,11 @@ const ReviewsIndex = () => {
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalDetail, setIsModalDetail] = useState<boolean>(false);
   const [dataReviews, setDataReviews] = useState<BookReviewsProps[]>([]);
+  const [dataReview, setDataReview] = useState<BookReviewsProps | null>(
+    initialBookReview,
+  );
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
@@ -133,17 +154,35 @@ const ReviewsIndex = () => {
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      await fetchReviews(page, limit);
+      // await fetchReviews(page, limit);
       setIsModalOpen(false);
       setSelectedId("");
       setLoading(false);
     }
   };
 
-  const handleModalOpen = (genreId: string) => {
+  const handleModalOpen = (reviewId: string) => {
     setIsModalOpen(true);
-    setSelectedId(genreId);
+    setSelectedId(reviewId);
   };
+
+  const handleModalDetailOpen = (reviewId: string) => {
+    setIsModalDetail(true);
+    setSelectedId(reviewId);
+  };
+
+  const handleCloseModalDetail = () => {
+    (setIsModalDetail(false), setSelectedId(""));
+    setDataReview(null);
+  };
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    const findDataRev = dataReviews.find((item) => item?.id === selectedId);
+
+    setDataReview(findDataRev as BookReviewsProps);
+  }, [selectedId]);
 
   const reviewColumn = [
     {
@@ -230,7 +269,7 @@ const ReviewsIndex = () => {
                   ? "success"
                   : status === BookReviewStatus.IS_UNDER_APPROVAL
                     ? "warning"
-                    : "error",
+                    : "danger",
             }))}
           />
         );
@@ -257,13 +296,9 @@ const ReviewsIndex = () => {
               {
                 key: "detail",
                 label: "Detail",
-                onClick: () => navigate(`${record.id}/detail`),
+                onClick: () => handleModalDetailOpen(record?.id as string),
               },
-              {
-                key: "edit",
-                label: "Edit",
-                onClick: () => navigate(`${record.id}/edit`),
-              },
+
               {
                 key: "delete",
                 label: "Delete",
@@ -430,6 +465,68 @@ const ReviewsIndex = () => {
         onCancel={() => setIsModalOpen(false)}
         onOk={() => handleDelete()}
       />
+
+      <Modal
+        title={
+          <h4 className="text-center font-semibold text-2xl tracking-wide">
+            Detail review
+          </h4>
+        }
+        open={isModalDetail}
+        footer={false}
+        onCancel={() => handleCloseModalDetail()}
+      >
+        <div className="p-4 flex justify-center gap-4">
+          <div className="w-[35%] aspect-[16/9] h-[300px] rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
+            <img
+              src={dataReview?.book?.images?.[0]?.imageUrl}
+              alt="book-image"
+              className="w-full h-full object-cover block"
+            />
+          </div>
+
+          <div className="w-[75%]">
+            <DetailItem
+              className="flex items-center gap-2"
+              label="Title:"
+              value={dataReview?.book?.title}
+            />
+
+            <DetailItem
+              className="flex items-center gap-2"
+              label="Rate:"
+              value={<StarLabel total_star={dataReview?.rating} />}
+            />
+            <DetailItem
+              className="flex items-center gap-2"
+              label="Status:"
+              value={
+                <Tag style={getStatusStyleByStatus(dataReview?.status)}>
+                  {dataReview?.status === BookReviewStatus.APPROVED
+                    ? "Approved"
+                    : dataReview?.status === BookReviewStatus.IS_UNDER_APPROVAL
+                      ? "Under Approval"
+                      : "Rejected"}
+                </Tag>
+              }
+            />
+
+            <DetailItem
+              className="flex flex-col"
+              label="Comment:"
+              value={
+                <div className="max-h-[200px] overflow-y-auto !p-4 rounded-xl bg-gray-100">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: dataReview?.comment as string,
+                    }}
+                  />
+                </div>
+              }
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

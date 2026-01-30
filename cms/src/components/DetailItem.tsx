@@ -4,11 +4,12 @@ import styled from "styled-components";
 interface PropTypes {
   value: string | ReactNode;
   label: string;
+  className?: string;
 }
 
-const DetailItem = ({ label, value }: PropTypes) => {
+const DetailItem = ({ label, value, className }: PropTypes) => {
   return (
-    <div>
+    <div className={className}>
       <Label>{label}</Label>
       {value ? (
         <Value>{value}</Value>
@@ -30,7 +31,7 @@ export const Label = styled.h1`
   color: black;
 `;
 
-const Value = styled.span`
+export const Value = styled.span`
   font-size: 14px;
   font-weight: 400;
   color: black;

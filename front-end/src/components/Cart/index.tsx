@@ -34,12 +34,15 @@ export interface PropCheck {
 const CartIndex = ({ books }: PropTypes) => {
   const auth = useAuth();
 
-  const quantityBooksRecord = books?.reduce((acc, item) => {
-    if (item?.UserCart?.id && typeof item?.UserCart?.quantity === "number") {
-      acc[item?.UserCart?.id] = item?.UserCart.quantity;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  const quantityBooksRecord = books?.reduce(
+    (acc, item) => {
+      if (item?.UserCart?.id && typeof item?.UserCart?.quantity === "number") {
+        acc[item?.UserCart?.id] = item?.UserCart.quantity;
+      }
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
@@ -48,7 +51,7 @@ const CartIndex = ({ books }: PropTypes) => {
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [quantities, setQuantities] = useState<Record<string, number>>(
-    quantityBooksRecord ?? {}
+    quantityBooksRecord ?? {},
   );
   const [isChange, setIsChange] = useState<boolean>(false);
 
@@ -72,7 +75,7 @@ const CartIndex = ({ books }: PropTypes) => {
   const mappinCheckedbook = isChecked.map((item: PropCheck) => item.id);
 
   const isCheckedBooks = books?.filter((item: BookProps) =>
-    mappinCheckedbook.includes(item.id as string)
+    mappinCheckedbook.includes(item.id as string),
   );
 
   const handleCheckAll = (e: CheckboxChangeEvent) => {
@@ -155,7 +158,7 @@ const CartIndex = ({ books }: PropTypes) => {
 
   const totalQuantity: number = (isCheckedBooks ?? []).reduce(
     (acc: number, item: BookProps) => acc + Number(item.UserCart?.quantity),
-    0
+    0,
   );
 
   const handleBulkCheckout = async () => {
@@ -167,7 +170,7 @@ const CartIndex = ({ books }: PropTypes) => {
 
       const res = await myAxios.post<{ redirect_url: string; token: string }>(
         "/midtrans/bulk-checkout",
-        { isCheckedBooks }
+        { books: isCheckedBooks },
       );
 
       console.log("Data sended: ", res.data);
@@ -238,7 +241,7 @@ const CartIndex = ({ books }: PropTypes) => {
                     icon={<MdDelete />}
                     onClick={() => setIsOpen(true)}
                     className={`!flex !items-center !gap-1 !text-base !cursor-pointer !p-2 !bg-red-400 !rounded-xl !font-bold !text-white hover:!bg-red-900 ${cn(
-                      !checkedAll && "!hidden"
+                      !checkedAll && "!hidden",
                     )} `}
                   >
                     {checkedAll && (
@@ -281,7 +284,7 @@ const CartIndex = ({ books }: PropTypes) => {
                             acc +
                             Number(item?.price || 0) *
                               Number(item?.UserCart?.quantity),
-                          0
+                          0,
                         )
                         .toLocaleString("id-ID")}
                     </p>
@@ -298,7 +301,7 @@ const CartIndex = ({ books }: PropTypes) => {
                             acc +
                             Number(item?.price || 0) *
                               Number(item?.UserCart?.quantity),
-                          0
+                          0,
                         )
                         .toLocaleString("id-ID")}
                     </h4>
@@ -334,7 +337,7 @@ const CartIndex = ({ books }: PropTypes) => {
                         acc +
                         Number(item?.price || 0) *
                           Number(item?.UserCart?.quantity),
-                      0
+                      0,
                     )
                     .toLocaleString("id-ID")}
                 </p>
@@ -346,7 +349,7 @@ const CartIndex = ({ books }: PropTypes) => {
                   onClick={() => {
                     if (isCheckedBooks.length === 0) {
                       return message.error(
-                        "Select at least one book to remove!."
+                        "Select at least one book to remove!.",
                       );
                     }
                     setIsOpen(true);

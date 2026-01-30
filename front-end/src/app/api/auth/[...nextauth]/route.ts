@@ -2,7 +2,6 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { LoginResponse, LoginCredentials, ApiError } from "@/types/api";
 import axios, { AxiosError } from "axios";
-import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 const authAxios = axios.create({
   baseURL: process.env.API_BASE_URL || "http://localhost:3000",
@@ -40,7 +39,7 @@ const authOptions: NextAuthOptions = {
 
           const response = await authAxios.post<LoginResponse>(
             "/auth/login",
-            loginData
+            loginData,
           );
 
           // console.log("Backend response data:", response.data);
@@ -66,8 +65,6 @@ const authOptions: NextAuthOptions = {
           // console.log("Response data:", data);
           return null;
         } catch (error) {
-          // console.error("🚨 Login error occurred:");
-
           if (error instanceof AxiosError) {
             const errorData = error.response?.data as ApiError;
 

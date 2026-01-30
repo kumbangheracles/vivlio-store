@@ -38,6 +38,22 @@ export const getStatusStyle = (color: string | undefined) => {
   }
 };
 
+export const getStatusStyleByStatus = (status?: string) => {
+  if (status === "APPROVED") {
+    return getStatusStyle("success");
+  }
+
+  if (status === "IS_UNDER_APPROVAL") {
+    return getStatusStyle("warning");
+  }
+
+  if (status === "REJECTED") {
+    return getStatusStyle("danger");
+  }
+
+  return getStatusStyle("primary");
+};
+
 export interface StatusOption {
   label: string;
   value: string;
