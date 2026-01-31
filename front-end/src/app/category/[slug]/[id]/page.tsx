@@ -37,7 +37,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
   // };
 
   const dataBooks = await fetchBooksHome();
-  const filteredBooksByCategoryId = dataBooks.filter(
+  const filteredBooksByCategoryId = dataBooks?.results.filter(
     (item) => item.categoryId === params.id,
   );
 

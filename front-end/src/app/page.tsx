@@ -24,7 +24,7 @@ export default async function Home() {
     <>
       {/* <AppLayout isAuthPageTampil={false}> */}
       <HomePage
-        dataBooks={books}
+        dataBooks={books?.results}
         dataCategories={categories}
         dataArticles={articles}
       />

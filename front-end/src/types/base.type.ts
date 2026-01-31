@@ -45,6 +45,14 @@ export interface BaseResponsePaginationProps<T> {
   };
 }
 
+export interface BaseResponBook<T> {
+  currentPage: number;
+  message: string;
+  results: Array<T>;
+  status: number;
+  total: number;
+  totalPages: number;
+}
 export interface DefaultQuery {
   limit?: number;
   offset?: number;

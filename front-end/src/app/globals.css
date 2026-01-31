@@ -150,3 +150,17 @@ Retrieved 2026-01-10, License - CC BY-SA 4.0
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
+}
+
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 const GenrePage = async ({ params }: PageProps) => {
   const dataBooks = await fetchBooksHome();
-  const filteredBooksByGenre = dataBooks?.filter((item) =>
+  const filteredBooksByGenre = dataBooks?.results?.filter((item) =>
     item.genres?.some((genre) => genre.genreid === params.id),
   );
 

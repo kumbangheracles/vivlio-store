@@ -3,14 +3,13 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import type { BookProps } from "../../../types/books.type";
-import { Input, Result, Select } from "antd";
+import { Result, Select } from "antd";
 import { cn } from "@/libs/cn";
 import GlobalLoading from "@/components/GlobalLoading";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
-import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import FadeUpWrapper from "../FadeUpWrapper";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -37,12 +36,12 @@ const ListBook: React.FC<BookTypes> = ({
   isGenre = false,
   isDisplayFilter = false,
   isDisplayOnlyAvailbleStock = false,
-  isDisplayStockable = false,
 }) => {
   const isMobile = useDeviceType();
   const [isDisplayStock, setDisplayStock] = useState<boolean>(
     isDisplayOnlyAvailbleStock,
   );
+
   const [selectOption, setSelectedOption] = useState<OptionType>("newest");
   const toTime = (date?: Date | string) => {
     if (!date) return 0;
@@ -186,11 +185,7 @@ const ListBook: React.FC<BookTypes> = ({
                     <>
                       {filteredDataBooks && filteredDataBooks.length > 0 ? (
                         filteredDataBooks.map((item, index) => (
-                          <div
-                            key={item?.id}
-                            data-aos="fade-up"
-                            data-aos-delay={index * 100}
-                          >
+                          <FadeUpWrapper delay={index * 100} key={item.id}>
                             <CardBook
                               title={item?.title}
                               id={item.id}
@@ -210,7 +205,7 @@ const ListBook: React.FC<BookTypes> = ({
                               fetchBooks={fetchBooks}
                               quantity={item?.quantity}
                             />
-                          </div>
+                          </FadeUpWrapper>
                         ))
                       ) : (
                         <Result
@@ -229,11 +224,7 @@ const ListBook: React.FC<BookTypes> = ({
                   ) : (
                     <>
                       {dataBooks?.slice(0, 8).map((item, index) => (
-                        <div
-                          key={item?.id}
-                          data-aos="fade-up"
-                          data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                        >
+                        <FadeUpWrapper delay={index * 100} key={item.id}>
                           <CardBook
                             key={item?.id}
                             title={item?.title}
@@ -254,7 +245,7 @@ const ListBook: React.FC<BookTypes> = ({
                             fetchBooks={fetchBooks}
                             quantity={item?.quantity}
                           />
-                        </div>
+                        </FadeUpWrapper>
                       ))}
                     </>
                   )}
@@ -343,11 +334,7 @@ const ListBook: React.FC<BookTypes> = ({
                         <>
                           {filteredDataBooks && filteredDataBooks.length > 0 ? (
                             filteredDataBooks.map((item, index) => (
-                              <div
-                                key={item?.id}
-                                data-aos="fade-up"
-                                data-aos-delay={index * 100}
-                              >
+                              <FadeUpWrapper delay={index * 100} key={item.id}>
                                 <CardBook
                                   title={item?.title}
                                   id={item.id}
@@ -367,7 +354,7 @@ const ListBook: React.FC<BookTypes> = ({
                                   fetchBooks={fetchBooks}
                                   quantity={item?.quantity}
                                 />
-                              </div>
+                              </FadeUpWrapper>
                             ))
                           ) : (
                             <Result
@@ -386,11 +373,7 @@ const ListBook: React.FC<BookTypes> = ({
                       ) : (
                         <>
                           {dataBooks?.slice(0, 8).map((item, index) => (
-                            <div
-                              key={item?.id}
-                              data-aos="fade-up"
-                              data-aos-delay={index * 100} // delay 100ms bertahap tiap card
-                            >
+                            <FadeUpWrapper delay={index * 100} key={item.id}>
                               <CardBook
                                 key={item?.id}
                                 title={item?.title}
@@ -411,7 +394,7 @@ const ListBook: React.FC<BookTypes> = ({
                                 fetchBooks={fetchBooks}
                                 quantity={item?.quantity}
                               />
-                            </div>
+                            </FadeUpWrapper>
                           ))}
                         </>
                       )}

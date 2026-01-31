@@ -1,6 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getSession } from "next-auth/react";
-
+export const API_URL = process.env.API_BASE_URL || "http://localhost:3000";
 const myAxios = axios.create({
   baseURL: process.env.API_BASE_URL || "http://localhost:3000",
   headers: {
@@ -38,6 +38,7 @@ myAxios.interceptors.response.use(
     switch (error.response?.status) {
       case 401:
         console.log("Unauthorized access");
+
         break;
       case 403:
         console.log("Forbidden access");

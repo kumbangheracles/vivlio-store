@@ -78,17 +78,19 @@ export default function HomePage(prop: PropTypes) {
                 See All
               </span>
             </div>
-            <div className="w-full overflow-x-scroll py-2 scrollbar-hide px-1">
-              <div className="flex items-center gap-3 py-2 px-1 justify-center">
-                {prop.dataCategories?.slice(0, 5).map((item) => (
-                  <span
-                    onClick={() => goToCategory(item?.name, item?.categoryId)}
-                    key={item.categoryId}
-                    className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
-                  >
-                    {item.name}
-                  </span>
-                ))}
+            <div className="flex  overflow-x-scroll">
+              <div className="w-[1000px] py-2 scrollbar-hide px-1">
+                <div className="flex items-center gap-3 py-2 px-1 justify-center">
+                  {prop.dataCategories?.slice(0, 5).map((item) => (
+                    <span
+                      onClick={() => goToCategory(item?.name, item?.categoryId)}
+                      key={item.categoryId}
+                      className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
+                    >
+                      {item.name}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

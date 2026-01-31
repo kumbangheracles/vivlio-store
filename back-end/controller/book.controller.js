@@ -24,6 +24,7 @@ module.exports = {
       title,
       categoryId,
       page = 1,
+      status,
       limit = 10,
     } = req.query || {};
 
@@ -35,10 +36,14 @@ module.exports = {
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
     }
+    if (status) {
+      filters.status = status;
+    }
     const offset = (page - 1) * limit;
     try {
       const { count, rows } = await Book.findAndCountAll({
         limit: parseInt(limit),
+        where: filters,
         include: [
           {
             model: BookImage,
@@ -114,6 +119,7 @@ module.exports = {
       maxPrice,
       stockAvailble = true,
       search, // Search by title or author
+      status,
     } = req.query;
 
     const filters = {};
@@ -131,6 +137,10 @@ module.exports = {
     // Search by title
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
+    }
+
+    if (status) {
+      filters.status = status;
     }
 
     // Universal search (title, author, description)
@@ -281,6 +291,7 @@ module.exports = {
           maxPrice,
           stockAvailble,
           categoryId,
+          status,
         },
       });
     } catch (error) {
@@ -294,7 +305,14 @@ module.exports = {
   },
 
   async getAll(req, res) {
-    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+    const {
+      isPopular,
+      title,
+      categoryId,
+      page = 1,
+      limit = 10,
+      status,
+    } = req.query;
 
     const filters = {};
     if (isPopular !== undefined) {
@@ -303,6 +321,9 @@ module.exports = {
     if (categoryId) filters.categoryId = categoryId;
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
+    }
+    if (status) {
+      filters.status = status;
     }
 
     const userId = req.id;
@@ -532,6 +553,7 @@ module.exports = {
     console.log("UserID Get One: ", userId);
     try {
       const { id } = req.params;
+      // const {} = req.query
       const book = await Book.findOne({
         where: { id },
         include: [
@@ -548,9 +570,16 @@ module.exports = {
           {
             model: BookReview,
             as: "reviews",
-            // where: { status: "APPROVED" },
-            // required: false,
-            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            where: { status: "APPROVED" },
+            required: false,
+            attributes: [
+              "id",
+              "rating",
+              "comment",
+              "createdAt",
+              "updatedAt",
+              "status",
+            ],
             include: {
               model: User,
               as: "user",

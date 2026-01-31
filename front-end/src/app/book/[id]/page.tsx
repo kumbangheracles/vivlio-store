@@ -44,7 +44,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
     });
     const book = res.data.result;
 
-    const similiarBooks = allBooks.filter(
+    const similiarBooks = allBooks?.results?.filter(
       (item) =>
         item.id !== book.id &&
         item.genres?.some((genre) =>
@@ -83,6 +83,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             updateAt: book?.updateAt,
             isInCart: book?.isInCart,
             reviews: book?.reviews,
+            quantity: book?.quantity,
           }}
           dataCategory={dataCategory}
           similiarBooks={similiarBooks}

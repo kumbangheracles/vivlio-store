@@ -11,6 +11,13 @@ export interface BookFilters {
   page?: number;
   limit?: number;
 }
+
+export interface BookParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+  status?: BookStatusType;
+}
 export type BookProps = {
   id?: string;
   title: string;

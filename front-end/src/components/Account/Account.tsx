@@ -392,112 +392,114 @@ const Account = ({ dataUser }: PropsType) => {
           </div>
         }
       >
-        <Form
-          layout="vertical"
-          form={form}
-          onFinish={handleSubmit}
-          onFinishFailed={handleSubmitFailed}
-        >
-          {activeKey === "password" && (
-            <Form.Item
-              label="Old Password"
-              name={"oldPassword"}
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: `Old password are required`,
-              //   },
-              // ]}
-            >
-              <Input.Password
-                variant="filled"
-                style={{ height: "50px" }}
-                placeholder="Input Old Password . . ."
-                onChange={(e) =>
-                  setIsDataUser({
-                    ...isDataUser,
-                    oldPassword: e.target.value,
-                  })
-                }
-              />
-            </Form.Item>
-          )}
-          <Form.Item
-            label={fieldMap[activeKey]?.label}
-            name={activeKey === "password" ? "" : fieldMap[activeKey]?.name}
-            // rules={[
-            //   {
-            //     required: true,
-            //     message: `${fieldMap[activeKey]?.label} are required`,
-            //   },
-
-            //   activeKey === "password"
-            //     ? { min: 6, message: "6 characters are needed" }
-            //     : {},
-
-            //   activeKey === "password"
-            //     ? {
-            //         pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/,
-            //         message: "Password must include alphabet and numeric",
-            //       }
-            //     : {},
-            // ]}
+        {modalOpen && (
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={handleSubmit}
+            onFinishFailed={handleSubmitFailed}
           >
-            {activeKey === "password" ? (
-              <Input.Password
-                variant="filled"
-                style={{ height: "50px" }}
-                placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
-                onChange={(e) =>
-                  setIsDataUser({
-                    ...isDataUser,
-                    [fieldMap[activeKey]?.name as string]: e.target.value,
-                  })
-                }
-                required={true}
-              />
-            ) : (
-              <Input
-                variant="filled"
-                style={{ height: "50px" }}
-                placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
-                onChange={(e) =>
-                  setIsDataUser({
-                    ...isDataUser,
-                    [fieldMap[activeKey]?.name as string]: e.target.value,
-                  })
-                }
-                required={true}
-              />
+            {activeKey === "password" && (
+              <Form.Item
+                label="Old Password"
+                name={"oldPassword"}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: `Old password are required`,
+                //   },
+                // ]}
+              >
+                <Input.Password
+                  variant="filled"
+                  style={{ height: "50px" }}
+                  placeholder="Input Old Password . . ."
+                  onChange={(e) =>
+                    setIsDataUser({
+                      ...isDataUser,
+                      oldPassword: e.target.value,
+                    })
+                  }
+                />
+              </Form.Item>
             )}
-          </Form.Item>
-
-          {activeKey === "password" && (
             <Form.Item
-              label="Confirm Password"
-              name={"confirmPassword"}
+              label={fieldMap[activeKey]?.label}
+              name={activeKey === "password" ? "" : fieldMap[activeKey]?.name}
               // rules={[
               //   {
               //     required: true,
-              //     message: `Confirm password are required`,
+              //     message: `${fieldMap[activeKey]?.label} are required`,
               //   },
+
+              //   activeKey === "password"
+              //     ? { min: 6, message: "6 characters are needed" }
+              //     : {},
+
+              //   activeKey === "password"
+              //     ? {
+              //         pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/,
+              //         message: "Password must include alphabet and numeric",
+              //       }
+              //     : {},
               // ]}
             >
-              <Input.Password
-                variant="filled"
-                style={{ height: "50px" }}
-                placeholder="Confirm New Password . . ."
-                onChange={(e) =>
-                  setIsDataUser({
-                    ...isDataUser,
-                    confirmPassword: e.target.value,
-                  })
-                }
-                required={true}
-              />
+              {activeKey === "password" ? (
+                <Input.Password
+                  variant="filled"
+                  style={{ height: "50px" }}
+                  placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
+                  onChange={(e) =>
+                    setIsDataUser({
+                      ...isDataUser,
+                      [fieldMap[activeKey]?.name as string]: e.target.value,
+                    })
+                  }
+                  required={true}
+                />
+              ) : (
+                <Input
+                  variant="filled"
+                  style={{ height: "50px" }}
+                  placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
+                  onChange={(e) =>
+                    setIsDataUser({
+                      ...isDataUser,
+                      [fieldMap[activeKey]?.name as string]: e.target.value,
+                    })
+                  }
+                  required={true}
+                />
+              )}
             </Form.Item>
-          )}
-        </Form>
+
+            {activeKey === "password" && (
+              <Form.Item
+                label="Confirm Password"
+                name={"confirmPassword"}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: `Confirm password are required`,
+                //   },
+                // ]}
+              >
+                <Input.Password
+                  variant="filled"
+                  style={{ height: "50px" }}
+                  placeholder="Confirm New Password . . ."
+                  onChange={(e) =>
+                    setIsDataUser({
+                      ...isDataUser,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  required={true}
+                />
+              </Form.Item>
+            )}
+          </Form>
+        )}
       </Modal>
 
       <Modal

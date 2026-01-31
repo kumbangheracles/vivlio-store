@@ -97,6 +97,21 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
     }
   };
 
+  const handleDelete = async (reviewId: string) => {
+    try {
+      setLoading(true);
+      await myAxios.delete(`/book-reviews/${reviewId}`);
+
+      message.success(`Successfully delete Reviews`);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      // await fetchReviews(page, limit);
+      setSelectedId("");
+      setLoading(false);
+    }
+  };
+
   const handleOpenModalRev = (id: string) => {
     const review = reviews?.find((item) => item.id === id);
     if (review) {
@@ -133,6 +148,15 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
               <Spin size="large" />
             ) : (
               <>
+                {item?.status === BookReviewStatus.REJECTED && (
+                  <button
+                    className="absolute px-1 text-sm rounded-md bg-white text-red-500 border-red-500 border py-1 bottom-4 left-1"
+                    onClick={() => handleDelete(item?.id as string)}
+                  >
+                    Delete
+                  </button>
+                )}
+
                 <Tag
                   className="!absolute right-0 bottom-5"
                   color={

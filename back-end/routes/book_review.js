@@ -19,10 +19,6 @@ router.post("/:bookId", authMiddleware, bookReviewsController.createReview);
 router.patch("/:id", authMiddleware, bookReviewsController.updateReview);
 
 // Delete Book Reviews
-router.delete(
-  "/:id",
-  [authMiddleware, checkRole(["admin", "super_admin"])],
-  bookReviewsController.deleteReview,
-);
+router.delete("/:id", authMiddleware, bookReviewsController.deleteReview);
 
 module.exports = router;

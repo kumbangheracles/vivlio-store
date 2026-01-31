@@ -43,10 +43,15 @@ import { truncateText } from "@/helpers/truncateText";
 import StarLabel from "./StarLabel";
 import styled from "styled-components";
 import AppRate from "../AppRate";
-import { BookReviewsProps, initialBookReview } from "@/types/bookreview.type";
+import {
+  BookReviewsProps,
+  BookReviewStatus,
+  initialBookReview,
+} from "@/types/bookreview.type";
 import { isEmpty } from "@/helpers/validation";
 import dayjs from "dayjs";
 import { CategoryProps } from "@/types/category.types";
+import { cn } from "@/libs/cn";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -127,7 +132,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     } finally {
       setLoading(false);
       // setModalOpen(false);
-      // router.refresh();
+      router.refresh();
       await fetchBooksHome();
     }
   };
@@ -208,23 +213,31 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     setSelectedIdRev(selectedId);
     setIsModalReview(true);
   };
+
   const filteredReviews = useMemo(() => {
     if (!book?.reviews) return [];
 
     let result = [...book.reviews];
 
     if (starFilter !== "all_score") {
-      result = result.filter((review) => review.rating === starFilter);
+      const star = Number(starFilter);
+      result = result.filter((review) => Number(review.rating) === star);
     }
 
     if (scoreOrder === "highest_score") {
-      result.sort((a, b) => (b?.rating as number) - (a?.rating as number));
+      result.sort((a, b) => (b.rating as number) - (a.rating as number));
     } else if (scoreOrder === "lowest_score") {
-      result.sort((a, b) => (a?.rating as number) - (b?.rating as number));
+      result.sort((a, b) => (a.rating as number) - (b.rating as number));
     }
 
     return result;
   }, [book?.reviews, scoreOrder, starFilter]);
+
+  const approvedReviews = useMemo(() => {
+    if (!book?.reviews) return [];
+    return book.reviews;
+  }, [book?.reviews]);
+
   const averageRating = useMemo((): number => {
     if (!book?.reviews || book.reviews.length === 0) return 0;
 
@@ -294,6 +307,10 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
 
   const truncDesc = truncateText(book?.description as string, 2000);
 
+  // useEffect(() => {
+  //   console.log("Filtered approved reviews: ", filteredReviews);
+  // }, [filteredReviews]);
+
   return (
     <div className="w-screen h-screen sm:w-[80%] sm:h-auto">
       <div className="max-w-7xl mx-auto p-2 sm:p-4">
@@ -309,13 +326,19 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   </Badge.Ribbon>
                 )}
 
+                {book?.quantity === 0 && (
+                  <h4 className="absolute p-3 rounded-2xl top-0 left-0 sm:left-10 z-[20] opacity-[1] text-red-700 bg-red-200">
+                    Out of Stock
+                  </h4>
+                )}
+
                 {book?.images && book?.images.length > 0 ? (
                   <Carousel
                     autoplay
-                    className="rounded-lg overflow-hidden flex justify-center items-center w-full sm:w-[300px] p-4 m-auto"
+                    className={`rounded-lg overflow-hidden flex justify-center items-center w-full sm:w-[300px] p-4 m-auto ${cn(book?.quantity === 0 ? "opacity-50" : "opacity-0")}`}
                   >
                     {book?.images.map((image, index) => (
-                      <div key={index} className="relative h-95 w-full">
+                      <div key={index} className="relative h-95 w-full ">
                         <Image
                           src={image?.imageUrl as string}
                           alt={
@@ -517,11 +540,15 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
             </div>
           </div>
 
-          {book?.reviews && book?.reviews.length > 0 ? (
+          {/* ===================== */}
+          {/* ADA REVIEW APPROVED */}
+          {/* ===================== */}
+          {approvedReviews.length > 0 ? (
             <div className="mt-4 h-full">
               <h4 className="text-xl sm:text-2xl font-semibold tracking-wide">
                 Book Reviews
               </h4>
+
               <div className="flex flex-col sm:flex-row justify-between">
                 <div className="flex  items-center justify-between sm:justify-start sm:gap-3 p-2">
                   <div className="flex items-baseline-last">
@@ -549,7 +576,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                           router.push("/auth/login");
                           return;
                         }
-
                         setIsModalReview(true);
                       }}
                       className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm"
@@ -559,6 +585,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   </div>
                 </div>
               </div>
+
               <Divider />
 
               <div className="flex w-full justify-center sm:justify-end gap-3 tracking-wide">
@@ -568,16 +595,9 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   value={scoreOrder}
                   onChange={(val: OptionTypeScore) => setScoreOrder(val)}
                   options={[
-                    {
-                      value: "highest_score",
-                      label: "Highest Score",
-                    },
-                    {
-                      value: "lowest_score",
-                      label: "Lowest Score",
-                    },
+                    { value: "highest_score", label: "Highest Score" },
+                    { value: "lowest_score", label: "Lowest Score" },
                   ]}
-                  // onChange={(value: OptionType) => setSelectedOption(value)}
                 />
                 <Select
                   loading={loading}
@@ -586,125 +606,120 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   value={starFilter}
                   onChange={(val: OptionTypeStar) => setStarFilter(val)}
                   options={[
-                    {
-                      value: "all_score",
-                      label: "All Score",
-                    },
-                    {
-                      value: 1,
-                      label: <StarLabel total_star={1} />,
-                    },
-                    {
-                      value: 2,
-                      label: <StarLabel total_star={2} />,
-                    },
-                    {
-                      value: 3,
-                      label: <StarLabel total_star={3} />,
-                    },
-                    {
-                      value: 4,
-                      label: <StarLabel total_star={4} />,
-                    },
-                    {
-                      value: 5,
-                      label: <StarLabel total_star={5} />,
-                    },
+                    { value: "all_score", label: "All Score" },
+                    { value: 1, label: <StarLabel total_star={1} /> },
+                    { value: 2, label: <StarLabel total_star={2} /> },
+                    { value: 3, label: <StarLabel total_star={3} /> },
+                    { value: 4, label: <StarLabel total_star={4} /> },
+                    { value: 5, label: <StarLabel total_star={5} /> },
                   ]}
-                  // onChange={(value: OptionType) => setSelectedOption(value)}
                 />
               </div>
 
               <div className="sm:p-4 p-0 mt-4 sm:mt-0">
                 <div className="flex flex-col gap-7">
-                  {filteredReviews && filteredReviews.length > 0 ? (
+                  {/* ===================== */}
+                  {/* FILTER KOSONG */}
+                  {/* ===================== */}
+                  {filteredReviews.length === 0 ? (
+                    <Empty description={"There's no review"} />
+                  ) : (
                     filteredReviews.map((item) => (
                       <div
                         key={item?.id}
                         className="flex bg-gray-50 p-4 rounded-2xl flex-col gap-2"
                       >
-                        <div className="flex relative justify-between sm:flex-row flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
-                              <Image
-                                src={
-                                  item?.user?.profileImage?.imageUrl ||
-                                  "/images/default-account.png"
-                                }
-                                width={100}
-                                height={100}
-                                className="w-full h-full object-cover text-white"
-                                alt="profile-img"
-                              />
+                        <div
+                          key={item?.id}
+                          className="flex bg-gray-50 p-4 rounded-2xl flex-col gap-2"
+                        >
+                          <div className="flex relative justify-between sm:flex-row flex-col gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-[40px] h-[40px] bg-gray-600 rounded-full overflow-hidden">
+                                <Image
+                                  src={
+                                    item?.user?.profileImage?.imageUrl ||
+                                    "/images/default-account.png"
+                                  }
+                                  width={100}
+                                  height={100}
+                                  className="w-full h-full object-cover text-white"
+                                  alt="profile-img"
+                                />
+                              </div>
+                              <div className="flex items-start tracking-wide flex-col">
+                                <h4 className="font-semibold text-[12px] sm:text-sm">
+                                  {item?.user?.username}
+                                </h4>
+                                <p className="text-gray-500 text-[11px]">
+                                  {dayjs(new Date(item?.createdAt!)).format(
+                                    "DD - MMM - YYYY",
+                                  )}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex items-start tracking-wide flex-col">
-                              <h4 className="font-semibold text-[12px] sm:text-sm">
-                                {item?.user?.username}
-                              </h4>
-                              <p className="text-gray-500 text-[11px]">
-                                {dayjs(new Date(item?.createdAt!)).format(
-                                  "DD - MMM - YYYY",
-                                )}
-                              </p>
+
+                            <div className="flex flex-col gap-4 sm:items-end">
+                              {!isMobile && (
+                                <Button
+                                  onClick={() =>
+                                    handleOpenEditModal(item?.id as string)
+                                  }
+                                  className="active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full"
+                                >
+                                  <EditOutlined />
+                                </Button>
+                              )}
+
+                              <StarLabel total_star={item?.rating} />
                             </div>
-                          </div>
 
-                          <div className="flex flex-col gap-4 sm:items-end">
-                            {!isMobile && (
-                              <Button
-                                onClick={() =>
-                                  handleOpenEditModal(item?.id as string)
-                                }
-                                className="active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full"
-                              >
-                                <EditOutlined />
-                              </Button>
-                            )}
-
-                            <StarLabel total_star={item?.rating} />
-                          </div>
-
-                          <Button
-                            onClick={() =>
-                              handleOpenEditModal(item?.id as string)
-                            }
-                            className="!absolute top-0 right-0 active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full !w-[40px] !h-[40px]"
-                          >
-                            <EditOutlined className="text-[15px]" />
-                          </Button>
-                        </div>
-
-                        <div className="relative mb-2">
-                          <p className="text-gray-700 text-[10px] sm:text-sm">
-                            {truncateText(item?.comment as string, baseLength)}
-                          </p>
-
-                          {item?.comment && item.comment.length > 300 && (
-                            <p
+                            <Button
                               onClick={() =>
-                                setBaseLength(
-                                  baseLength > 300
-                                    ? 300
-                                    : item?.comment!.length,
-                                )
+                                handleOpenEditModal(item?.id as string)
                               }
-                              className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                              className="!absolute top-0 right-0 active:bg-gray-200 !p-2 flex items-center justify-center !rounded-full !w-[40px] !h-[40px]"
                             >
-                              {baseLength > 300 ? "Hide" : "Read More"}
-                            </p>
-                          )}
-                        </div>
+                              <EditOutlined className="text-[15px]" />
+                            </Button>
+                          </div>
 
-                        <Divider className="sm:!my-4 !hidden sm:block" />
+                          <div className="relative mb-2">
+                            <p className="text-gray-700 text-[10px] sm:text-sm">
+                              {truncateText(
+                                item?.comment as string,
+                                baseLength,
+                              )}
+                            </p>
+
+                            {item?.comment && item.comment.length > 300 && (
+                              <p
+                                onClick={() =>
+                                  setBaseLength(
+                                    baseLength > 300
+                                      ? 300
+                                      : item?.comment!.length,
+                                  )
+                                }
+                                className="underline text-[12px] sm:text-sm absolute right-0 hover:text-sky-600 cursor-pointer"
+                              >
+                                {baseLength > 300 ? "Hide" : "Read More"}
+                              </p>
+                            )}
+                          </div>
+
+                          <Divider className="sm:!my-4 !hidden sm:block" />
+                        </div>
                       </div>
                     ))
-                  ) : (
-                    <Empty description={"There's no review"} />
                   )}
                 </div>
               </div>
             </div>
           ) : (
+            /* ===================== */
+            /* BELUM ADA REVIEW SAMA SEKALI */
+            /* ===================== */
             <div className="p-4 flex items-center justify-center">
               <Result
                 status="404"
@@ -718,7 +733,6 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                         router.push("/auth/login");
                         return;
                       }
-
                       setIsModalReview(true);
                     }}
                     className="!text-[10px] !p-2 sm:!p-4 sm:!text-sm"
