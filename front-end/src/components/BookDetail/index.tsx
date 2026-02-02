@@ -199,6 +199,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     } finally {
       setLoading(false);
       setIsModalReview(false);
+      setDataReview(initialBookReview);
+      setRating(0);
       router.refresh();
     }
   };

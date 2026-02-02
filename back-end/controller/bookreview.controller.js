@@ -23,6 +23,8 @@ module.exports = {
 
     // ORDER dipisah
     const order = [[sortBy, sortOrder.toUpperCase()]];
+
+    console.log("Query: ", req.query);
     try {
       const { count, rows } = await BookReview.findAndCountAll({
         distinct: true,

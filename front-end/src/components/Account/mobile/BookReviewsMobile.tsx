@@ -2,8 +2,8 @@
 
 import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Modal, Result, Select, Tag } from "antd";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import BookDefaultImg from "../../../assets/images/default-img.png";
 import StarLabel from "@/components/BookDetail/StarLabel";
@@ -18,11 +18,23 @@ import dayjs from "dayjs";
 import ModalReview from "@/components/ModalReview";
 interface PropTypes {
   bookReviews: BookReviewsProps[];
+  initialStatus?: string;
+  initialPage?: number;
+  // fetchBookReviews: (status: BookReviewStatus | "") => void;
 }
-const BookReviewsMobile = ({ bookReviews }: PropTypes) => {
+const BookReviewsMobile = ({
+  bookReviews,
+  initialStatus = "",
+  initialPage = 1,
+}: PropTypes) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const [dataReview, setDataReview] =
     useState<BookReviewsProps>(initialBookReview);
+  const [selectedOption, setSelectedOption] = useState<
+    BookReviewStatus | string
+  >(initialStatus);
 
   const [reviews, setReviews] = useState<BookReviewsProps[]>(bookReviews);
   const [page, setPage] = useState<number>(1);
@@ -55,6 +67,38 @@ const BookReviewsMobile = ({ bookReviews }: PropTypes) => {
     setIsModalReview(false);
     setSelectedId("");
   };
+  useEffect(() => {
+    setReviews(bookReviews);
+  }, [bookReviews]);
+
+  useEffect(() => {
+    const status = searchParams.get("status") || "";
+    const currentPage = Number(searchParams.get("page") || 1);
+
+    setSelectedOption(status);
+    setPage(currentPage);
+  }, [searchParams]);
+
+  const handleChange = (value: string) => {
+    const statusValue = value;
+
+    setSelectedOption(value);
+
+    const params = new URLSearchParams();
+    params.set("page", "1");
+
+    if (statusValue && statusValue.trim()) {
+      params.set("status", statusValue);
+    }
+
+    const url = `?${params.toString()}`;
+
+    startTransition(() => {
+      router.push(url);
+      router.refresh();
+    });
+  };
+
   return (
     <div>
       <div className="fixed top-0 bg-white shadow-sm justify-between flex w-full px-3 py-3 z-[999]">
@@ -65,28 +109,30 @@ const BookReviewsMobile = ({ bookReviews }: PropTypes) => {
 
         <div>
           <Select
-            loading={loading}
+            loading={loading || isPending}
             style={{ minWidth: 155 }}
-            // value={selectOption}
+            value={selectedOption as BookReviewStatus}
+            disabled={loading || isPending}
+            placeholder="Filter by status"
             options={[
               {
-                value: "newest_saved",
-                label: "Newest Saved",
+                value: BookReviewStatus.APPROVED,
+                label: "Approved",
               },
               {
-                value: "oldest_saved",
-                label: "Oldest Saved",
+                value: BookReviewStatus.IS_UNDER_APPROVAL,
+                label: "Under Approval",
               },
               {
-                value: "highest_price",
-                label: "Highest Price",
+                value: BookReviewStatus.REJECTED,
+                label: "Rejected",
               },
               {
-                value: "lowest_price",
-                label: "Lowest Price",
+                value: "",
+                label: "All Reviews",
               },
             ]}
-            // onChange={(value: OptionType) => setSelectedOption(value)}
+            onChange={handleChange}
           />
         </div>
       </div>
