@@ -61,7 +61,7 @@ const AppButton: React.FC<PropTypes> = ({
 
 export default AppButton;
 
-const MyButton = styled(Button)<{ padding?: string }>`
+export const MyButton = styled(Button)<{ padding?: string }>`
   padding: ${({ padding }) => (padding ? padding : "0px 14px")};
   font-size: 14px;
   text-align: center;

@@ -11,106 +11,37 @@ import { EditOutlined } from "@ant-design/icons";
 import { truncateText } from "@/helpers/truncateText";
 
 import dayjs from "dayjs";
-import { Button, message, Spin, Tag } from "antd";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { isEmpty } from "@/helpers/validation";
-import { ErrorHandler } from "@/helpers/handleError";
-import myAxios from "@/libs/myAxios";
+import { Button, Modal, Spin, Tag } from "antd";
+import { useState } from "react";
 import { cn } from "@/libs/cn";
 import ModalReview from "../ModalReview";
+import useBookReviews from "@/hooks/useBookReviews";
 interface PropTypes {
   bookReviews: BookReviewsProps[];
+  fetchReviews?: () => void;
 }
 
-const BookReviews = ({ bookReviews }: PropTypes) => {
-  const router = useRouter();
+const BookReviews = ({ bookReviews, fetchReviews }: PropTypes) => {
   const [dataReview, setDataReview] =
     useState<BookReviewsProps>(initialBookReview);
-  const [loading, setLoading] = useState<boolean>(false);
+
   const [reviews, setReviews] = useState<BookReviewsProps[]>(bookReviews);
-  const [loadingLoad, setLoadingLoad] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [selectedId, setSelectedId] = useState<string>("");
-  const [isModalReview, setIsModalReview] = useState<boolean>(false);
 
-  const selectedReview = reviews?.find((item) => item.id === selectedId);
-  const handleLoadMore = async () => {
-    setLoadingLoad(true);
-    const nextPage = page + 1;
-
-    try {
-      const response = await fetch(`/api/reviews?page=${nextPage}`);
-      const newData = await response.json();
-
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setReviews((prev) => [...prev!, ...newData]);
-        setPage(nextPage);
-      }
-    } catch (error) {
-      ErrorHandler(error);
-    } finally {
-      setLoadingLoad(false);
-      router.refresh();
-    }
-  };
-  const handleSubmitReview = async (data: BookReviewsProps) => {
-    if (data?.comment?.length! < 10) {
-      message.error("Comment Atleast 10 characters!.");
-      return;
-    }
-    if (isEmpty(data.comment)) {
-      message.error("Comment are required!.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const payload = {
-        rating: data?.rating,
-        comment: data?.comment,
-        bookId: selectedReview?.bookId,
-        userId: selectedReview?.userId,
-      };
-
-      const res = await myAxios.patch(`/book-reviews/${selectedId}`, payload);
-      if (res) {
-        message.success("Success update review");
-        setReviews((prev) =>
-          prev.map((review) =>
-            review.id === selectedId
-              ? { ...review, rating: data.rating, comment: data.comment }
-              : review,
-          ),
-        );
-      }
-    } catch (error) {
-      ErrorHandler(error);
-    } finally {
-      setLoading(false);
-      setIsModalReview(false);
-      router.refresh();
-    }
-  };
-
-  const handleDelete = async (reviewId: string) => {
-    try {
-      setLoading(true);
-      await myAxios.delete(`/book-reviews/${reviewId}`);
-
-      message.success(`Successfully delete Reviews`);
-    } catch (error) {
-      ErrorHandler(error);
-    } finally {
-      // await fetchReviews(page, limit);
-      setSelectedId("");
-      setLoading(false);
-    }
-  };
+  const {
+    handleLoadMore,
+    handleSubmitReview,
+    hasMore,
+    isModalReview,
+    loading,
+    loadingLoad,
+    selectedId,
+    deleteModal,
+    setSelectedId,
+    setIsModalReview,
+    handleDelete,
+    setDeleteModal,
+  } = useBookReviews({ reviews, setReviews, setPage, page });
 
   const handleOpenModalRev = (id: string) => {
     const review = reviews?.find((item) => item.id === id);
@@ -142,7 +73,7 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
             // data-aos="fade-up"
             // data-aos-delay={index * 100}
             // data-aos-duration={800}
-            className={`p-4 rounded-xl border !w-[300px] min-h-[190px] max-w-[300px] border-gray-300 hover:shadow-xl cursor-pointer relative transition-all ${cn(loading ? "flex items-center justify-center min-w-[300px]" : "")}`}
+            className={`p-4 rounded-xl border !w-[300px] min-h-[200px] max-w-[300px] border-gray-300 hover:shadow-xl cursor-pointer relative transition-all ${cn(loading ? "flex items-center justify-center min-w-[300px]" : "")}`}
           >
             {loading ? (
               <Spin size="large" />
@@ -150,8 +81,10 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
               <>
                 {item?.status === BookReviewStatus.REJECTED && (
                   <button
-                    className="absolute px-1 text-sm rounded-md bg-white text-red-500 border-red-500 border py-1 bottom-4 left-1"
-                    onClick={() => handleDelete(item?.id as string)}
+                    className="absolute text-sm rounded-md  hover:!bg-red-100 transition-all bg-white text-red-500 border-red-500 border px-3 py-1 bottom-4 left-2 z-20 cursor-pointer"
+                    onClick={() => {
+                      (setDeleteModal(true), setSelectedId(item?.id as string));
+                    }}
                   >
                     Delete
                   </button>
@@ -217,17 +150,24 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
           </div>
         ))}
       </div>
-      {hasMore && (
-        <Button
-          onClick={handleLoadMore}
-          disabled={loadingLoad}
-          loading={loadingLoad}
-          type="primary"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-        >
-          Load More
-        </Button>
-      )}
+      <>
+        {reviews?.length > 6 && (
+          <>
+            {hasMore && (
+              <Button
+                onClick={handleLoadMore}
+                disabled={loadingLoad}
+                loading={loadingLoad}
+                type="primary"
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+              >
+                Load More
+              </Button>
+            )}
+          </>
+        )}
+      </>
+
       <ModalReview
         handleSubmitReview={() => handleSubmitReview(dataReview)}
         isModalReview={isModalReview}
@@ -236,6 +176,19 @@ const BookReviews = ({ bookReviews }: PropTypes) => {
         setDataReview={setDataReview}
         loading={loading}
       />
+
+      <Modal
+        open={deleteModal}
+        closable={true}
+        cancelText={"Cancel"}
+        onCancel={() => {
+          (setDeleteModal(false), setSelectedId(""));
+        }}
+        confirmLoading={loading}
+        onOk={() => handleDelete(selectedId)}
+      >
+        Are you sure want to delete this review?
+      </Modal>
     </div>
   );
 };

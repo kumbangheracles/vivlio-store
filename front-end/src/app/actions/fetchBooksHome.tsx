@@ -20,6 +20,8 @@ async function fetchBooksHome({
       cache: "no-store",
     });
 
+    console.log("Res: ", res);
+
     return res.json();
   } catch (err) {
     console.log("fetchBooks error:", err);

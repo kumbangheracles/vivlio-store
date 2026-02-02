@@ -22,6 +22,7 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
     <>
       {isMobile ? (
         <div
+          key={dataAricle?.id}
           onClick={() => handleGoToDetail(dataAricle?.id as string)}
           className="relative rounded-md flex-none basis-[8.5em] overflow-hidden h-[200px] border border-[#cacaca]"
         >

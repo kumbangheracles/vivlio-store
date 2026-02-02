@@ -152,7 +152,8 @@ export default function Navbar({
     <>
       {(isMobile && path === "/cart") ||
       (isMobile && path === "/account") ||
-      (isMobile && path === "/account/wishlist") ? (
+      (isMobile && path === "/account/wishlist") ||
+      (isMobile && path === "/account/book-reviews") ? (
         <></>
       ) : (
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">

@@ -21,6 +21,7 @@ const AccountPage = async () => {
       dataWishlist={dataWishlist}
       dataBookReviews={dataBookReviews}
       fetchWishlist={fetchWishlist}
+      fetchReviews={fetchBookReviews}
     />
   );
 };

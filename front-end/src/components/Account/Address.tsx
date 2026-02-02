@@ -1,3 +1,4 @@
+"use client";
 import { UserProperties } from "@/types/user.type";
 
 interface PropTypes {

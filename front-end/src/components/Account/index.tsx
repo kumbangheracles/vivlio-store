@@ -9,6 +9,7 @@ import { BookWithWishlist } from "@/types/wishlist.type";
 import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
 import DefaultImage from "../../assets/images/profile-default.jpg";
+import { MdOutlineRateReview } from "react-icons/md";
 import {
   FileDoneOutlined,
   HeartOutlined,
@@ -27,6 +28,7 @@ interface AccountProps {
   dataWishlist?: BookWithWishlist[];
   fetchWishlist: () => void;
   dataBookReviews?: BookReviewsProps[];
+  fetchReviews?: () => void;
 }
 
 const AccountIndex: React.FC<AccountProps> = ({
@@ -34,6 +36,7 @@ const AccountIndex: React.FC<AccountProps> = ({
   dataBookReviews,
   dataWishlist,
   fetchWishlist,
+  fetchReviews,
 }) => {
   const router = useRouter();
   const LOCAL_STORAGE_KEY = "lastActiveTabKey";
@@ -87,7 +90,10 @@ const AccountIndex: React.FC<AccountProps> = ({
       key: "books_reviews",
       children: (
         <>
-          <BookReviews bookReviews={dataBookReviews as BookReviewsProps[]} />
+          <BookReviews
+            fetchReviews={fetchReviews}
+            bookReviews={dataBookReviews as BookReviewsProps[]}
+          />
         </>
       ),
     },
@@ -124,12 +130,18 @@ const AccountIndex: React.FC<AccountProps> = ({
     },
     {
       id: 3,
+      title: "Reviews",
+      icon: <MdOutlineRateReview />,
+      path: "/account/book-reviews",
+    },
+    {
+      id: 4,
       title: "Address",
       icon: <FaRegMap />,
       path: "/account/address",
     },
     {
-      id: 4,
+      id: 5,
       title: "Account",
       icon: <UserOutlined />,
       path: "/account/profile",

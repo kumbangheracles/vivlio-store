@@ -181,7 +181,9 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       if (!selectedIdRev) {
         const res = await myAxios.post(`/book-reviews/${bookId}`, payload);
         if (res) {
-          message.success("Success create review");
+          message.success(
+            "Success create review, your review is under approval.",
+          );
         }
       } else {
         const res = await myAxios.patch(
@@ -335,7 +337,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                 {book?.images && book?.images.length > 0 ? (
                   <Carousel
                     autoplay
-                    className={`rounded-lg overflow-hidden flex justify-center items-center w-full sm:w-[300px] p-4 m-auto ${cn(book?.quantity === 0 ? "opacity-50" : "opacity-0")}`}
+                    className={`rounded-lg overflow-hidden flex justify-center items-center w-full sm:w-[300px] p-4 m-auto ${cn(book?.quantity === 0 ? "opacity-50" : "opacity-100")}`}
                   >
                     {book?.images.map((image, index) => (
                       <div key={index} className="relative h-95 w-full ">

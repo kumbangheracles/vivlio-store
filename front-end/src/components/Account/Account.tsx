@@ -1,10 +1,10 @@
 "use client";
-import { Card, Form, Input, message, Modal, Upload } from "antd";
+import { Card, Form, message, Modal, Upload } from "antd";
 import Cropper from "react-easy-crop";
 import Image from "next/image";
 import styled from "styled-components";
 import DefaultImage from "../../assets/images/profile-default.jpg";
-import AppButton from "../AppButton";
+import AppButton, { MyButton } from "../AppButton";
 import DetailItem from "../DetailItem";
 import { useCallback, useEffect, useState } from "react";
 import { EditOutlined } from "@ant-design/icons";
@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import getCroppedImg from "@/helpers/getCroppedImage";
 import { v4 as uuidv4 } from "uuid";
 import { RcFile, UploadChangeParam, UploadFile } from "antd/es/upload";
+import AccountForm from "./AccountForm";
 type FieldKey = "fullName" | "username" | "email" | "password" | "";
 
 interface PropsType {
@@ -43,6 +44,7 @@ const Account = ({ dataUser }: PropsType) => {
   };
 
   const handleSubmit = async (data: UserProperties) => {
+    // const [form] = Form.useForm();
     try {
       await form.validateFields();
     } catch (error) {
@@ -50,6 +52,12 @@ const Account = ({ dataUser }: PropsType) => {
       return;
     }
 
+    // if (!beforeUpload(data?.profileImage as RcFile)) {
+    //   message.error(
+    //     "Image size & format are not valid please change the image.",
+    //   );
+    //   return;
+    // }
     // Password specific validations
     if (activeKey === "password") {
       if (!data?.oldPassword) {
@@ -175,21 +183,6 @@ const Account = ({ dataUser }: PropsType) => {
       setModalOpen(false);
     }
   };
-  const handleSubmitFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-    message.error("Please fill in all required fields correctly");
-  };
-
-  const fieldMap: Record<FieldKey, { label: string; name: string }> = {
-    fullName: { label: "Full Name", name: "fullName" },
-    username: { label: "Username", name: "username" },
-    email: { label: "Email", name: "email" },
-    password: { label: "Password", name: "password" },
-    "": {
-      label: "",
-      name: "",
-    },
-  };
 
   const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -294,9 +287,12 @@ const Account = ({ dataUser }: PropsType) => {
 
     return true;
   };
-  useEffect(() => {
-    form.setFieldsValue(dataUser);
-  }, [dataUser]);
+  // useEffect(() => {
+  //   if (activeKey) {
+  //     const [form] = Form.useForm();
+  //     form.setFieldsValue(dataUser);
+  //   }
+  // }, [activeKey]);
   return (
     <Card className="shadow-md">
       <TitleTab>Account Setting</TitleTab>
@@ -330,7 +326,7 @@ const Account = ({ dataUser }: PropsType) => {
                   maxCount={1}
                   beforeUpload={beforeUpload}
                 >
-                  <AppButton label="Change Profile Photo" loading={loading} />
+                  <MyButton loading={loading}>Change Profile Photo</MyButton>
                 </Upload>
 
                 <AppButton
@@ -392,113 +388,13 @@ const Account = ({ dataUser }: PropsType) => {
           </div>
         }
       >
-        {modalOpen && (
-          <Form
-            layout="vertical"
-            form={form}
-            onFinish={handleSubmit}
-            onFinishFailed={handleSubmitFailed}
-          >
-            {activeKey === "password" && (
-              <Form.Item
-                label="Old Password"
-                name={"oldPassword"}
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: `Old password are required`,
-                //   },
-                // ]}
-              >
-                <Input.Password
-                  variant="filled"
-                  style={{ height: "50px" }}
-                  placeholder="Input Old Password . . ."
-                  onChange={(e) =>
-                    setIsDataUser({
-                      ...isDataUser,
-                      oldPassword: e.target.value,
-                    })
-                  }
-                />
-              </Form.Item>
-            )}
-            <Form.Item
-              label={fieldMap[activeKey]?.label}
-              name={activeKey === "password" ? "" : fieldMap[activeKey]?.name}
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: `${fieldMap[activeKey]?.label} are required`,
-              //   },
-
-              //   activeKey === "password"
-              //     ? { min: 6, message: "6 characters are needed" }
-              //     : {},
-
-              //   activeKey === "password"
-              //     ? {
-              //         pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/,
-              //         message: "Password must include alphabet and numeric",
-              //       }
-              //     : {},
-              // ]}
-            >
-              {activeKey === "password" ? (
-                <Input.Password
-                  variant="filled"
-                  style={{ height: "50px" }}
-                  placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
-                  onChange={(e) =>
-                    setIsDataUser({
-                      ...isDataUser,
-                      [fieldMap[activeKey]?.name as string]: e.target.value,
-                    })
-                  }
-                  required={true}
-                />
-              ) : (
-                <Input
-                  variant="filled"
-                  style={{ height: "50px" }}
-                  placeholder={`Input New ${fieldMap[activeKey]?.label} . . .`}
-                  onChange={(e) =>
-                    setIsDataUser({
-                      ...isDataUser,
-                      [fieldMap[activeKey]?.name as string]: e.target.value,
-                    })
-                  }
-                  required={true}
-                />
-              )}
-            </Form.Item>
-
-            {activeKey === "password" && (
-              <Form.Item
-                label="Confirm Password"
-                name={"confirmPassword"}
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: `Confirm password are required`,
-                //   },
-                // ]}
-              >
-                <Input.Password
-                  variant="filled"
-                  style={{ height: "50px" }}
-                  placeholder="Confirm New Password . . ."
-                  onChange={(e) =>
-                    setIsDataUser({
-                      ...isDataUser,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  required={true}
-                />
-              </Form.Item>
-            )}
-          </Form>
+        {activeKey && (
+          <AccountForm
+            activeKey={activeKey}
+            loading={loading}
+            onSubmit={handleSubmit}
+            dataUser={dataUser}
+          />
         )}
       </Modal>
 

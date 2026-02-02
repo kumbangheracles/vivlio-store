@@ -1,3 +1,4 @@
+"use client";
 import { BookReviewsProps } from "@/types/bookreview.type";
 import { Button, Input, Modal } from "antd";
 import Image from "next/image";

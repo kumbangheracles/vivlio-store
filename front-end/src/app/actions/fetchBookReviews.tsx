@@ -1,3 +1,4 @@
+"use server";
 import { createServerAxios } from "@/libs/serverAxios";
 import { BookReviewsProps } from "@/types/bookreview.type";
 import { getServerSession } from "next-auth";
