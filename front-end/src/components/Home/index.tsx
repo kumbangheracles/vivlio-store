@@ -11,6 +11,7 @@ import MobileBanner from "./components/MobileBanner";
 import ListBlog from "../ListBlog";
 import { ArticleProperties } from "@/types/article.type";
 import { useRouter } from "next/navigation";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -21,6 +22,7 @@ interface PropTypes {
 
 export default function HomePage(prop: PropTypes) {
   const router = useRouter();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
   const recentPopularBook = prop.dataBooks
     ?.filter((item) => item.isPopular)
@@ -60,7 +62,7 @@ export default function HomePage(prop: PropTypes) {
 
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
-    router.push(`/category/${slug}/${categoryId}`);
+    handlePushRoute(`/category/${slug}/${categoryId}`);
   };
   return (
     <>
@@ -73,7 +75,7 @@ export default function HomePage(prop: PropTypes) {
               </span>
               <span
                 className=" tracking-wider text-[10px] text-gray-400"
-                onClick={() => router.push("/category")}
+                onClick={() => handlePushRoute("/category")}
               >
                 See All
               </span>

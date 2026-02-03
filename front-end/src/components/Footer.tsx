@@ -18,12 +18,13 @@ import CategoryOutlined from "../assets/icons/category-icon.svg";
 import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 const Footer = () => {
   const router = useRouter();
   const isMobile = useDeviceType();
   const path = usePathname();
   const [classFoot, setClassFoot] = useState("");
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleStyleFoot = (pathName: string) => {
     if (
       pathName === "/" ||
@@ -52,7 +53,7 @@ const Footer = () => {
               <div className="flex items-center transition-all flex-col relative w-full">
                 <HomeOutlined
                   onClick={() => {
-                    router.push("/");
+                    handlePushRoute("/");
                   }}
                   className={path === "/" ? classFoot : "w-[20px]"}
                 />
@@ -60,7 +61,7 @@ const Footer = () => {
               <div
                 className="flex items-center transition-all flex-col relative w-full"
                 onClick={() => {
-                  router.push("/category");
+                  handlePushRoute("/category");
                 }}
               >
                 <Image
@@ -76,13 +77,13 @@ const Footer = () => {
                   className={
                     path === "/account/wishlist" ? classFoot : "w-[20px]"
                   }
-                  onClick={() => router.push("/account/wishlist")}
+                  onClick={() => handlePushRoute("/account/wishlist")}
                 />
               </div>
               <div className="flex items-center transition-all flex-col relative w-full ">
                 <UserOutlined
                   className={path === "/account" ? classFoot : "w-[20px]"}
-                  onClick={() => router.push("/account")}
+                  onClick={() => handlePushRoute("/account")}
                 />
               </div>
             </div>

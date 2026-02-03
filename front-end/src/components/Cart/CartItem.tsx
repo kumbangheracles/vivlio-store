@@ -10,6 +10,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { PropCheck } from ".";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   book: BookProps;
   isChecked?: PropCheck[];
@@ -25,13 +26,13 @@ interface PropTypes {
 
 const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
   const router = useRouter();
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   const goToDetail = (id: string) => {
-    router.push(`/book/${id}`);
+    handlePushRoute(`/book/${id}`);
   };
   const [loading, setLoading] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(
-    book?.UserCart?.quantity as number
+    book?.UserCart?.quantity as number,
   );
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -124,7 +125,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
                 setIsLoading(false);
               } else {
                 setIsChecked?.((prev) =>
-                  prev.filter((item) => item.id !== book?.id)
+                  prev.filter((item) => item.id !== book?.id),
                 );
 
                 setIsLoading(false);
@@ -218,7 +219,7 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
               ]);
             } else {
               setIsChecked?.((prev) =>
-                prev.filter((item) => item.id !== book?.id)
+                prev.filter((item) => item.id !== book?.id),
               );
             }
           }}

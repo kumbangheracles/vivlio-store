@@ -8,6 +8,7 @@ import AuthProvider from "@/context/AuthProvider";
 import fetchCategory from "./actions/fetchCategory";
 import fetchCartedBooks from "./actions/fetchCartedBooks";
 import fetchGenres from "./actions/fetchGenre";
+import GlobalLoadingBar from "@/components/GlobalLoadingBar";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body>
         <AuthProvider>
+          <GlobalLoadingBar />
           <AppLayout
             dataUser={dataUser}
             dataCategories={dataCategories}

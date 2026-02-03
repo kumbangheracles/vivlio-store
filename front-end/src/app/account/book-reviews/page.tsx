@@ -7,22 +7,22 @@ interface Params {
   searchParams: Promise<{
     status?: string;
     page?: string;
+    limit?: string;
   }>;
 }
 
 const BookReviewsMobilePage = async ({ searchParams }: Params) => {
   const params = await searchParams;
 
-  console.log("Params: ", params);
-
   const status = params?.status ?? "";
   const page = Number(params?.page ?? 1);
+  const limit = params?.limit ?? "6";
   const dataBookReviews = await fetchBookReviews({
     page,
     status: status as BookReviewStatus,
+    limit: limit.toString(),
   });
-  console.log("Status extracted:", status);
-  console.log("Page extracted:", page);
+
   return (
     <>
       <BookReviewsMobile

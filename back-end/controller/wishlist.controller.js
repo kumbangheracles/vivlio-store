@@ -83,6 +83,60 @@ module.exports = {
     }
   },
 
+  // async getAllWishlist(req, res) {
+  //   const {
+  //     page = 1,
+  //     limit = 10,
+  //     status,
+  //     sortBy = "createdAt",
+  //     sortOrder = "DESC",
+  //   } = req.query;
+
+  //   const offset = (page - 1) * limit;
+  //   const where = {};
+  //   if (status) {
+  //     where.status = status;
+  //   }
+
+  //   const order = [[sortBy, sortOrder.toUpperCase()]];
+  //   try {
+  //     const userId = req.id;
+
+  //     const { count, rows } = await UserWishlist.findAll({
+  //       where: { userId },
+  //       order,
+  //       include: [
+  //         {
+  //           model: Book,
+  //           where: where,
+  //           as: "book",
+  //           include: [
+  //             { model: BookStats, as: "stats" },
+  //             { model: BookImage, as: "images" },
+  //             { model: Genre, as: "genres", through: { attributes: [] } },
+  //           ],
+  //         },
+  //         offset,
+  //       ],
+  //     });
+
+  //     res.status(200).json({
+  //       status: 200,
+  //       message: "Success",
+  //       results: rows,
+  //       total: count,
+  //       currentPage: parseInt(page),
+  //       totalPages: Math.ceil(count / limit),
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       status: 500,
+  //       message: error.message || "Internal server error",
+  //       data: [],
+  //     });
+  //   }
+  // },
+
   async addToWishlist(req, res) {
     try {
       const userId = req.id;

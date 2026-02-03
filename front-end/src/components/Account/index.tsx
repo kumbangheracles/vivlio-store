@@ -1,6 +1,6 @@
 "use client";
 import { Card, message, Modal, Tabs } from "antd";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { styled } from "styled-components";
 import Account from "./Account";
 import { UserProperties } from "@/types/user.type";
@@ -23,6 +23,7 @@ import { signOut } from "next-auth/react";
 import { ErrorHandler } from "@/helpers/handleError";
 import BookReviews from "./BookReviews";
 import { BookReviewsProps } from "@/types/bookreview.type";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
@@ -44,6 +45,7 @@ const AccountIndex: React.FC<AccountProps> = ({
   const [activeTab, setActiveTab] = useState<string>("account");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { handlePushRoute } = useGlobalLoadingBar();
   useEffect(() => {
     const savedTab = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedTab) {
@@ -88,6 +90,7 @@ const AccountIndex: React.FC<AccountProps> = ({
     {
       label: <LabelText>Books Reviews</LabelText>,
       key: "books_reviews",
+      // onclick: ()=> ,
       children: (
         <>
           <BookReviews
@@ -147,6 +150,19 @@ const AccountIndex: React.FC<AccountProps> = ({
       path: "/account/profile",
     },
   ];
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    params.set("key", activeTab);
+    const url = `?${params.toString()}`;
+
+    startTransition(() => {
+      handlePushRoute(url);
+      router.refresh();
+    });
+  }, [activeTab]);
+
   return (
     <>
       {isMobile ? (
@@ -189,7 +205,7 @@ const AccountIndex: React.FC<AccountProps> = ({
                 <div
                   className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md"
                   key={item.id}
-                  onClick={() => router.push(item.path)}
+                  onClick={() => handlePushRoute(item.path)}
                 >
                   {item.icon}
                   <h4 className="font-normal tracking-wide text-[12px]">

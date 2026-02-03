@@ -6,6 +6,7 @@ import { ArticleProperties } from "@/types/article.type";
 import { truncateText } from "@/helpers/truncateText";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   dataAricle: ArticleProperties;
 }
@@ -13,10 +14,11 @@ interface PropTypes {
 const BlogCard: React.FC<PropTypes> = ({ dataAricle }) => {
   const isMobile = useDeviceType();
   const router = useRouter();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleGoToDetail = (id: string) => {
     if (!id) return;
 
-    router.push(`/articles/detail/${id}`);
+    handlePushRoute(`/articles/detail/${id}`);
   };
   return (
     <>

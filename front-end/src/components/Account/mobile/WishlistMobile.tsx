@@ -7,6 +7,7 @@ import CardBookWishlist from "../CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
@@ -19,10 +20,11 @@ type OptionType =
 
 const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   const auth = useAuth();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const router = useRouter();
   if (!auth) {
     message.info("You must login first");
-    router.push("/login");
+    handlePushRoute("/login");
   }
   const { loading, fetchBooks } = useWishlistStore();
   const [selectOption, setSelectedOption] =
@@ -116,7 +118,7 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
                   title="Book not found"
                   subTitle={"Looks like you haven't wish any book yet"}
                   extra={
-                    <Button type="primary" onClick={() => router.push("/")}>
+                    <Button type="primary" onClick={() => handlePushRoute("/")}>
                       Let's find it
                     </Button>
                   }

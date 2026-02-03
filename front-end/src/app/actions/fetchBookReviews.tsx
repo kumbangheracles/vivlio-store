@@ -7,10 +7,15 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 interface PropTypesFetch {
   page: number;
   status: string;
+  limit?: string;
 }
 
 async function fetchBookReviews(
-  { page = 1, status = "" }: PropTypesFetch = { page: 1, status: "" },
+  { page = 1, status = "", limit = "6" }: PropTypesFetch = {
+    page: 1,
+    status: "",
+    limit: "6",
+  },
 ): Promise<BookReviewsProps[]> {
   try {
     const session = await getServerSession(authOptions);
@@ -23,10 +28,8 @@ async function fetchBookReviews(
     const serverAxios = createServerAxios(session?.accessToken);
     const params = new URLSearchParams({
       page: page.toString(),
-      limit: "6",
+      limit: limit,
     });
-
-    console.log("Status yang diterima:", status);
 
     if (status && status.trim() !== "") {
       params.append("status", status);
@@ -35,6 +38,8 @@ async function fetchBookReviews(
     const response = await serverAxios.get(url);
 
     const filteredReviews = response.data.results;
+
+    console.log("Respons: ", response.data);
     return filteredReviews;
   } catch (err: any) {
     console.log("fetch book reviews error:", err || err);

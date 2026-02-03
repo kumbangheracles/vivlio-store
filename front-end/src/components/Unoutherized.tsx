@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { Result, Button } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -7,7 +8,7 @@ const Unauthorized = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const auth = useAuth();
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const route =
@@ -25,7 +26,7 @@ const Unauthorized = () => {
           : "Sorry, you are not authorized to access this page."
       }
       extra={
-        <Button type="primary" onClick={() => router.push(route)}>
+        <Button type="primary" onClick={() => handlePushRoute(route)}>
           {auth?.authenticated === true ? "Back to home" : "Sign in"}
         </Button>
       }

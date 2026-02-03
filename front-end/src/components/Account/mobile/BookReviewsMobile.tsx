@@ -22,19 +22,12 @@ interface PropTypes {
   initialPage?: number;
   // fetchBookReviews: (status: BookReviewStatus | "") => void;
 }
-const BookReviewsMobile = ({
-  bookReviews,
-  initialStatus = "",
-  initialPage = 1,
-}: PropTypes) => {
+const BookReviewsMobile = ({ bookReviews, initialStatus = "" }: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+
   const [dataReview, setDataReview] =
     useState<BookReviewsProps>(initialBookReview);
-  const [selectedOption, setSelectedOption] = useState<
-    BookReviewStatus | string
-  >(initialStatus);
 
   const [reviews, setReviews] = useState<BookReviewsProps[]>(bookReviews);
   const [page, setPage] = useState<number>(1);
@@ -52,7 +45,19 @@ const BookReviewsMobile = ({
     setIsModalReview,
     handleDelete,
     setDeleteModal,
-  } = useBookReviews({ reviews, setReviews, setPage, page });
+    selectedOption,
+    setSelectedOption,
+    isPending,
+    handleChange,
+    setLimit,
+  } = useBookReviews({
+    reviews,
+    setReviews,
+    setPage,
+    page,
+    initialStatus,
+    bookReviews,
+  });
 
   const handleOpenModalRev = (id: string) => {
     const review = reviews?.find((item) => item.id === id);
@@ -74,30 +79,11 @@ const BookReviewsMobile = ({
   useEffect(() => {
     const status = searchParams.get("status") || "";
     const currentPage = Number(searchParams.get("page") || 1);
-
+    const limit = Number(searchParams.get("limit") || 6);
+    setLimit(limit);
     setSelectedOption(status);
     setPage(currentPage);
   }, [searchParams]);
-
-  const handleChange = (value: string) => {
-    const statusValue = value;
-
-    setSelectedOption(value);
-
-    const params = new URLSearchParams();
-    params.set("page", "1");
-
-    if (statusValue && statusValue.trim()) {
-      params.set("status", statusValue);
-    }
-
-    const url = `?${params.toString()}`;
-
-    startTransition(() => {
-      router.push(url);
-      router.refresh();
-    });
-  };
 
   return (
     <div>
@@ -227,21 +213,19 @@ const BookReviewsMobile = ({
           </>
         )}
         <>
-          {reviews?.length > 6 && (
-            <>
-              {hasMore && (
-                <Button
-                  onClick={handleLoadMore}
-                  disabled={loadingLoad}
-                  loading={loadingLoad}
-                  type="primary"
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-                >
-                  Load More
-                </Button>
-              )}
-            </>
-          )}
+          <>
+            {hasMore && (
+              <Button
+                onClick={handleLoadMore}
+                disabled={loadingLoad}
+                loading={loadingLoad}
+                type="primary"
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+              >
+                Load More
+              </Button>
+            )}
+          </>
         </>
       </div>
 

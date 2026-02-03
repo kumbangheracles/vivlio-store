@@ -52,6 +52,7 @@ import { isEmpty } from "@/helpers/validation";
 import dayjs from "dayjs";
 import { CategoryProps } from "@/types/category.types";
 import { cn } from "@/libs/cn";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -81,6 +82,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
     book?.wishlistUsers?.length! > 0,
   );
   const { fetchBooksHome } = useWishlistStore();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const { setIsWishlist, isWishlist } = useIsWishlistStore();
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [baseLength, setBaseLength] = useState<number>(300);
@@ -106,7 +108,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   const handleWishlistClick = async () => {
     if (!auth.accessToken) {
       message.info("You must login first.");
-      router.push("/auth/login");
+      handlePushRoute("/auth/login");
 
       return;
     }
@@ -172,7 +174,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
       setLoading(true);
 
       const payload = {
-        rating: rating,
+        rating: rating || 0,
         comment: data?.comment,
         bookId: book?.id,
         userId: auth?.user?.id,
@@ -262,11 +264,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   };
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
-    router.push(`/category/${slug}/${categoryId}`);
+    handlePushRoute(`/category/${slug}/${categoryId}`);
   };
   const goToGenre = (genreTitle: string, genreId: string) => {
     const slug = slugify(genreTitle);
-    router.push(`/genre/${slug}/${genreId}`);
+    handlePushRoute(`/genre/${slug}/${genreId}`);
   };
 
   const handleCloseModalRev = () => {
@@ -296,7 +298,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
   //     console.log("Data sended: ", res.data);
 
   //     if (res) {
-  //       // router.push(res.data?.redirect_url);
+  //       // handlePushRoute(res.data?.redirect_url);
   //       window.snap.pay(res.data.token); // untuk menampilkan pop-up payment dari midtrans
   //     }
 
@@ -462,6 +464,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                   size="large"
                   icon={<ShoppingCartOutlined />}
                   onClick={() => {
+                    if (book?.quantity === 0) {
+                      return message.info(
+                        "This item is currently unavailable.",
+                      );
+                    }
                     handleAddToCart();
                   }}
                   disabled={loading}
@@ -577,7 +584,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                       onClick={() => {
                         if (!auth?.authenticated) {
                           message.info("You must login first!");
-                          router.push("/auth/login");
+                          handlePushRoute("/auth/login");
                           return;
                         }
                         setIsModalReview(true);
@@ -734,7 +741,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     onClick={() => {
                       if (!auth?.authenticated) {
                         message.info("You must login first!");
-                        router.push("/auth/login");
+                        handlePushRoute("/auth/login");
                         return;
                       }
                       setIsModalReview(true);

@@ -4,12 +4,14 @@ import { CategoryProps } from "@/types/category.types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../../assets/images/default-img.png";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 type PropTypes = CategoryProps & {
   index?: number;
 };
 
 const CardCategory = (prop: PropTypes) => {
   const router = useRouter();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const slugify = (text: string) => {
     return text
       .toLowerCase() // huruf kecil
@@ -21,7 +23,7 @@ const CardCategory = (prop: PropTypes) => {
 
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
-    router.push(`/category/${slug}/${categoryId}`);
+    handlePushRoute(`/category/${slug}/${categoryId}`);
   };
   return (
     <div

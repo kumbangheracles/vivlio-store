@@ -22,6 +22,7 @@ import { BookProps } from "@/types/books.type";
 import MainLogo from "../assets/main-logo.png";
 import Image from "next/image";
 import { GenreProperties } from "@/types/genre.type";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
@@ -44,6 +45,7 @@ export default function Navbar({
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [dropCategory, setIsDropCategory] = useState<boolean>(false);
   const [totalLengthCart, setTotalLengthCart] = useState<number>(0);
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleLogout = async () => {
     try {
       setIsloading(true);
@@ -69,11 +71,11 @@ export default function Navbar({
     if (auth.loading) return;
     if (!auth.accessToken) {
       message.info("You must login first!!!");
-      router.push("/auth/login");
+      handlePushRoute("/auth/login");
       return;
     }
 
-    router.push("/cart");
+    handlePushRoute("/cart");
   };
 
   const slugify = (text: string) => {
@@ -87,13 +89,13 @@ export default function Navbar({
 
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
-    router.push(`/category/${slug}/${categoryId}`);
+    handlePushRoute(`/category/${slug}/${categoryId}`);
 
     setIsDropCategory(false);
   };
   const goToGenre = (genreTitle: string, genreId: string) => {
     const slug = slugify(genreTitle);
-    router.push(`/genre/${slug}/${genreId}`);
+    handlePushRoute(`/genre/${slug}/${genreId}`);
 
     setIsDropCategory(false);
   };
@@ -114,7 +116,7 @@ export default function Navbar({
               <MdOutlineNavigateNext />
             </StyledLabel>
           ),
-          onClick: () => router.push("/account"),
+          onClick: () => handlePushRoute("/account"),
         },
         {
           key: "logout",
@@ -139,7 +141,7 @@ export default function Navbar({
             </StyledLabel>
           ),
           onClick: () => {
-            router.push("/auth/login");
+            handlePushRoute("/auth/login");
           },
         },
       ];
@@ -162,7 +164,7 @@ export default function Navbar({
             <div className="flex justify-between w-full items-center px-5 z-[99] bg-[#d9eafd] md:px-[20px] lg:px-[100px] py-4">
               <div
                 className="font-extrabold tracking-widest text-xl logo cursor-pointer "
-                onClick={() => router.push("/")}
+                onClick={() => handlePushRoute("/")}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-hidden">

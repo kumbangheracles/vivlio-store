@@ -15,6 +15,7 @@ import { truncateText } from "@/helpers/truncateText";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useIsWishlistStore } from "@/zustand/isWishlist.store";
 import useDeviceType from "@/hooks/useDeviceType";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 // import { fetchBooks } from "@/app/page";
 type CardBookProps = BookProps & {
   showIcon?: "trash" | "wish";
@@ -47,6 +48,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     const { fetchBooksHome } = useWishlistStore();
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const { handlePushRoute } = useGlobalLoadingBar();
     const auth = useAuth();
     const router = useRouter();
 
@@ -55,7 +57,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     const handleWishlist = async () => {
       if (!auth.accessToken) {
         message.info("You must login first.");
-        router.push("/auth/login");
+        handlePushRoute("/auth/login");
 
         return;
       }
@@ -94,11 +96,11 @@ const CardBook: React.FC<CardBookProps> = React.memo(
     const goToDetail = (id: string) => {
       if (!auth.accessToken) {
         message.info("You must login first!!!");
-        router.push("/auth/login");
+        handlePushRoute("/auth/login");
         return;
       }
 
-      router.push(`/book/${id}`);
+      handlePushRoute(`/book/${id}`);
     };
 
     return (

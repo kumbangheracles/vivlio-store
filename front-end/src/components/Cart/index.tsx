@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 interface PropTypes {
   books: BookProps[];
 }
@@ -53,6 +54,7 @@ const CartIndex = ({ books }: PropTypes) => {
   const [quantities, setQuantities] = useState<Record<string, number>>(
     quantityBooksRecord ?? {},
   );
+  const { handlePushRoute } = useGlobalLoadingBar();
   const [isChange, setIsChange] = useState<boolean>(false);
 
   const router = useRouter();
@@ -60,7 +62,7 @@ const CartIndex = ({ books }: PropTypes) => {
     if (auth.loading) return;
     if (!auth.accessToken) {
       message.info("You must login first!!!");
-      router.push("/auth/login");
+      handlePushRoute("/auth/login");
     }
   }, [auth.loading, auth.accessToken]);
 
@@ -176,7 +178,7 @@ const CartIndex = ({ books }: PropTypes) => {
       console.log("Data sended: ", res.data);
 
       if (res) {
-        // router.push(res.data?.redirect_url);
+        // handlePushRoute(res.data?.redirect_url);
         window.snap.pay(res.data.token); // untuk menampilkan pop-up payment dari midtrans
       }
 
@@ -215,7 +217,7 @@ const CartIndex = ({ books }: PropTypes) => {
               className="cart-result"
               title={"Looks like you haven’t added anything to your cart yet."}
               extra={
-                <Button type="primary" onClick={() => router.push("/")}>
+                <Button type="primary" onClick={() => handlePushRoute("/")}>
                   Let's Shop First
                 </Button>
               }

@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import useGlobalLoadingBar from "./useGlobalLoadingBar";
 
 interface UseAuthOptions {
   required?: boolean;
@@ -12,10 +13,10 @@ export function useAuth(options: UseAuthOptions = {}) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { required = false, redirectTo = "/auth/login" } = options;
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   useEffect(() => {
     if (required && status === "unauthenticated") {
-      router.push(redirectTo);
+      handlePushRoute(redirectTo);
     }
   }, [required, status, router, redirectTo]);
 
@@ -32,12 +33,12 @@ export function useAuth(options: UseAuthOptions = {}) {
 export function useRequireAuth(allowedRoles?: string[]) {
   const { session, loading, authenticated } = useAuth({ required: true });
   const router = useRouter();
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   useEffect(() => {
     if (!loading && authenticated && allowedRoles) {
       const userRole = session?.user.role;
       if (userRole && !allowedRoles.includes(userRole)) {
-        router.push("/unauthorized");
+        handlePushRoute("/unauthorized");
       }
     }
   }, [loading, authenticated, session, allowedRoles, router]);

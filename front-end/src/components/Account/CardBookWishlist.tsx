@@ -15,6 +15,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { truncateText } from "@/helpers/truncateText";
 import { useRouter } from "next/navigation";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 type PropTypes = BookProps & {};
 
 const CardBookWishlist: React.FC<PropTypes> = ({
@@ -31,6 +32,7 @@ const CardBookWishlist: React.FC<PropTypes> = ({
   const { setIsWishlist, wishlist, isWishlist } = useIsWishlistStore();
   const router = useRouter();
   const isMobile = useDeviceType();
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleRemoveWishlist = async (bookId: string) => {
     if (!bookId) {
       message.error("Book not found");
@@ -52,7 +54,7 @@ const CardBookWishlist: React.FC<PropTypes> = ({
     }
   };
   const goToDetail = (id: string) => {
-    router.push(`/book/${id}`);
+    handlePushRoute(`/book/${id}`);
   };
   return (
     <>
@@ -143,10 +145,12 @@ const CardBookWishlist: React.FC<PropTypes> = ({
         </>
       ) : (
         <>
-          <StyledCard>
+          <StyledCard onClick={() => goToDetail(id as string)}>
             <div
               className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
-              onClick={() => setModalOpen(true)}
+              onClick={(e) => {
+                (e.stopPropagation(), setModalOpen(true));
+              }}
             >
               {loading ? (
                 <Spin size="small" />

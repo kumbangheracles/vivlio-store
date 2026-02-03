@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
+import useGlobalLoadingBar from "./useGlobalLoadingBar";
 
 interface PropTypes {
   loading: boolean;
@@ -19,11 +20,11 @@ const useCart = (prop: PropTypes) => {
   const { loading, setLoading, isCart, setIsCart, bookId, fetchCart } = prop;
   const auth = useAuth();
   const router = useRouter();
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleAddToCart = async () => {
     if (!auth.accessToken) {
       message.info("You must login first!!!");
-      router.push("/auth/login");
+      handlePushRoute("/auth/login");
       return;
     }
 

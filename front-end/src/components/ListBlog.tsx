@@ -6,6 +6,7 @@ import BlogCard from "./BlogCard";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ArticleProperties } from "@/types/article.type";
 import { useRouter } from "next/navigation";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 
 interface PropTypes {
   dataArticles: ArticleProperties[];
@@ -19,7 +20,7 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollByAmount = isMobile ? 250 : 700;
   const router = useRouter();
-
+  const { handlePushRoute } = useGlobalLoadingBar();
   const handleScroll = () => {
     const el = carouselRef.current;
     if (!el) return;
@@ -46,7 +47,7 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
       direction === "left" ? -scrollByAmount : scrollByAmount;
     const target = Math.max(
       0,
-      Math.min(start + scrollAmount, el.scrollWidth - el.clientWidth)
+      Math.min(start + scrollAmount, el.scrollWidth - el.clientWidth),
     );
     const change = target - start;
     const duration = 600;
@@ -95,7 +96,7 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
         </h4>
 
         <h4
-          onClick={() => router.push("/articles")}
+          onClick={() => handlePushRoute("/articles")}
           className=" text-gray-500 font-normal mr-2 sm:mr-4 sm:text-sm sm:hover:underline tracking-normal text-[11px] cursor-pointer"
         >
           See All
