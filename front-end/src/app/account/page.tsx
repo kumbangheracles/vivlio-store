@@ -13,11 +13,15 @@ export const metadata = {
 };
 
 interface Params {
-  searchParams: Promise<{
+  searchParams?: {
     status?: string;
     page?: string;
     limit?: string;
-  }>;
+    sortPrice?: "1" | "-1";
+    sortDate?: "newest_saved" | "oldest_saved";
+    pageWish?: string;
+    limitWish?: string;
+  };
 }
 
 const AccountPage = async ({ searchParams }: Params) => {
@@ -30,14 +34,29 @@ const AccountPage = async ({ searchParams }: Params) => {
     status: status as BookReviewStatus,
     limit: limit.toString(),
   });
+
+  const pageWish = Number(params?.pageWish ?? 1);
+  const limitWish = params?.limitWish ?? "5";
+  const sortPrice = params?.sortPrice;
+  const sortDate = params?.sortDate ?? "newest_saved";
+  const dataWishlist = await fetchWishlist({
+    pageWish: pageWish,
+    limitWish: limitWish,
+    sortPrice: sortPrice,
+    sortDate: sortDate,
+  });
+
   const dataUser = await fetchUser();
-  const dataWishlist = await fetchWishlist();
   return (
     <AccountIndex
       dataUser={dataUser as UserProperties}
       dataWishlist={dataWishlist}
       dataBookReviews={dataBookReviews}
-      fetchWishlist={fetchWishlist}
+      // fetchWishlist={fetchWishlist({
+      //   page: pageWish,
+      //   limit: limitWish,
+      //   sortPrice,
+      // })}
       fetchReviews={fetchBookReviews}
     />
   );

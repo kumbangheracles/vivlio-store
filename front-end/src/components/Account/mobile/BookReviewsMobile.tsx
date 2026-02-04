@@ -16,6 +16,8 @@ import {
 } from "@/types/bookreview.type";
 import dayjs from "dayjs";
 import ModalReview from "@/components/ModalReview";
+import useDeviceType from "@/hooks/useDeviceType";
+import NotFoundPage from "@/components/NotFoundPage";
 interface PropTypes {
   bookReviews: BookReviewsProps[];
   initialStatus?: string;
@@ -25,7 +27,7 @@ interface PropTypes {
 const BookReviewsMobile = ({ bookReviews, initialStatus = "" }: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const isMobile = useDeviceType();
   const [dataReview, setDataReview] =
     useState<BookReviewsProps>(initialBookReview);
 
@@ -84,6 +86,10 @@ const BookReviewsMobile = ({ bookReviews, initialStatus = "" }: PropTypes) => {
     setSelectedOption(status);
     setPage(currentPage);
   }, [searchParams]);
+
+  if (!isMobile) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div>

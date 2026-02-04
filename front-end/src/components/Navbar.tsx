@@ -153,9 +153,9 @@ export default function Navbar({
   return (
     <>
       {(isMobile && path === "/cart") ||
-      (isMobile && path === "/account") ||
-      (isMobile && path === "/account/wishlist") ||
-      (isMobile && path === "/account/book-reviews") ? (
+      (isMobile && path === "/account-mobile") ||
+      (isMobile && path === "/account-mobile/wishlist") ||
+      (isMobile && path === "/account-mobile/book-reviews") ? (
         <></>
       ) : (
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">

@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import myAxios from "@/libs/myAxios";
 import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
-import { Empty, message } from "antd";
+import { Empty } from "antd";
 
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 import { Metadata } from "next";
@@ -38,7 +38,6 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
   const dataCategory = await fetchCategory();
   const accessToken = session?.accessToken;
   const allBooks = await fetchBooksHome();
-  console.log("Allbooks: ", allBooks);
   try {
     const res = await myAxios.get<{ result: BookProps }>(`/books/${id}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},

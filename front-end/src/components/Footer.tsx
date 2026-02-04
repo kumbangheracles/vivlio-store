@@ -19,6 +19,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import { useMounted } from "@/hooks/useMounted";
 const Footer = () => {
   const router = useRouter();
   const isMobile = useDeviceType();
@@ -28,9 +29,9 @@ const Footer = () => {
   const handleStyleFoot = (pathName: string) => {
     if (
       pathName === "/" ||
-      pathName === "/account" ||
+      pathName === "/account-mobile" ||
       pathName === "/category" ||
-      pathName === "/account/wishlist"
+      pathName === "/account-mobile/wishlist"
     ) {
       setClassFoot(
         "bg-white rounded-full w-[40px] h-[40px] p-1 flex items-center transition-all justify-center absolute top-[-20px]",
@@ -43,7 +44,9 @@ const Footer = () => {
   useEffect(() => {
     handleStyleFoot(path);
   }, [path]);
+  const mounted = useMounted();
 
+  if (!mounted) return null;
   return (
     <>
       {isMobile ? (
@@ -75,15 +78,17 @@ const Footer = () => {
               <div className="flex items-center transition-all flex-col relative w-full ">
                 <HeartOutlined
                   className={
-                    path === "/account/wishlist" ? classFoot : "w-[20px]"
+                    path === "/account-mobile/wishlist" ? classFoot : "w-[20px]"
                   }
-                  onClick={() => handlePushRoute("/account/wishlist")}
+                  onClick={() => handlePushRoute("/account-mobile/wishlist")}
                 />
               </div>
               <div className="flex items-center transition-all flex-col relative w-full ">
                 <UserOutlined
-                  className={path === "/account" ? classFoot : "w-[20px]"}
-                  onClick={() => handlePushRoute("/account")}
+                  className={
+                    path === "/account-mobile" ? classFoot : "w-[20px]"
+                  }
+                  onClick={() => handlePushRoute("/account-mobile")}
                 />
               </div>
             </div>
@@ -117,21 +122,36 @@ const Footer = () => {
 
             {/* Bagian Tengah - Navigasi */}
             <Navigation>
-              <Link className="link" href={"/"}>
+              <p
+                className="link cursor-pointer"
+                onClick={() => handlePushRoute("/")}
+              >
                 Home
-              </Link>
-              <Link className="link" href={"/blog"}>
+              </p>
+              <p
+                className="link cursor-pointer"
+                onClick={() => handlePushRoute("/blog")}
+              >
                 Blog
-              </Link>
-              <Link className="link" href={"/cart"}>
+              </p>
+              <p
+                className="link cursor-pointer"
+                onClick={() => handlePushRoute("/cart")}
+              >
                 Cart
-              </Link>
-              <Link className="link" href={"/account"}>
+              </p>
+              <p
+                className="link cursor-pointer"
+                onClick={() => handlePushRoute("/account")}
+              >
                 Account Details
-              </Link>
-              <Link className="link" href={"/"}>
+              </p>
+              <p
+                className="link cursor-pointer"
+                onClick={() => handlePushRoute("/")}
+              >
                 Browse Book
-              </Link>
+              </p>
             </Navigation>
 
             {/* Bagian Kanan - Tentang Perusahaan */}

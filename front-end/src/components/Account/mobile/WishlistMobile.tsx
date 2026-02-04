@@ -1,8 +1,8 @@
 "use client";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Result, Select } from "antd";
-import { useMemo, useState } from "react";
+import { Button, message, Result, Select } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import CardBookWishlist from "../CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useRouter } from "next/navigation";
@@ -22,10 +22,12 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   const auth = useAuth();
   const { handlePushRoute } = useGlobalLoadingBar();
   const router = useRouter();
-  if (!auth) {
-    message.info("You must login first");
-    handlePushRoute("/login");
-  }
+  useEffect(() => {
+    if (!auth) {
+      message.info("You must login first");
+      handlePushRoute("/login");
+    }
+  }, [auth, handlePushRoute]);
   const { loading, fetchBooks } = useWishlistStore();
   const [selectOption, setSelectedOption] =
     useState<OptionType>("newest_saved");

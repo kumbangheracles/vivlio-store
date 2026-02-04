@@ -12,6 +12,8 @@ import ListBlog from "../ListBlog";
 import { ArticleProperties } from "@/types/article.type";
 import { useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "../GlobalLoading";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -64,6 +66,10 @@ export default function HomePage(prop: PropTypes) {
     const slug = slugify(categoryName);
     handlePushRoute(`/category/${slug}/${categoryId}`);
   };
+
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <>
       {isMobile ? (

@@ -1,6 +1,6 @@
 "use server";
 import { createServerAxios } from "@/libs/serverAxios";
-import { BookReviewsProps, BookReviewStatus } from "@/types/bookreview.type";
+import { BookReviewsProps } from "@/types/bookreview.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
@@ -25,7 +25,10 @@ async function fetchBookReviews(
     //   window.location.href = "/unoutherized";
     // }
 
-    const serverAxios = createServerAxios(session?.accessToken);
+    const serverAxios = createServerAxios({
+      token: session?.accessToken,
+      isConsole: false,
+    });
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit,
@@ -39,7 +42,7 @@ async function fetchBookReviews(
 
     const filteredReviews = response.data.results;
 
-    console.log("Respons: ", response.data);
+    // console.log("Respons: ", response.data);
     return filteredReviews;
   } catch (err: any) {
     console.log("fetch book reviews error:", err || err);

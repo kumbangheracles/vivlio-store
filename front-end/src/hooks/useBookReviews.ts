@@ -12,6 +12,7 @@ import {
   useTransition,
 } from "react";
 import useGlobalLoadingBar from "./useGlobalLoadingBar";
+import useDeviceType from "./useDeviceType";
 
 interface PropTypes {
   page?: number;
@@ -37,6 +38,7 @@ const useBookReviews = ({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isModalReview, setIsModalReview] = useState<boolean>(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const isMobile = useDeviceType();
   const [selectedId, setSelectedId] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
@@ -73,7 +75,12 @@ const useBookReviews = ({
       params.set("status", currentStatus);
     }
 
-    const url = `?${params.toString()}`;
+    let url = "";
+    if (isMobile) {
+      url = `?${params.toString()}`;
+    } else {
+      url = `?key=books_reviews?${params.toString()}`;
+    }
 
     startTransition(() => {
       router.push(url, { scroll: false });
@@ -152,7 +159,12 @@ const useBookReviews = ({
       params.set("status", value);
     }
 
-    const url = `?${params.toString()}`;
+    let url = "";
+    if (isMobile) {
+      url = `?${params.toString()}`;
+    } else {
+      url = `?key=books_reviews?${params.toString()}`;
+    }
 
     startTransition(() => {
       handlePushRoute(url);

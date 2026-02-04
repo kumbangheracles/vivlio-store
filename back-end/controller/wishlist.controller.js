@@ -51,11 +51,31 @@ module.exports = {
     }
   },
   async getAllWishlist(req, res) {
+    const pageWish = parseInt(req.query.pageWish) || 1;
+    const limitWish = parseInt(req.query.limitWish) || 10;
+    const sortPrice = parseInt(req.query.sortPrice) || 0;
+    const sortDate = req.query.sortDate || "";
+    const offset = (pageWish - 1) * limitWish;
+
     try {
       const userId = req.id;
+      const order = [];
+      if (sortPrice === 1) {
+        order.push([{ model: Book, as: "book" }, "price", "ASC"]);
+      } else if (sortPrice === -1) {
+        order.push([{ model: Book, as: "book" }, "price", "DESC"]);
+      } else if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      } else if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
 
-      const wishlist = await UserWishlist.findAll({
+      const { count, rows } = await UserWishlist.findAndCountAll({
         where: { userId },
+        limit: limitWish,
+        offset,
+        distinct: true,
+        order: order,
         include: [
           {
             model: Book,
@@ -72,7 +92,10 @@ module.exports = {
       res.status(200).json({
         status: 200,
         message: "Success",
-        results: wishlist,
+        results: rows,
+        total: count,
+        currentPage: parseInt(pageWish),
+        totalPages: Math.ceil(count / limitWish),
       });
     } catch (error) {
       res.status(500).json({

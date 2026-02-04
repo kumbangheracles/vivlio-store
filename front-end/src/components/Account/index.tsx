@@ -1,5 +1,5 @@
 "use client";
-import { Card, message, Modal, Tabs } from "antd";
+import { Card, Tabs } from "antd";
 import { startTransition, useEffect, useState } from "react";
 import { styled } from "styled-components";
 import Account from "./Account";
@@ -7,31 +7,22 @@ import { UserProperties } from "@/types/user.type";
 import Wishlist from "./Wishlist";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import useDeviceType from "@/hooks/useDeviceType";
-import Image from "next/image";
-import DefaultImage from "../../assets/images/profile-default.jpg";
-import { MdOutlineRateReview } from "react-icons/md";
-import {
-  FileDoneOutlined,
-  HeartOutlined,
-  LogoutOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { FaRegMap } from "react-icons/fa";
-import { useRouter } from "next/navigation";
-import myAxios from "@/libs/myAxios";
-import { signOut } from "next-auth/react";
-import { ErrorHandler } from "@/helpers/handleError";
+import { useRouter, useSearchParams } from "next/navigation";
 import BookReviews from "./BookReviews";
 import { BookReviewsProps } from "@/types/bookreview.type";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import NotFoundPage from "../NotFoundPage";
+import AntdRegistry from "@/libs/AntdRegistry";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "../GlobalLoading";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
-  fetchWishlist: () => void;
+  fetchWishlist?: () => void;
   dataBookReviews?: BookReviewsProps[];
   fetchReviews?: () => void;
 }
-
+type TabKey = "account" | "wishlist" | "transaction" | "book-reviews";
 const AccountIndex: React.FC<AccountProps> = ({
   dataUser,
   dataBookReviews,
@@ -40,22 +31,14 @@ const AccountIndex: React.FC<AccountProps> = ({
   fetchReviews,
 }) => {
   const router = useRouter();
-  const LOCAL_STORAGE_KEY = "lastActiveTabKey";
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("key") as TabKey) || "account";
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const isMobile = useDeviceType();
-  const [activeTab, setActiveTab] = useState<string>("account");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { handlePushRoute } = useGlobalLoadingBar();
-  useEffect(() => {
-    const savedTab = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (savedTab) {
-      setActiveTab(savedTab);
-    }
-  }, []);
 
   const handleTabChange = (key: string) => {
-    setActiveTab(key);
-    localStorage.setItem(LOCAL_STORAGE_KEY, key);
+    setActiveTab(key as TabKey);
   };
 
   const tabItems = [
@@ -101,145 +84,27 @@ const AccountIndex: React.FC<AccountProps> = ({
       ),
     },
   ];
-  const handleLogout = async () => {
-    try {
-      setIsLoading(true);
-      await myAxios.post("/auth/logout");
-      message.info("Logout Success");
-      await signOut({
-        callbackUrl: "/auth/login",
-      });
-    } catch (error) {
-      ErrorHandler(error);
-      await signOut({
-        callbackUrl: "/auth/login",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const listSection = [
-    {
-      id: 1,
-      title: "Transaction",
-      icon: <FileDoneOutlined />,
-      path: "/account/transaction",
-    },
-    {
-      id: 2,
-      title: "Wishlist",
-      icon: <HeartOutlined />,
-      path: "/account/wishlist",
-    },
-    {
-      id: 3,
-      title: "Reviews",
-      icon: <MdOutlineRateReview />,
-      path: "/account/book-reviews",
-    },
-    {
-      id: 4,
-      title: "Address",
-      icon: <FaRegMap />,
-      path: "/account/address",
-    },
-    {
-      id: 5,
-      title: "Account",
-      icon: <UserOutlined />,
-      path: "/account/profile",
-    },
-  ];
 
   useEffect(() => {
-    const params = new URLSearchParams();
-
+    const params = new URLSearchParams(searchParams.toString());
     params.set("key", activeTab);
-    const url = `?${params.toString()}`;
+
+    const url = `?key=${activeTab}`;
 
     startTransition(() => {
-      handlePushRoute(url);
-      router.refresh();
+      handlePushRoute(url, { scroll: false });
     });
   }, [activeTab]);
 
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <>
-      {isMobile ? (
-        <div>
-          <div className="fixed top-0 bg-white shadow-sm w-full px-3 py-3 z-[999]">
-            <h4 className="text-sm font-bold tracking-wide">Account</h4>
-          </div>
-
-          <div
-            className="relative flex w-full mt-[-17px] justify-center bg-[url('/images/background-mobile.png')] 
-                bg-cover bg-center h-[140px]"
-          >
-            <div className="absolute bottom-[10px] flex items-center justify-center flex-col ">
-              <div
-                className=" flex items-center justify-center 
-              w-[85px] h-[85px] rounded-full overflow-hidden 
-              border-4 border-white bg-white"
-              >
-                <Image
-                  width={100}
-                  height={100}
-                  src={dataUser?.profileImage?.imageUrl || DefaultImage}
-                  alt="profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <h4 className="font-semibold tracking-wide text-sm">
-                {dataUser?.fullName}
-              </h4>
-              <h4 className="font-normal text-gray-600 tracking-wide text-[12px]">
-                {dataUser?.email}
-              </h4>
-            </div>
-          </div>
-
-          <div className="p-4 flex flex-col gap-2">
-            <>
-              {listSection.map((item) => (
-                <div
-                  className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md"
-                  key={item.id}
-                  onClick={() => handlePushRoute(item.path)}
-                >
-                  {item.icon}
-                  <h4 className="font-normal tracking-wide text-[12px]">
-                    {item.title}
-                  </h4>
-                </div>
-              ))}
-            </>
-
-            <div
-              className="flex items-center gap-3 p-2 active:bg-gray-200 rounded-md"
-              onClick={() => setIsOpen(true)}
-            >
-              <LogoutOutlined />
-              <h4 className="font-normal tracking-wide text-[12px]">Log Out</h4>
-            </div>
-          </div>
-
-          <Modal
-            open={isOpen}
-            okText="Yes"
-            cancelText="Cancel"
-            onCancel={() => setIsOpen(false)}
-            onOk={handleLogout}
-            confirmLoading={isLoading}
-            title={<h1 className="text-center font-bold">Logout</h1>}
-            centered
-          >
-            <div className="text-center">
-              <h1>Are you sure you want to logout?</h1>
-            </div>
-          </Modal>
-        </div>
-      ) : (
+      <div className="sm:hidden block">
+        <NotFoundPage />
+      </div>
+      <div className="sm:block hidden">
         <CardContainer>
           <Tabs
             // destroyInactiveTabPane
@@ -251,7 +116,7 @@ const AccountIndex: React.FC<AccountProps> = ({
             onChange={handleTabChange}
           />
         </CardContainer>
-      )}
+      </div>
     </>
   );
 };

@@ -29,7 +29,7 @@ const ArticleIndex = ({ dataArticles }: PropTypes) => {
             </h4>
             <div className="flex flex-wrap justify-center gap-2  py-5 mx-3 bg-gray-100 rounded-md">
               {dataArticles?.map((item) => (
-                <BlogCard dataAricle={item} />
+                <BlogCard dataAricle={item} key={item?.id} />
               ))}
             </div>
           </>
