@@ -5,9 +5,10 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 async function fetchUser() {
   const session = await getServerSession(authOptions);
 
+  if (!session?.user?.id || !session?.accessToken) {
+    return null;
+  }
   try {
-    if (!session?.user) return null;
-
     const res = await myAxios.get(`/users/${session.user.id}`, {
       headers: {
         Authorization: `Bearer ${session.accessToken}`,

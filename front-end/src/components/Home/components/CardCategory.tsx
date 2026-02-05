@@ -34,8 +34,8 @@ const CardCategory = (prop: PropTypes) => {
       {/* Background Image */}
       <Image
         src={prop.categoryImage?.imageUrl || DefaultImage}
-        width={100}
-        height={100}
+        width={1000}
+        height={1000}
         alt={"Test"}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
       />

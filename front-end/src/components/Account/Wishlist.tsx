@@ -1,115 +1,29 @@
 "use client";
 import { BookWithWishlist } from "@/types/wishlist.type";
-import { Button, Card, Empty, Select } from "antd";
-import { Suspense, useEffect, useMemo, useState, useTransition } from "react";
+import { Button, Empty, Select } from "antd";
+import { Suspense } from "react";
 import GlobalLoading from "../GlobalLoading";
 import React from "react";
 import CardBookWishlist from "./CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
-import { useRouter, useSearchParams } from "next/navigation";
-import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
-import useDeviceType from "@/hooks/useDeviceType";
+import useWishlist from "@/hooks/useWishlist";
 
 type PropTypes = {
   dataWish?: BookWithWishlist[];
   fetchWishlist?: () => void;
 };
 
-type KeyPropsTime = "newest_saved" | "oldest_saved";
-
-type KeyPropsPrice = "-1" | "1";
-type WishlistSort =
-  | "price_asc"
-  | "price_desc"
-  | "date_newest"
-  | "date_oldest"
-  | null;
-
 const Wishlist = ({ dataWish }: PropTypes) => {
   const { fetchBooks } = useWishlistStore();
-  const [sort, setSort] = useState<WishlistSort>(null);
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const { handlePushRoute } = useGlobalLoadingBar();
-  const isMobile = useDeviceType();
-  const [selectedOptionPrice, setSelectedOptionPrice] =
-    useState<KeyPropsPrice | null>("-1");
-
-  const [selectedOption, setSelectedOption] = useState<KeyPropsTime | null>(
-    "newest_saved",
-  );
-  const [isPending, startTransition] = useTransition();
-  const limitParams = Number(searchParams.get("limitWish") || 5);
-  const [hasMore, setHasMore] = useState<boolean>(false);
-  const [limit, setLimit] = useState<number | null>(limitParams || 5);
-  const [loadingMore, setLoadingMore] = useState(false);
-  useEffect(() => {
-    setLoadingMore(false);
-    const currentLimit = Number(searchParams.get("limitWish") || 5);
-    setHasMore((dataWish?.length as number) >= currentLimit);
-  }, [dataWish, searchParams, loadingMore]);
-  const handleLoadMore = () => {
-    const newLimit = (limit as number) + 5;
-
-    setLoadingMore(true);
-    setLimit(newLimit);
-
-    const params = new URLSearchParams();
-    params.set("pageWish", "1");
-    params.set("limitWish", newLimit.toString());
-
-    const currentSortPrice = searchParams.get("sortPrice");
-    if (currentSortPrice && currentSortPrice.trim() !== "") {
-      params.set("sortPrice", currentSortPrice);
-    }
-
-    let url = "";
-    if (isMobile) {
-      url = `?${params.toString()}`;
-    } else {
-      url = `?key=wishlist?${params.toString()}`;
-    }
-
-    startTransition(() => {
-      router.push(url, { scroll: false });
-      router.refresh();
-    });
-  };
-
-  const updateFilters = (value: WishlistSort) => {
-    setLoadingMore(false);
-    setSort(value);
-
-    const params = new URLSearchParams();
-    params.set("pageWish", "1");
-    params.set("limitWish", limit?.toString() as string);
-
-    switch (value) {
-      case "price_asc":
-        params.set("sortPrice", "1");
-        break;
-
-      case "price_desc":
-        params.set("sortPrice", "-1");
-        break;
-
-      case "date_newest":
-        params.set("sortDate", "newest_saved");
-        break;
-
-      case "date_oldest":
-        params.set("sortDate", "oldest_saved");
-        break;
-    }
-
-    const url = `?key=wishlist?${params.toString()}`;
-
-    startTransition(() => {
-      handlePushRoute(url);
-      router.refresh();
-    });
-  };
+  const {
+    handleLoadMore,
+    hasMore,
+    isPending,
+    loadingMore,
+    sort,
+    updateFilters,
+  } = useWishlist({ dataWish });
 
   return (
     <>

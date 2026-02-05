@@ -762,6 +762,7 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
           <ListBook
             dataBooks={similiarBooks}
             isSpace={true}
+            isSeeAll={false}
             titleSection="Similiar Books"
           />
         ) : (

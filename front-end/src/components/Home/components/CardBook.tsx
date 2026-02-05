@@ -117,7 +117,7 @@ const CardBook: React.FC<CardBookProps> = React.memo(
                 </h4>
               )}
               <div
-                className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[18px] h-[18px] flex justify-center items-center border-black border-1 p-[2px]"
+                className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[30px] h-[30px] flex justify-center items-center border-black border-1 p-[2px]"
                 onClick={(e) => {
                   (e.stopPropagation(), handleWishlist());
                 }}

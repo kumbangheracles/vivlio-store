@@ -139,7 +139,7 @@ const ListBook: React.FC<BookTypes> = ({
           {/* Mobile */}
           <div className="mt-3 pt-2 bg-gray-100 rounded-md">
             <div className="flex justify-between pl-3 pt-2">
-              <h4 className="font-semibold tracking-wider text-[11px] px-2">
+              <h4 className="font-semibold tracking-wider text-[16px] px-2">
                 {titleSection}
               </h4>
 

@@ -29,7 +29,6 @@ export function useAuth(options: UseAuthOptions = {}) {
   };
 }
 
-// Hook khusus untuk role-based access
 export function useRequireAuth(allowedRoles?: string[]) {
   const { session, loading, authenticated } = useAuth({ required: true });
   const router = useRouter();

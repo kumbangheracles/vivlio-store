@@ -147,7 +147,7 @@ const CardBookWishlist: React.FC<PropTypes> = ({
         <>
           <StyledCard onClick={() => goToDetail(id as string)}>
             <div
-              className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
+              className="rounded-[50%] bg-white cursor-pointer absolute right-3 top-3 !z-50 w-[25px] h-[25px] flex justify-center items-center border-black border-1"
               onClick={(e) => {
                 (e.stopPropagation(), setModalOpen(true));
               }}
@@ -207,7 +207,10 @@ const CardBookWishlist: React.FC<PropTypes> = ({
                 <div className="flex gap-3.5 items-center justify-end w-full">
                   <AppButton
                     label="Cancel"
-                    onClick={() => setModalOpen(false)}
+                    onClick={(e) => {
+                      e?.stopPropagation?.();
+                      setModalOpen(false);
+                    }}
                     loading={loading}
                   />
                   <AppButton

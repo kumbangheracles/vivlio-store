@@ -13,7 +13,6 @@ const {
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
-const uploader = require("../config/uploader");
 const { Op } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 

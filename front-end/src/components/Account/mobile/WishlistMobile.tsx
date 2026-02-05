@@ -8,6 +8,10 @@ import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import useDeviceType from "@/hooks/useDeviceType";
+import NotFoundPage from "@/components/NotFoundPage";
+import useWishlist from "@/hooks/useWishlist";
+import { useMounted } from "@/hooks/useMounted";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
@@ -20,6 +24,7 @@ type OptionType =
 
 const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   const auth = useAuth();
+  const isMobile = useDeviceType();
   const { handlePushRoute } = useGlobalLoadingBar();
   const router = useRouter();
   useEffect(() => {
@@ -28,36 +33,23 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
       handlePushRoute("/login");
     }
   }, [auth, handlePushRoute]);
-  const { loading, fetchBooks } = useWishlistStore();
-  const [selectOption, setSelectedOption] =
-    useState<OptionType>("newest_saved");
-  const toTime = (date?: Date | string) => {
-    if (!date) return 0;
-    return date instanceof Date ? date.getTime() : new Date(date).getTime();
-  };
+  const { fetchBooks } = useWishlistStore();
 
-  const filteredWishlists = useMemo(() => {
-    if (!dataWishlists) return [];
+  const {
+    handleLoadMore,
+    hasMore,
+    isPending,
+    loadingMore,
+    sort,
+    updateFilters,
+  } = useWishlist({ dataWish: dataWishlists });
 
-    const sorted = [...dataWishlists];
+  const mounted = useMounted();
 
-    switch (selectOption) {
-      case "newest_saved":
-        return sorted.sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt));
-
-      case "oldest_saved":
-        return sorted.sort((a, b) => toTime(a.createdAt) - toTime(b.createdAt));
-
-      case "highest_price":
-        return sorted.sort((a, b) => b.book!.price - a.book!.price);
-
-      case "lowest_price":
-        return sorted.sort((a, b) => a.book!.price - b.book!.price);
-
-      default:
-        return sorted;
-    }
-  }, [dataWishlists, selectOption]);
+  if (!mounted) return null;
+  if (!isMobile) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div>
@@ -69,28 +61,17 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
 
         <div>
           <Select
-            loading={loading}
+            loading={loadingMore || isPending}
             style={{ minWidth: 155 }}
-            value={selectOption}
+            value={sort}
+            placeholder="Sort wishlist"
             options={[
-              {
-                value: "newest_saved",
-                label: "Newest Saved",
-              },
-              {
-                value: "oldest_saved",
-                label: "Oldest Saved",
-              },
-              {
-                value: "highest_price",
-                label: "Highest Price",
-              },
-              {
-                value: "lowest_price",
-                label: "Lowest Price",
-              },
+              { value: "price_asc", label: "Lowest Price" },
+              { value: "price_desc", label: "Highest Price" },
+              // { value: "date_newest", label: "Newest Saved" },
+              // { value: "date_oldest", label: "Oldest Saved" },
             ]}
-            onChange={(value: OptionType) => setSelectedOption(value)}
+            onChange={updateFilters}
           />
         </div>
       </div>
@@ -98,8 +79,8 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
       <div>
         <>
           <div className="flex items-center justify-center bg-gray-100 py-3 mx-2 rounded-md gap-2.5 flex-wrap">
-            {filteredWishlists.length > 0 ? (
-              filteredWishlists.map((item) => (
+            {dataWishlists!.length > 0 ? (
+              dataWishlists!.map((item) => (
                 <CardBookWishlist
                   key={item?.id}
                   id={item?.bookId}
@@ -128,6 +109,17 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
               </div>
             )}
           </div>
+          {hasMore && (
+            <Button
+              onClick={handleLoadMore}
+              disabled={loadingMore || isPending}
+              loading={loadingMore || isPending}
+              type="primary"
+              className="mt-4 ml-3 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+            >
+              Load More
+            </Button>
+          )}
         </>
       </div>
     </div>
