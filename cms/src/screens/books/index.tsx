@@ -1,4 +1,15 @@
-import { Col, Dropdown, Image, Menu, message, Modal, Row, Space } from "antd";
+import {
+  Col,
+  Dropdown,
+  Image,
+  Menu,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+} from "antd";
 import HeaderPage from "../../components/HeaderPage";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
@@ -55,12 +66,35 @@ const Books = () => {
       setloading(true);
 
       const res = await myAxios.patch(`/books/${id}`, { status });
-      setDataBooks((prev) =>
-        prev.map((item) => (item?.categoryId === id ? res.data : item)),
-      );
+      // setDataBooks((prev) =>
+      //   prev.map((item) => (item?.categoryId === id ? res.data : item)),
+      // );
 
       message.success("Success update status");
-      console.log("response: ", res.data);
+      // console.log("response: ", res.data);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setloading(false);
+      await fetchBooks(page, limit);
+    }
+  };
+
+  const handleIsRecomendChange = async (id: string, isRecomend: boolean) => {
+    if (!id) {
+      message.error("Book not found");
+      return;
+    }
+
+    try {
+      setloading(true);
+
+      await myAxios.patch(`/books/${id}`, { isRecomend });
+      // setDataBooks((prev) =>
+      //   prev.map((item) => (item?.categoryId === id ? res.data : item)),
+      // );
+
+      message.success("Success update status");
     } catch (error) {
       ErrorHandler(error);
     } finally {
@@ -151,8 +185,25 @@ const Books = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      width: 150,
+      width: 120,
       render: (price: number) => `Rp ${Number(price).toLocaleString("id-ID")}`,
+    },
+    {
+      title: "Recomend",
+      dataIndex: "recomend",
+      key: "recomend",
+      width: 100,
+      render: (_: any, record: BookProps) => (
+        <Switch
+          value={record?.isRecomend}
+          onChange={(value) => {
+            handleIsRecomendChange(record?.id as string, value as boolean);
+          }}
+          style={{
+            backgroundColor: record?.isRecomend ? "lightgreen" : "gray",
+          }}
+        />
+      ),
     },
 
     {

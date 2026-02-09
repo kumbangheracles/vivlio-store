@@ -17,6 +17,7 @@ export interface BookParams {
   page?: number;
   limit?: number;
   status?: BookStatusType;
+  isRecomend?: boolean;
 }
 export type BookProps = {
   id?: string;
@@ -33,6 +34,7 @@ export type BookProps = {
   description?: string;
   categories?: CategoryProps;
   createdByAdminId?: string;
+  isRecomend?: boolean;
   stats?: {
     popularityScore?: number;
     purchaseCount?: number;

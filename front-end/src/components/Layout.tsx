@@ -19,6 +19,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
 import { GenreProperties } from "@/types/genre.type";
+import { useOverlayStore } from "@/zustand/useOverlay.store";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
@@ -26,6 +27,7 @@ interface LayoutProps {
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
   dataGenres?: GenreProperties[];
+  dataBooks?: BookProps[];
 }
 const AppLayout: React.FC<LayoutProps> = ({
   children,
@@ -33,15 +35,17 @@ const AppLayout: React.FC<LayoutProps> = ({
   dataCategories,
   dataCartedBooks,
   dataGenres,
+  dataBooks,
 }) => {
   const pathname = usePathname();
   const isMobile = useDeviceType();
+  const { isOverlay, setIsOverlay } = useOverlayStore();
 
   const isPageAuth = pathname.startsWith("/auth");
   const isResult = pathname.startsWith("/result");
   useEffect(() => {
     AOS.init({
-      once: true, // animasi hanya sekali
+      once: true,
       mirror: false,
       duration: 800,
     });
@@ -60,6 +64,9 @@ const AppLayout: React.FC<LayoutProps> = ({
       document.body.removeChild(script);
     };
   }, []);
+
+  console.log("isoverlay:", isOverlay);
+
   return (
     <>
       <ConfigProvider>
@@ -76,11 +83,18 @@ const AppLayout: React.FC<LayoutProps> = ({
                       dataUser={dataUser}
                       dataCategories={dataCategories}
                       dataCartedBooks={dataCartedBooks}
+                      dataBooks={dataBooks}
                     />
                     <WrapperChildren isMobile={isMobile}>
                       <Suspense fallback={<GlobalLoading />}>
                         {children}
                       </Suspense>
+                      {isOverlay && (
+                        <div
+                          onClick={() => setIsOverlay(false)}
+                          className="inset-0 bg-black/50 transition-opacity duration-300 top-0 left-0 fixed h-screen w-screen z-[40]"
+                        ></div>
+                      )}
                     </WrapperChildren>
                     <Footer />
                   </WrapperLayout>

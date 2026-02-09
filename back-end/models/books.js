@@ -44,6 +44,11 @@ const Book = sequelize.define(
       allowNull: false,
       defaultValue: "UNPUBLISHED",
     },
+    isRecomend: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     isPopular: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

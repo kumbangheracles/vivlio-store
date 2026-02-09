@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Dropdown from "antd/es/dropdown/dropdown";
-import { Badge, Button, message } from "antd";
+import { Badge, Button, Divider, message } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
 import { usePathname, useRouter } from "next/navigation";
@@ -23,11 +23,20 @@ import MainLogo from "../assets/main-logo.png";
 import Image from "next/image";
 import { GenreProperties } from "@/types/genre.type";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import { useOverlayStore } from "@/zustand/useOverlay.store";
+import {
+  loadHistory,
+  MAX,
+  saveHistory,
+  SearchHistory,
+} from "@/libs/searchHistoryLibs";
+import CardBookNavbar from "./CardBookNavbar";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
   dataGenres?: GenreProperties[];
+  dataBooks?: BookProps[];
 }
 
 export default function Navbar({
@@ -35,11 +44,16 @@ export default function Navbar({
   dataCategories,
   dataCartedBooks,
   dataGenres,
+  dataBooks,
 }: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuth();
   const router = useRouter();
   const isMobile = useDeviceType();
+  const { isOverlay, setIsOverlay, toggleOverlay } = useOverlayStore();
+  const [keyword, setKeyword] = useState("");
+  const [history, setHistory] = useState<SearchHistory[]>([]);
+  const [isDisplayRecom, setIsDisplayRecom] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
@@ -149,6 +163,56 @@ export default function Navbar({
   useEffect(() => {
     setTotalLengthCart(dataCartedBooks?.length as number);
   }, [dataCartedBooks]);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setIsOverlay(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (dropCategory) {
+      setIsOverlay(true);
+      setIsDisplayRecom(false);
+    } else {
+      setIsOverlay(false);
+    }
+
+    if (isDisplayRecom) {
+      setIsDropCategory(false);
+      setIsOverlay(true);
+    }
+
+    if (!isOverlay) {
+      setIsDisplayRecom(false);
+    }
+  }, [dropCategory, isDisplayRecom, isOverlay]);
+
+  const addHistory = (item: SearchHistory) => {
+    const history = loadHistory();
+
+    const filtered = history.filter(
+      (h) =>
+        h.keyword !== item.keyword ||
+        JSON.stringify(h.filters) !== JSON.stringify(item.filters),
+    );
+
+    const newHistory = [{ ...item, searchedAt: Date.now() }, ...filtered].slice(
+      0,
+      MAX,
+    );
+
+    saveHistory(newHistory);
+  };
 
   return (
     <>
@@ -182,7 +246,7 @@ export default function Navbar({
                 </div>
               </div>
 
-              <div className=" w-full flex  items-center gap-3 justify-center sm:w-[50%]">
+              <div className=" w-full flex relative  items-center gap-3 justify-center sm:w-[50%]">
                 <div
                   onClick={() => setIsDropCategory((prev) => !prev)}
                   className="cursor-pointer bg-white border border-white px-3 py-2 rounded-[50px]"
@@ -200,9 +264,42 @@ export default function Navbar({
                 <div className="flex gap-3 py-3 px-6 w-full bg-white rounded-[50px] border-white border">
                   <input
                     placeholder="Search Books, Blogs, etc"
+                    onFocus={() => {
+                      (setIsOverlay(true), setIsDisplayRecom(true));
+                    }}
+                    onClick={() => {
+                      (setIsOverlay(true), setIsDisplayRecom(true));
+                    }}
+                    onChange={() => {
+                      (setIsOverlay(true), setIsDisplayRecom(true));
+                    }}
                     className="w-full outline-0 border-none"
                   />
                   <SearchOutlined />
+                </div>
+                {/* Recom list */}
+                <div
+                  className={`
+      fixed top-18 mx-auto z-[20]
+      min-w-[500px] max-w-[500px] h-auto
+      bg-white rounded-xl p-4 shadow-2xl
+      transition-all duration-200
+      ${cn(
+        isDisplayRecom
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-2 pointer-events-none",
+      )}
+    `}
+                >
+                  <h4 className="font-semibold tracking-wide text-xl">
+                    Recomended Books
+                  </h4>
+
+                  <div className="flex mt-2 justify-between flex-wrap">
+                    {dataBooks?.map((item, index) => (
+                      <CardBookNavbar dataBook={item} key={index} />
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -270,7 +367,7 @@ export default function Navbar({
             <div
               className={` ${cn(
                 dropCategory ? "max-h-[500px]" : "max-h-[0px]",
-              )}   base-blue shadow-2xl p-4 fixed top-1 z-[-10] w-full sm:w-[750px] transition-all duration-400 rounded-xl overflow-hidden`}
+              )}   base-blue shadow-2xl p-4 fixed top-1 !z-30 w-full sm:w-[750px] transition-all duration-400 rounded-xl overflow-hidden`}
             >
               <div
                 className="flex gap-5 mt-[70px]

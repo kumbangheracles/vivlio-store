@@ -22,6 +22,7 @@ export type BookProps = {
   genres?: string[];
   images?: BookImage[];
   description?: string;
+  isRecomend?: boolean;
   categories?: CategoryProps;
   createdByAdminId?: string;
 };

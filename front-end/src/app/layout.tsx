@@ -9,6 +9,7 @@ import fetchCategory from "./actions/fetchCategory";
 import fetchCartedBooks from "./actions/fetchCartedBooks";
 import fetchGenres from "./actions/fetchGenre";
 import GlobalLoadingBar from "@/components/GlobalLoadingBar";
+import fetchBooksHome from "./actions/fetchBooksHome";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -22,6 +23,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const dataCategories = await fetchCategory();
   const dataCartedBooks = await fetchCartedBooks();
   const dataGenres = await fetchGenres();
+  const dataBooks = await fetchBooksHome({
+    isRecomend: true,
+  });
 
   return (
     <html lang="en">
@@ -34,6 +38,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             dataCartedBooks={dataCartedBooks}
             isAuthPageTampil={false}
             dataGenres={dataGenres}
+            dataBooks={dataBooks?.results}
           >
             {children}
           </AppLayout>

@@ -119,6 +119,7 @@ module.exports = {
       stockAvailble = true,
       search, // Search by title or author
       status,
+      isRecomend,
     } = req.query;
 
     const filters = {};
@@ -153,6 +154,9 @@ module.exports = {
 
     if (!stockAvailble) {
       filters.stockAvailble = false;
+    }
+    if (isRecomend) {
+      filters.isRecomend;
     }
 
     // Filter by price range
@@ -311,11 +315,16 @@ module.exports = {
       page = 1,
       limit = 10,
       status,
+      isRecomend,
     } = req.query;
 
     const filters = {};
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+
+    if (isRecomend) {
+      filters.isRecomend = true;
     }
     if (categoryId) filters.categoryId = categoryId;
     if (title) {
@@ -438,7 +447,14 @@ module.exports = {
     }
   },
   async cmsGetAll(req, res) {
-    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
+    const {
+      isPopular,
+      title,
+      categoryId,
+      page = 1,
+      limit = 10,
+      isRecomend,
+    } = req.query;
 
     const filters = {};
     if (isPopular !== undefined) {
@@ -453,6 +469,9 @@ module.exports = {
       ? { ...filters, createdByAdminId: req.id }
       : filters;
 
+    if (isRecomend) {
+      filters.isRecomend = true;
+    }
     const offset = (page - 1) * limit;
     try {
       console.log("userId logined: ", req.id);
