@@ -9,7 +9,7 @@ export interface SearchHistory {
 }
 
 export const KEY = "search-history";
-export const MAX = 10;
+export const MAX = 8;
 
 export const loadHistory = (): SearchHistory[] => {
   return JSON.parse(localStorage.getItem(KEY) || "[]");

@@ -1,24 +1,25 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import Dropdown from "antd/es/dropdown/dropdown";
-import { Badge, Button, Divider, message } from "antd";
+import { Badge, Button, Divider, Empty, message, Spin } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
 import { usePathname, useRouter } from "next/navigation";
-import myAxios from "@/libs/myAxios";
+import myAxios, { API_URL } from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppInput from "./AppInput";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { CiSearch } from "react-icons/ci";
 import { signOut } from "next-auth/react";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import DropdownProfile from "./DropdownProfile";
 import { UserProperties } from "@/types/user.type";
-import { MdOutlineNavigateNext } from "react-icons/md";
+import { MdHistory, MdOutlineNavigateNext } from "react-icons/md";
 import { cn } from "@/libs/cn";
 import useDeviceType from "@/hooks/useDeviceType";
 import { CategoryProps } from "@/types/category.types";
-import { BookProps } from "@/types/books.type";
+import { BookProps, BookStatusType } from "@/types/books.type";
 import MainLogo from "../assets/main-logo.png";
 import Image from "next/image";
 import { GenreProperties } from "@/types/genre.type";
@@ -31,12 +32,14 @@ import {
   SearchHistory,
 } from "@/libs/searchHistoryLibs";
 import CardBookNavbar from "./CardBookNavbar";
+import highlightText from "@/helpers/HighlightText";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
   dataGenres?: GenreProperties[];
   dataBooks?: BookProps[];
+  allBooks?: BookProps[];
 }
 
 export default function Navbar({
@@ -45,6 +48,7 @@ export default function Navbar({
   dataCartedBooks,
   dataGenres,
   dataBooks,
+  allBooks,
 }: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuth();
@@ -52,7 +56,10 @@ export default function Navbar({
   const isMobile = useDeviceType();
   const { isOverlay, setIsOverlay, toggleOverlay } = useOverlayStore();
   const [keyword, setKeyword] = useState("");
+  const [results, setResults] = useState<BookProps[]>([]);
+  const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
   const [history, setHistory] = useState<SearchHistory[]>([]);
+  const [suggestions, setSuggestions] = useState<BookProps[]>([]);
   const [isDisplayRecom, setIsDisplayRecom] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
@@ -197,22 +204,91 @@ export default function Navbar({
     }
   }, [dropCategory, isDisplayRecom, isOverlay]);
 
-  const addHistory = (item: SearchHistory) => {
+  async function fetchBooksSearch(keyword: string) {
+    const params = new URLSearchParams({
+      title: keyword,
+      status: BookStatusType.PUBLISH,
+      page: "1",
+      limit: "10",
+    });
+
+    let url;
+
+    if (auth?.accessToken) {
+      url = `${API_URL}/books?${params}`;
+    } else {
+      url = `${API_URL}/books/common-all?${params}`;
+    }
+
+    const res = await fetch(url, {
+      headers: auth?.accessToken
+        ? { Authorization: `Bearer ${auth?.accessToken}` }
+        : {},
+      cache: "no-store",
+    });
+
+    console.log("res key: ", res);
+
+    return res.json();
+  }
+
+  const addHistory = (keyword: string) => {
+    if (!keyword.trim()) return loadHistory();
+
     const history = loadHistory();
+    const filtered = history.filter((h) => h.keyword !== keyword);
 
-    const filtered = history.filter(
-      (h) =>
-        h.keyword !== item.keyword ||
-        JSON.stringify(h.filters) !== JSON.stringify(item.filters),
-    );
-
-    const newHistory = [{ ...item, searchedAt: Date.now() }, ...filtered].slice(
+    const newHistory = [{ keyword, searchedAt: Date.now() }, ...filtered].slice(
       0,
       MAX,
     );
 
     saveHistory(newHistory);
+    return newHistory;
   };
+
+  useEffect(() => {
+    if (keyword.length < 2) {
+      setSuggestions([]);
+      setIsloading(false);
+      return;
+    }
+
+    setIsloading(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetchBooksSearch(keyword);
+        setSuggestions(res.results || []);
+      } finally {
+        setIsloading(false);
+      }
+    }, 700);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [keyword]);
+
+  const handleSearch = async (value?: string) => {
+    const searchValue = value ?? keyword;
+    if (!searchValue.trim()) return;
+
+    const res = await fetchBooksSearch(searchValue);
+
+    setResults(res.results || []);
+
+    console.log("Res result: ", res.results);
+    setHistory(addHistory(searchValue));
+    setIsDisplayRecom(false);
+    setIsOverlay(false);
+  };
+
+  useEffect(() => {
+    if (results.length > 0) {
+      setResultDispay(<></>);
+    }
+  }, [results]);
 
   return (
     <>
@@ -263,6 +339,7 @@ export default function Navbar({
 
                 <div className="flex gap-3 py-3 px-6 w-full bg-white rounded-[50px] border-white border">
                   <input
+                    defaultValue={keyword}
                     placeholder="Search Books, Blogs, etc"
                     onFocus={() => {
                       (setIsOverlay(true), setIsDisplayRecom(true));
@@ -270,10 +347,15 @@ export default function Navbar({
                     onClick={() => {
                       (setIsOverlay(true), setIsDisplayRecom(true));
                     }}
-                    onChange={() => {
-                      (setIsOverlay(true), setIsDisplayRecom(true));
+                    onChange={(e) => {
+                      (setIsOverlay(true),
+                        setIsDisplayRecom(true),
+                        setKeyword(e.target.value));
                     }}
                     className="w-full outline-0 border-none"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearch();
+                    }}
                   />
                   <SearchOutlined />
                 </div>
@@ -291,11 +373,54 @@ export default function Navbar({
       )}
     `}
                 >
+                  {/* Autocomplete */}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center p-4">
+                      <Spin />
+                    </div>
+                  ) : (
+                    <>
+                      {" "}
+                      {keyword.length > 0 && (
+                        <div className="mt-2">
+                          {suggestions.length > 0 ? (
+                            suggestions.map((book) => (
+                              <div
+                                key={book.id}
+                                className="px-4 py-2 hover:bg-gray-100 rounded-xl cursor-pointer flex items-center gap-5 mb-2"
+                                onClick={() => handleSearch(book.title)}
+                              >
+                                <CiSearch />
+                                <div>{highlightText(book.title, keyword)}</div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="py-6">
+                              <Empty description="Not Found" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {keyword.length === 0 &&
+                    history.map((h, i) => (
+                      <div className="mb-4">
+                        <div
+                          key={i}
+                          className="px-4 py-2 hover:bg-gray-100 rounded-xl flex items-center gap-5 cursor-pointer"
+                          onClick={() => handleSearch(h.keyword)}
+                        >
+                          <MdHistory /> {h.keyword}
+                        </div>
+                      </div>
+                    ))}
                   <h4 className="font-semibold tracking-wide text-xl">
                     Recomended Books
                   </h4>
 
-                  <div className="flex mt-2 justify-between flex-wrap">
+                  <div className="flex mt-2 gap-2 justify-between flex-wrap">
                     {dataBooks?.map((item, index) => (
                       <CardBookNavbar dataBook={item} key={index} />
                     ))}

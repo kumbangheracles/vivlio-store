@@ -28,6 +28,7 @@ interface LayoutProps {
   dataCartedBooks?: BookProps[];
   dataGenres?: GenreProperties[];
   dataBooks?: BookProps[];
+  allBooks?: BookProps[];
 }
 const AppLayout: React.FC<LayoutProps> = ({
   children,
@@ -36,6 +37,7 @@ const AppLayout: React.FC<LayoutProps> = ({
   dataCartedBooks,
   dataGenres,
   dataBooks,
+  allBooks,
 }) => {
   const pathname = usePathname();
   const isMobile = useDeviceType();
@@ -84,6 +86,7 @@ const AppLayout: React.FC<LayoutProps> = ({
                       dataCategories={dataCategories}
                       dataCartedBooks={dataCartedBooks}
                       dataBooks={dataBooks}
+                      allBooks={allBooks}
                     />
                     <WrapperChildren isMobile={isMobile}>
                       <Suspense fallback={<GlobalLoading />}>
