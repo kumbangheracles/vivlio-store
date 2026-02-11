@@ -13,6 +13,16 @@ const useGlobalLoadingBar = () => {
       });
     });
   };
+  const handleReplaceRoute = (
+    url: string,
+    option: { scroll?: boolean } = {},
+  ) => {
+    startTransition(() => {
+      router.replace(url, {
+        scroll: option.scroll ?? false,
+      });
+    });
+  };
 
   useEffect(() => {
     if (isPending) {
@@ -22,7 +32,7 @@ const useGlobalLoadingBar = () => {
     }
   }, [isPending]);
 
-  return { handlePushRoute };
+  return { handlePushRoute, handleReplaceRoute };
 };
 
 export default useGlobalLoadingBar;

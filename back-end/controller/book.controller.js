@@ -25,9 +25,13 @@ module.exports = {
       page = 1,
       status,
       limit = 10,
+      isRecomend,
     } = req.query || {};
 
     const filters = {};
+    if (isRecomend) {
+      filters.isRecomend = true;
+    }
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
     }
@@ -313,7 +317,7 @@ module.exports = {
       title,
       categoryId,
       page = 1,
-      limit = 10,
+      limit,
       status,
       isRecomend,
     } = req.query;
@@ -335,10 +339,12 @@ module.exports = {
     }
 
     const userId = req.id;
+    const parsedLimit = limit ? parseInt(limit) : null;
 
-    const offset = (page - 1) * limit;
+    const offset = (page - 1) * parsedLimit;
     console.log(">>> req.id:", req.id);
     console.log(">>> req.user:", req.user);
+    console.log("search title: ", title);
 
     try {
       console.log("Login as user");
@@ -347,7 +353,7 @@ module.exports = {
         order: isPopular
           ? [[{ model: BookStats, as: "stats" }, "views", "DESC"]]
           : [["createdAt", "DESC"]],
-        limit: parseInt(limit),
+        limit: parsedLimit || undefined,
         include: [
           {
             model: BookImage,
@@ -436,7 +442,7 @@ module.exports = {
         results: results,
         total: count,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
+        totalPages: Math.ceil(count / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({

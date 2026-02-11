@@ -1,10 +1,10 @@
 "use client";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import Dropdown from "antd/es/dropdown/dropdown";
-import { Badge, Button, Divider, Empty, message, Spin } from "antd";
+import { Badge, Empty, message, Spin } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import myAxios, { API_URL } from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppInput from "./AppInput";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { CiSearch } from "react-icons/ci";
 import { signOut } from "next-auth/react";
-import { DownOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import DropdownProfile from "./DropdownProfile";
 import { UserProperties } from "@/types/user.type";
 import { MdHistory, MdOutlineNavigateNext } from "react-icons/md";
@@ -26,6 +26,8 @@ import { GenreProperties } from "@/types/genre.type";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useOverlayStore } from "@/zustand/useOverlay.store";
 import {
+  clearHistory,
+  clearOneHistory,
   loadHistory,
   MAX,
   saveHistory,
@@ -65,8 +67,10 @@ export default function Navbar({
   const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [dropCategory, setIsDropCategory] = useState<boolean>(false);
+  const params = new URLSearchParams();
+
   const [totalLengthCart, setTotalLengthCart] = useState<number>(0);
-  const { handlePushRoute } = useGlobalLoadingBar();
+  const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
   const handleLogout = async () => {
     try {
       setIsloading(true);
@@ -110,13 +114,13 @@ export default function Navbar({
 
   const goToCategory = (categoryName: string, categoryId: string) => {
     const slug = slugify(categoryName);
-    handlePushRoute(`/category/${slug}/${categoryId}`);
+    handleReplaceRoute(`/category/${slug}/${categoryId}`);
 
     setIsDropCategory(false);
   };
   const goToGenre = (genreTitle: string, genreId: string) => {
     const slug = slugify(genreTitle);
-    handlePushRoute(`/genre/${slug}/${genreId}`);
+    handleReplaceRoute(`/genre/${slug}/${genreId}`);
 
     setIsDropCategory(false);
   };
@@ -227,8 +231,6 @@ export default function Navbar({
       cache: "no-store",
     });
 
-    console.log("res key: ", res);
-
     return res.json();
   }
 
@@ -238,14 +240,25 @@ export default function Navbar({
     const history = loadHistory();
     const filtered = history.filter((h) => h.keyword !== keyword);
 
-    const newHistory = [{ keyword, searchedAt: Date.now() }, ...filtered].slice(
-      0,
-      MAX,
-    );
+    const newHistory: SearchHistory[] = [
+      { id: Math.random(), keyword, searchedAt: Date.now() },
+      ...filtered,
+    ].slice(0, MAX);
+
+    console.log("type newHistory: ", newHistory);
 
     saveHistory(newHistory);
     return newHistory;
   };
+
+  // useEffect(() => {
+  //   const history = loadHistory();
+  //   console.log("History: ", history);
+
+  //   if (history.length > 4) {
+  //     history.pop();
+  //   }
+  // }, [loadHistory()]);
 
   useEffect(() => {
     if (keyword.length < 2) {
@@ -276,12 +289,18 @@ export default function Navbar({
 
     const res = await fetchBooksSearch(searchValue);
 
+    params.set("key", searchValue as string);
+    handleReplaceRoute(`/search-books?${params.toString()}`);
     setResults(res.results || []);
 
-    console.log("Res result: ", res.results);
     setHistory(addHistory(searchValue));
     setIsDisplayRecom(false);
     setIsOverlay(false);
+  };
+
+  const deleteOneHistory = (id: number) => {
+    clearOneHistory(id);
+    setHistory(loadHistory());
   };
 
   useEffect(() => {
@@ -380,7 +399,6 @@ export default function Navbar({
                     </div>
                   ) : (
                     <>
-                      {" "}
                       {keyword.length > 0 && (
                         <div className="mt-2">
                           {suggestions.length > 0 ? (
@@ -404,25 +422,50 @@ export default function Navbar({
                     </>
                   )}
 
-                  {keyword.length === 0 &&
-                    history.map((h, i) => (
-                      <div className="mb-4">
+                  {/* History */}
+                  {keyword.length === 0 && history.length > 0 && (
+                    <div className="mb-4 relative">
+                      <div className="flex justify-between items-center">
+                        <h4 className=" font-semibold tracking-wide text-xl">
+                          Search History
+                        </h4>
+                        <h4
+                          className="font-medium cursor-pointer underline text-sm tracking-wide"
+                          onClick={() => {
+                            (clearHistory(), setHistory([]));
+                          }}
+                        >
+                          Clear History
+                        </h4>
+                      </div>
+                      {history.map((h, i) => (
                         <div
                           key={i}
-                          className="px-4 py-2 hover:bg-gray-100 rounded-xl flex items-center gap-5 cursor-pointer"
+                          className="px-4 py-2 hover:bg-gray-100 rounded-xl flex items-center justify-between cursor-pointer"
                           onClick={() => handleSearch(h.keyword)}
                         >
-                          <MdHistory /> {h.keyword}
+                          <div className="flex items-center gap-5">
+                            <MdHistory /> <h4>{h.keyword}</h4>
+                          </div>
+
+                          <CloseOutlined
+                            onClick={(e) => {
+                              (clearOneHistory(h.id),
+                                deleteOneHistory(h.id),
+                                e.stopPropagation());
+                            }}
+                          />
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  )}
                   <h4 className="font-semibold tracking-wide text-xl">
                     Recomended Books
                   </h4>
 
                   <div className="flex mt-2 gap-2 justify-between flex-wrap">
-                    {dataBooks?.map((item, index) => (
-                      <CardBookNavbar dataBook={item} key={index} />
+                    {dataBooks?.map((item) => (
+                      <CardBookNavbar dataBook={item} key={item.id} />
                     ))}
                   </div>
                 </div>

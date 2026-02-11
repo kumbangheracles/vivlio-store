@@ -1,27 +1,20 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Row,
-  Col,
   Card,
-  Modal,
   Button,
   Form,
   Input,
   Divider,
-  Menu,
   Select,
   Flex,
   message,
-  InputNumber,
 } from "antd";
 import styled from "styled-components";
-import { InputOTP } from "antd-input-otp";
 import { initialUser, type UserProperties } from "../../../types/user.type";
 import {
   FacebookFilled,
   GoogleCircleFilled,
-  InstagramFilled,
   LoadingOutlined,
   TwitterCircleFilled,
 } from "@ant-design/icons";
@@ -33,11 +26,13 @@ import { RoleProperties } from "../../../types/role.type";
 import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 const RegisterForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<EUserRole | null>(null);
   const [user, setUser] = useState<UserProperties>(initialUser);
   const [dataRole, setDataRole] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
   const isEmpty = (val?: string) =>
     !val || val.trim() === "" || val === undefined;
   const isEmptyRole = (val: number | string) => !val;
@@ -64,7 +59,7 @@ const RegisterForm: React.FC = () => {
   useEffect(() => {
     if (Array.isArray(dataRole) && dataRole.length > 0) {
       const customerRole = dataRole.find(
-        (role: RoleProperties) => role.name === "customer"
+        (role: RoleProperties) => role.name === "customer",
       );
 
       if (customerRole) {
@@ -93,14 +88,14 @@ const RegisterForm: React.FC = () => {
       localStorage.setItem("email", body.email!);
       const res = await myAxios.post("/auth/register", body);
       if (res) {
-        navigate.push("/auth/register/verification-code");
+        handlePushRoute("/auth/register/verification-code");
       }
       console.log("Data terkirim: ", res.data);
 
       // setUser(res.data);
 
       message.success(
-        "Success Registration! Please check your email for verification code."
+        "Success Registration! Please check your email for verification code.",
       );
     } catch (error) {
       ErrorHandler(error);
@@ -342,7 +337,7 @@ const RegisterForm: React.FC = () => {
             <p>Already have account?</p>
             <p
               style={{ color: "#7badff", cursor: "pointer" }}
-              onClick={() => navigate.push("/auth/login")}
+              onClick={() => handlePushRoute("/auth/login")}
             >
               Sign In
             </p>

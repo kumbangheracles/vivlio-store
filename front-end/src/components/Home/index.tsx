@@ -13,7 +13,9 @@ import { ArticleProperties } from "@/types/article.type";
 import { useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useMounted } from "@/hooks/useMounted";
+import { redirect } from "next/navigation";
 import GlobalLoading from "../GlobalLoading";
+import { useAuth } from "@/hooks/useAuth";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -23,7 +25,6 @@ interface PropTypes {
 }
 
 export default function HomePage(prop: PropTypes) {
-  const router = useRouter();
   const { handlePushRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
   const recentPopularBook = prop.dataBooks

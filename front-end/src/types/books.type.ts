@@ -13,7 +13,7 @@ export interface BookFilters {
 }
 
 export interface BookParams {
-  search?: string;
+  title?: string;
   page?: number;
   limit?: number;
   status?: BookStatusType;

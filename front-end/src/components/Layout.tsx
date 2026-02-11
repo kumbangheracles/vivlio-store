@@ -67,8 +67,6 @@ const AppLayout: React.FC<LayoutProps> = ({
     };
   }, []);
 
-  console.log("isoverlay:", isOverlay);
-
   return (
     <>
       <ConfigProvider>

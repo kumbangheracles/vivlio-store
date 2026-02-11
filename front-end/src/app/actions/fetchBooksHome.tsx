@@ -7,6 +7,8 @@ import { BaseResponBook } from "@/types/base.type";
 async function fetchBooksHome({
   status = BookStatusType.PUBLISH,
   isRecomend = false,
+  title = "",
+  limit = 0,
 }: BookParams = {}): Promise<BaseResponBook<BookProps>> {
   const session = await getServerSession(authOptions);
 
@@ -20,6 +22,15 @@ async function fetchBooksHome({
     if (isRecomend) {
       params.append("isRecomend", isRecomend.toString());
     }
+
+    if (title) {
+      params.append("title", title);
+    }
+
+    if (limit) {
+      params.append("limit", limit.toString());
+    }
+
     const res = await fetch(`${API_URL}${url}?${params}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
       cache: "no-store",

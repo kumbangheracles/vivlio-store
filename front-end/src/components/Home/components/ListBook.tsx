@@ -271,13 +271,13 @@ const ListBook: React.FC<BookTypes> = ({
       ) : (
         <>
           {/* Desktop */}
-          <div
-            className={`mt-10 pt-4 rounded-md ${cn(
-              isCategory || isGenre ? "bg-gray-200" : "bg-white",
-            )}`}
-          >
-            {dataBooks!?.length > 0 ? (
-              <>
+          {dataBooks!?.length > 0 ? (
+            <>
+              <div
+                className={`mt-10 pt-4 rounded-md ${cn(
+                  isCategory || isGenre ? "bg-gray-50" : "bg-white",
+                )}`}
+              >
                 <div className="flex justify-between">
                   <div>
                     <TitleList>{titleSection}</TitleList>
@@ -401,9 +401,11 @@ const ListBook: React.FC<BookTypes> = ({
                     </>
                   </ListBookWrapper>
                 </Suspense>
-              </>
-            ) : (
-              <>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={`mt-10 pt-4 rounded-md `}>
                 <TitleList>{titleSection}</TitleList>
                 <Result
                   status="404"
@@ -416,9 +418,9 @@ const ListBook: React.FC<BookTypes> = ({
                         : "There are no books related"
                   }
                 />
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </>

@@ -29,6 +29,7 @@ const CardBookNavbar = ({ dataBook }: PropTypes) => {
     <div
       className="flex items-start gap-2 bg-gray-50 rounded-xl p-2 w-[230px] cursor-pointer hover:bg-gray-200 transition-all"
       onClick={() => goToDetail(dataBook?.id as string)}
+      key={dataBook.id}
     >
       <div className="w-[80px] h-[100px] overflow-hidden rounded-xl shrink-0">
         <Image
@@ -60,8 +61,11 @@ const CardBookNavbar = ({ dataBook }: PropTypes) => {
             <h4 className="font-normal text-[12px] mr-1 text-gray-500 shrink-0">
               Genre:
             </h4>
-            {dataBook?.genres?.slice(0, 4).map((item) => (
-              <h4 className="text-[10px] p-[2px] bg-white rounded-md border-gray-300 cursor-pointer hover:bg-sky-50 transition-all border">
+            {dataBook?.genres?.slice(0, 4).map((item, index) => (
+              <h4
+                key={`${item.genre_title}-${index}`}
+                className="text-[10px] p-[2px] bg-white rounded-md border-gray-300 cursor-pointer hover:bg-sky-50 transition-all border"
+              >
                 {item?.genre_title}
               </h4>
             ))}

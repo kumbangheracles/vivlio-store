@@ -10,6 +10,7 @@ import {
   TwitterCircleFilled,
 } from "@ant-design/icons";
 import styled from "styled-components";
+import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 
 interface LoginFormState {
   identifier: string;
@@ -26,6 +27,7 @@ const LoginForm: React.FC = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
+  const { handleReplaceRoute, handlePushRoute } = useGlobalLoadingBar();
 
   const [formState, setFormState] = useState<LoginFormState>({
     identifier: "herkalsuper@admin.com",
@@ -56,7 +58,7 @@ const LoginForm: React.FC = () => {
         const session = await getSession();
         console.log("Login successful:", session);
         message.success("Login Success, Welcome to ViviBook!!.");
-        navigate.push("/");
+        handleReplaceRoute("/");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -204,7 +206,7 @@ const LoginForm: React.FC = () => {
             <p>Don't have account?</p>
             <p
               style={{ color: "#7badff", cursor: "pointer" }}
-              onClick={() => navigate.push("/auth/register")}
+              onClick={() => handlePushRoute("/auth/register")}
             >
               Sign Up
             </p>
