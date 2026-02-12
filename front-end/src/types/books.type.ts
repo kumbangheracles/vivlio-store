@@ -18,6 +18,10 @@ export interface BookParams {
   limit?: number;
   status?: BookStatusType;
   isRecomend?: boolean;
+  sortDate?: string;
+  sortPrice?: number;
+  categoryId?: string;
+  onlyAvailable?: boolean;
 }
 export type BookProps = {
   id?: string;

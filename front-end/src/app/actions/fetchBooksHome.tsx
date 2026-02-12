@@ -9,6 +9,10 @@ async function fetchBooksHome({
   isRecomend = false,
   title = "",
   limit = 0,
+  sortDate = "",
+  sortPrice = -1,
+  categoryId = "",
+  onlyAvailble = false,
 }: BookParams = {}): Promise<BaseResponBook<BookProps>> {
   const session = await getServerSession(authOptions);
 
@@ -17,6 +21,7 @@ async function fetchBooksHome({
     const url = accessToken ? "/books" : "/books/common-all";
     const params = new URLSearchParams({
       status: status,
+      onlyAvailble: onlyAvailble.toString(),
     });
 
     if (isRecomend) {
@@ -31,14 +36,26 @@ async function fetchBooksHome({
       params.append("limit", limit.toString());
     }
 
+    if (sortDate) {
+      params.append("sortDate", sortDate);
+    }
+    if (sortPrice) {
+      params.append("sortPrice", sortPrice.toString());
+    }
+    if (categoryId) {
+      params.append("categoryId", categoryId.toString());
+    }
+
     const res = await fetch(`${API_URL}${url}?${params}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
       cache: "no-store",
     });
 
+    const data = res.json();
+
     console.log("Res: ", res);
 
-    return res.json();
+    return data;
   } catch (err) {
     console.log("fetchBooks error:", err);
     throw err;

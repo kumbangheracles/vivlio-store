@@ -86,6 +86,14 @@ const Books = () => {
       return;
     }
 
+    const bookWithRecom = dataBooks?.filter(
+      (item) => item.isRecomend === false,
+    );
+
+    if (bookWithRecom.length > 4) {
+      message.error("Only 4 book can be recomend");
+      return;
+    }
     try {
       setloading(true);
 

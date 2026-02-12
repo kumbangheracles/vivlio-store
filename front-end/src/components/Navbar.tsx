@@ -309,6 +309,12 @@ export default function Navbar({
     }
   }, [results]);
 
+  useEffect(() => {
+    if (path === "/") {
+      params.set("key", "");
+    }
+  }, [router]);
+
   return (
     <>
       {(isMobile && path === "/cart") ||

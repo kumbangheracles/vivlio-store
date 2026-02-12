@@ -17,7 +17,10 @@ const SearchBookIndex = ({ dataBooks, shown, total }: PropTypes) => {
   return (
     <div className="w-full p-4 mt-[-20px]">
       <ListBook
-        isCategory
+        isDisplayFilter={true}
+        isCategory={false}
+        isGenre={false}
+        isSearch={true}
         dataBooks={dataBooks}
         titleSection={`Showing ${shown} of ${total} search results for "${key}"`}
       />
@@ -33,9 +36,4 @@ export const TitleList = styled.h4`
   text-align: start;
   margin-bottom: 10px;
   margin-left: 50px;
-`;
-
-const ListBookWrapper = styled.div`
-  padding: 5px;
-  margin: 0rem 2rem;
 `;

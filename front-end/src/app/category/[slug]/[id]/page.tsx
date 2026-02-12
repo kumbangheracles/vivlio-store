@@ -1,8 +1,6 @@
 import { Metadata } from "next";
 import ListBook from "@/components/Home/components/ListBook";
 import deslugify from "@/libs/deslugyfy";
-import fetchBookClient from "@/app/actions/fetchBookClient";
-import { BookFilters } from "@/types/books.type";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 interface PageProps {
   params: { id: string; slug: string };
@@ -12,6 +10,9 @@ interface PageProps {
     minPrice?: string;
     maxPrice?: string;
     page?: string;
+    key?: string;
+    sortDate?: string;
+    sortPrice?: number;
   };
 }
 
@@ -26,20 +27,18 @@ export async function generateMetadata({
 }
 
 const CategoryPage = async ({ params, searchParams }: PageProps) => {
-  // const filterOptions: BookFilters = {
-  //   id: params.id,
-  //   search: searchParams.search,
-  //   sortBy: searchParams.sortBy as any,
-  //   minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
-  //   maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
-  //   page: searchParams.page ? Number(searchParams.page) : 1,
-  //   limit: 20,
-  // };
+  const sortDate = searchParams?.sortDate;
+  const sortPrice = searchParams?.sortPrice;
 
-  const dataBooks = await fetchBooksHome();
-  const filteredBooksByCategoryId = dataBooks?.results.filter(
-    (item) => item.categoryId === params.id,
-  );
+  const dataBooks = await fetchBooksHome({
+    limit: 12,
+    sortPrice: sortPrice,
+    sortDate: sortDate,
+    categoryId: params.id,
+  });
+
+  const total = dataBooks.total;
+  const shown = dataBooks.results?.length;
 
   const titleList = deslugify(params.slug);
 
@@ -47,8 +46,8 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
     <div className="w-full p-4 mt-[-20px]">
       <ListBook
         isCategory={true}
-        dataBooks={filteredBooksByCategoryId}
-        titleSection={titleList}
+        dataBooks={dataBooks?.results}
+        titleSection={`Showing ${shown} of ${total} search results for "${titleList}"`}
         isSeeAll={false}
         isDisplayFilter={true}
         isDisplayStockable={true}

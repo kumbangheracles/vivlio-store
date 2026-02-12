@@ -13,7 +13,7 @@ const {
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
 const { sequelize } = require("../config/database");
-const { Op } = require("sequelize");
+const { Op, or } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 
 module.exports = {
@@ -24,13 +24,23 @@ module.exports = {
       categoryId,
       page = 1,
       status,
-      limit = 10,
+      limit,
+      sortPrice,
+      sortDate,
       isRecomend,
+      onlyAvailable,
     } = req.query || {};
+    const parsedLimit = limit ? parseInt(limit) : null;
+    const parsedSortPrice = parseInt(sortPrice);
 
     const filters = {};
     if (isRecomend) {
       filters.isRecomend = true;
+    }
+    if (onlyAvailable === "true") {
+      filters.quantity = {
+        [Op.gt]: 0,
+      };
     }
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
@@ -42,11 +52,37 @@ module.exports = {
     if (status) {
       filters.status = status;
     }
-    const offset = (page - 1) * limit;
+    const offset = (page - 1) * parsedLimit;
+
+    console.log("Limit common: ", parsedLimit);
+    console.log("isPopular Common: ", isPopular);
     try {
-      const { count, rows } = await Book.findAndCountAll({
-        limit: parseInt(limit),
+      const total = await Book.count({
         where: filters,
+      });
+
+      const order = [];
+
+      if (parsedSortPrice) {
+        order.push(["price", parsedSortPrice === 1 ? "ASC" : "DESC"]);
+      }
+
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
+
+      if (isPopular) {
+        order.push([{ model: BookStats, as: "stats" }, "views", "DESC"]);
+      }
+      console.log("order:", order);
+      const rows = await Book.findAll({
+        limit: parsedLimit,
+        where: filters,
+        order: order,
         include: [
           {
             model: BookImage,
@@ -97,9 +133,9 @@ module.exports = {
         status: 200,
         message: "Success",
         results: rows,
-        total: count,
+        total: total,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
+        totalPages: Math.ceil(total / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({
@@ -320,7 +356,12 @@ module.exports = {
       limit,
       status,
       isRecomend,
+      sortPrice,
+      onlyAvailable,
+      sortDate = "",
     } = req.query;
+
+    const parsedSortPrice = parseInt(sortPrice);
 
     const filters = {};
     if (isPopular !== undefined) {
@@ -337,7 +378,11 @@ module.exports = {
     if (status) {
       filters.status = status;
     }
-
+    if (onlyAvailable === "true") {
+      filters.quantity = {
+        [Op.gt]: 0,
+      };
+    }
     const userId = req.id;
     const parsedLimit = limit ? parseInt(limit) : null;
 
@@ -345,14 +390,34 @@ module.exports = {
     console.log(">>> req.id:", req.id);
     console.log(">>> req.user:", req.user);
     console.log("search title: ", title);
+    console.log("isPopular:", isPopular);
+    console.log("Login as user");
 
     try {
-      console.log("Login as user");
-      const { count, rows } = await Book.findAndCountAll({
+      const order = [];
+
+      if (parsedSortPrice) {
+        order.push(["price", parsedSortPrice === 1 ? "ASC" : "DESC"]);
+      }
+
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
+
+      if (isPopular) {
+        order.push([{ model: BookStats, as: "stats" }, "views", "DESC"]);
+      }
+
+      const total = await Book.count({
         where: filters,
-        order: isPopular
-          ? [[{ model: BookStats, as: "stats" }, "views", "DESC"]]
-          : [["createdAt", "DESC"]],
+      });
+      const rows = await Book.findAll({
+        where: filters,
+        order: order,
         limit: parsedLimit || undefined,
         include: [
           {
@@ -440,9 +505,9 @@ module.exports = {
         status: 200,
         message: "Success",
         results: results,
-        total: count,
+        total: total,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(count / parsedLimit),
+        totalPages: Math.ceil(total / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({
@@ -736,11 +801,10 @@ module.exports = {
         return res.status(404).json({ message: "Book not found" });
       }
 
-      const { title, author, price, book_type, isPopular, categoryId } =
-        req.body;
+      // const { title, author, price, book_type, isPopular, categoryId } =
+      //   req.body;
       let images = req.body.images;
-      let genreIds = req.body.genres;
-
+      // let genreIds = req.body.genres;
       // Update book utama
       await Book.update(req.body, {
         where: { id },

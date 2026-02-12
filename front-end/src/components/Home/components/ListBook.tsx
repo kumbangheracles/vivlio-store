@@ -10,6 +10,7 @@ import { BookWithWishlist } from "@/types/wishlist.type";
 import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
 import FadeUpWrapper from "../FadeUpWrapper";
+import useBooks, { FilterBooksSort } from "@/hooks/useBooks";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -22,6 +23,7 @@ interface BookTypes {
   isDisplayFilter?: boolean;
   isDisplayOnlyAvailbleStock?: boolean;
   isDisplayStockable?: boolean;
+  isSearch?: boolean;
 }
 type OptionType = "newest" | "oldest" | "highest_price" | "lowest_price";
 type StockOption = "all" | "available";
@@ -36,11 +38,21 @@ const ListBook: React.FC<BookTypes> = ({
   isGenre = false,
   isDisplayFilter = false,
   isDisplayOnlyAvailbleStock = false,
+  isSearch = false,
 }) => {
   const isMobile = useDeviceType();
   const [isDisplayStock, setDisplayStock] = useState<boolean>(
     isDisplayOnlyAvailbleStock,
   );
+
+  const {
+    handleLoadMore,
+    hasMore,
+    isPending,
+    loadingMore,
+    sort,
+    updateFilters,
+  } = useBooks({ dataBooks });
 
   const [selectOption, setSelectedOption] = useState<OptionType>("newest");
   const toTime = (date?: Date | string) => {
@@ -58,32 +70,6 @@ const ListBook: React.FC<BookTypes> = ({
     }
   };
 
-  const filteredDataBooks = useMemo(() => {
-    if (!dataBooks) return [];
-
-    const stockedBooks = isDisplayStock
-      ? (dataBooks?.filter((item) => item.quantity !== 0) ?? [])
-      : (dataBooks ?? []);
-
-    const sorted = [...stockedBooks];
-
-    switch (selectOption) {
-      case "newest":
-        return sorted.sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt));
-
-      case "oldest":
-        return sorted.sort((a, b) => toTime(a.createdAt) - toTime(b.createdAt));
-
-      case "highest_price":
-        return sorted.sort((a, b) => b.price - a.price);
-
-      case "lowest_price":
-        return sorted.sort((a, b) => a.price - b.price);
-
-      default:
-        return sorted;
-    }
-  }, [dataBooks, selectOption, isDisplayStock]);
   useEffect(() => {
     setDisplayStock(isDisplayOnlyAvailbleStock);
   }, [isDisplayOnlyAvailbleStock]);
@@ -138,8 +124,8 @@ const ListBook: React.FC<BookTypes> = ({
         <>
           {/* Mobile */}
           <div className="mt-3 pt-2 bg-gray-100 rounded-md">
-            <div className="flex justify-between pl-3 pt-2">
-              <h4 className="font-semibold tracking-wider text-[16px] px-2">
+            <div className="flex justify-between pl-3 pt-2 flex-col">
+              <h4 className="font-semibold tracking-wider text-[13px] text-center px-2">
                 {titleSection}
               </h4>
 
@@ -150,8 +136,9 @@ const ListBook: React.FC<BookTypes> = ({
               )}
 
               {isDisplayFilter && (
-                <div className="flex flex-wrap gap-2 px-2 text-[11px] tracking-wider w-[150px]">
+                <div className="flex  gap-2 px-2 text-[11px] tracking-wider w-full mt-3">
                   <Select
+                    style={{ height: 30 }}
                     size="small"
                     className="w-full sm:w-auto"
                     value={stockSelectValue}
@@ -163,16 +150,30 @@ const ListBook: React.FC<BookTypes> = ({
                   />
 
                   <Select
+                    style={{ height: 30 }}
                     size="small"
                     className="w-full sm:w-auto"
-                    value={selectOption}
+                    value={sort}
+                    placeholder={"Filter"}
                     options={[
-                      { value: "newest", label: "Newest" },
-                      { value: "oldest", label: "Oldest" },
-                      { value: "highest_price", label: "Highest Price" },
-                      { value: "lowest_price", label: "Lowest Price" },
+                      {
+                        value: "newest_saved",
+                        label: "Newest",
+                      },
+                      {
+                        value: "oldest_saved",
+                        label: "Oldest",
+                      },
+                      {
+                        value: "price_asc",
+                        label: "Lowest Price",
+                      },
+                      {
+                        value: "price_desc",
+                        label: "Highest Price",
+                      },
                     ]}
-                    onChange={(value: OptionType) => setSelectedOption(value)}
+                    onChange={(value: FilterBooksSort) => updateFilters(value)}
                   />
                 </div>
               )}
@@ -183,8 +184,8 @@ const ListBook: React.FC<BookTypes> = ({
                 <>
                   {isCategory || isGenre ? (
                     <>
-                      {filteredDataBooks && filteredDataBooks.length > 0 ? (
-                        filteredDataBooks.map((item, index) => (
+                      {dataBooks && dataBooks.length > 0 ? (
+                        dataBooks.map((item, index) => (
                           <FadeUpWrapper delay={index * 100} key={item.id}>
                             <CardBook
                               title={item?.title}
@@ -275,7 +276,7 @@ const ListBook: React.FC<BookTypes> = ({
             <>
               <div
                 className={`mt-10 pt-4 rounded-md ${cn(
-                  isCategory || isGenre ? "bg-gray-50" : "bg-white",
+                  isCategory || isGenre || isSearch ? "bg-gray-50" : "bg-white",
                 )}`}
               >
                 <div className="flex justify-between">
@@ -287,37 +288,46 @@ const ListBook: React.FC<BookTypes> = ({
                     <div className=" flex gap-2.5 mr-[50px]">
                       <Select
                         className="ml-[50px]"
+                        loading={isPending}
+                        placeholder="Filter Stock"
                         style={{ minWidth: 150 }}
-                        value={stockSelectValue}
+                        value={sort}
                         options={[
-                          { value: "all", label: "All Stock" },
-                          { value: "available", label: "Stock Available Only" },
+                          { value: "all_stock", label: "All Stock" },
+                          {
+                            value: "only_available",
+                            label: "Stock Available Only",
+                          },
                         ]}
-                        onChange={handleStockChange}
+                        onChange={(value: FilterBooksSort) =>
+                          updateFilters(value)
+                        }
                       />
                       <Select
+                        loading={isPending}
                         style={{ minWidth: 140 }}
-                        value={selectOption}
+                        value={sort}
+                        placeholder={"Filter"}
                         options={[
                           {
-                            value: "newest",
+                            value: "newest_saved",
                             label: "Newest",
                           },
                           {
-                            value: "oldest",
+                            value: "oldest_saved",
                             label: "Oldest",
                           },
                           {
-                            value: "highest_price",
-                            label: "Highest Price",
-                          },
-                          {
-                            value: "lowest_price",
+                            value: "price_asc",
                             label: "Lowest Price",
                           },
+                          {
+                            value: "price_desc",
+                            label: "Highest Price",
+                          },
                         ]}
-                        onChange={(value: OptionType) =>
-                          setSelectedOption(value)
+                        onChange={(value: FilterBooksSort) =>
+                          updateFilters(value)
                         }
                       />
                     </div>
@@ -326,14 +336,14 @@ const ListBook: React.FC<BookTypes> = ({
                 <Suspense fallback={<GlobalLoading />}>
                   <ListBookWrapper
                     className={`flex flex-wrap gap-5 justify-center ${cn(
-                      isCategory || isGenre ? "!pt-5 !pb-10" : "",
+                      isCategory || isGenre || isSearch ? "!pt-5 !pb-10" : "",
                     )}`}
                   >
                     <>
                       {isCategory || isGenre ? (
                         <>
-                          {filteredDataBooks && filteredDataBooks.length > 0 ? (
-                            filteredDataBooks.map((item, index) => (
+                          {dataBooks && dataBooks.length > 0 ? (
+                            dataBooks.map((item, index) => (
                               <FadeUpWrapper delay={index * 100} key={item.id}>
                                 <CardBook
                                   title={item?.title}
