@@ -4,7 +4,8 @@ import Dropdown from "antd/es/dropdown/dropdown";
 import { Badge, Empty, message, Spin } from "antd";
 import { styled } from "styled-components";
 import { Modal } from "antd";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { GoArrowLeft } from "react-icons/go";
+import { usePathname, useRouter } from "next/navigation";
 import myAxios, { API_URL } from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import AppInput from "./AppInput";
@@ -56,8 +57,7 @@ export default function Navbar({
   const auth = useAuth();
   const router = useRouter();
   const isMobile = useDeviceType();
-  const { isOverlay, setIsOverlay, toggleOverlay } = useOverlayStore();
-  const [keyword, setKeyword] = useState("");
+  const { isOverlay, setIsOverlay, toggleOverlay, keyword, setKeyword } = useOverlayStore();
   const [results, setResults] = useState<BookProps[]>([]);
   const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
   const [history, setHistory] = useState<SearchHistory[]>([]);
@@ -588,10 +588,21 @@ export default function Navbar({
           </div>
 
           {/* Mobile */}
-          <div className=" sm:hidden flex justify-between items-center px-5 md:px-[100px] py-3">
+          <div
+            className={`sm:hidden flex justify-between items-center ${cn(isMobile && path === "/search-books-mobile" ? "px-2" : "px-5")} w-full md:px-[100px] py-3`}
+          >
             {/* Logo */}
 
-            <div className="input-search-navbar w-full sm:w-[70%] mr-4">
+            {isMobile && path === "/search-books-mobile" && (
+              <GoArrowLeft
+                size={25}
+                className="mx-1"
+                onClick={() => router.back()}
+              />
+            )}
+            <div
+              className={`input-search-navbar w-full sm:w-[70%] ${cn(isMobile && path === "/search-books-mobile" ? "mr-0" : "mr-4")}`}
+            >
               <AppInput
                 prefix={<SearchOutlined />}
                 placeholder="Search Books, Blogs, etc"
@@ -601,8 +612,20 @@ export default function Navbar({
                   borderRadius: 15,
                   letterSpacing: 1,
                 }}
+                onChange={(e) => {
+                  (setIsDisplayRecom(true), setKeyword(e.target.value));
+                }}
+                onClick={() => {
+                  if (path === "/search-books-mobile") return;
+                  handlePushRoute("/search-books-mobile");
+                }}
+                className="w-full outline-0 border-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
               />
             </div>
+
             {/* Desktop Menu */}
 
             <div className="hidden md:flex justify-around items-center gap-5">
@@ -640,6 +663,7 @@ export default function Navbar({
               </div>
 
               {/* Cart */}
+
               <div
                 className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
                 onClick={() => goToCart()}
@@ -654,7 +678,7 @@ export default function Navbar({
               </div>
             </div>
 
-            {isMobile && (
+            {isMobile && path !== "/search-books-mobile" && (
               <div
                 className="flex items-center justify-center w-[30px] h-[30px] cursor-pointer border rounded-full p-1 border-white hover:border-black transition-all"
                 onClick={() => goToCart()}
@@ -690,26 +714,6 @@ export default function Navbar({
     </>
   );
 }
-
-const BottomNavbar = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  font-size: 12px;
-  --tw-tracking: var(--tracking-widest);
-  letter-spacing: var(--tracking-widest);
-  justify-content: space-around;
-  background-color: #d9eafd;
-  font-weight: 700;
-  text-decoration: none;
-  font-family: "Poppins", sans-serif;
-  width: 100%;
-  li {
-    text-decoration: none;
-    list-style: none;
-    position: relative;
-  }
-`;
 
 interface linkProps {
   isBlue?: boolean;

@@ -27,7 +27,7 @@ const CardBookNavbar = ({ dataBook }: PropTypes) => {
   };
   return (
     <div
-      className="flex items-start gap-2 bg-gray-50 rounded-xl p-2 w-[230px] cursor-pointer hover:bg-gray-200 transition-all"
+      className="flex items-start gap-2 bg-gray-50 rounded-xl p-2 w-full sm:w-[230px] cursor-pointer hover:bg-gray-200 transition-all"
       onClick={() => goToDetail(dataBook?.id as string)}
       key={dataBook.id}
     >

@@ -17,6 +17,7 @@ const SearchBookIndex = ({ dataBooks, shown, total }: PropTypes) => {
   return (
     <div className="w-full p-4 mt-[-20px]">
       <ListBook
+        isSeeAll={false}
         isDisplayFilter={true}
         isCategory={false}
         isGenre={false}
