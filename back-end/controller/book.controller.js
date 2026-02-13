@@ -22,6 +22,7 @@ module.exports = {
       isPopular,
       title,
       categoryId,
+      genreId,
       page = 1,
       status,
       limit,
@@ -32,6 +33,8 @@ module.exports = {
     } = req.query || {};
     const parsedLimit = limit ? parseInt(limit) : null;
     const parsedSortPrice = parseInt(sortPrice);
+    console.log("onlyAvailble:", onlyAvailable);
+    console.log("Full query:", req.query);
 
     const filters = {};
     if (isRecomend) {
@@ -46,6 +49,7 @@ module.exports = {
       filters.isPopular = isPopular === "true" || isPopular === "1";
     }
     if (categoryId) filters.categoryId = categoryId;
+
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
     }
@@ -94,6 +98,10 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
+            ...(genreId && {
+              where: { genreid: genreId },
+              required: true,
+            }),
           },
           {
             model: BookReview,
@@ -352,17 +360,18 @@ module.exports = {
       isPopular,
       title,
       categoryId,
+      genreId,
       page = 1,
       limit,
       status,
       isRecomend,
       sortPrice,
-      onlyAvailable,
+      onlyAvailable = "",
       sortDate = "",
     } = req.query;
 
     const parsedSortPrice = parseInt(sortPrice);
-
+    console.log("Full Query: ", req.query);
     const filters = {};
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
@@ -372,6 +381,7 @@ module.exports = {
       filters.isRecomend = true;
     }
     if (categoryId) filters.categoryId = categoryId;
+
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
     }
@@ -430,6 +440,10 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
+            ...(genreId && {
+              where: { genreid: genreId },
+              required: true,
+            }),
           },
           {
             model: BookReview,
@@ -747,6 +761,7 @@ module.exports = {
           description: req.body.description,
           isPopular: req.body.isPopular || false,
           categoryId: req.body.categoryId || null,
+          quantity: req.body.quantity || 0,
           createdByAdminId: req.id,
         },
         { transaction: t },

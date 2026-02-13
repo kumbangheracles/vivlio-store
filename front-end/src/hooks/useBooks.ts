@@ -1,3 +1,4 @@
+"use client";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import { useState, useTransition, useEffect } from "react";
@@ -11,7 +12,7 @@ export type FilterBooksSort =
   | "newest_saved"
   | "oldest_saved"
   | "all_stock"
-  | "only_availble"
+  | "only_available"
   | null;
 
 interface PropTypes {
@@ -19,6 +20,7 @@ interface PropTypes {
 }
 const useBooks = ({ dataBooks }: PropTypes) => {
   const [sort, setSort] = useState<FilterBooksSort>(null);
+  const [sortStock, setSortStock] = useState<FilterBooksSort>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -74,7 +76,7 @@ const useBooks = ({ dataBooks }: PropTypes) => {
     }
     params.delete("sortPrice");
     params.delete("sortDate");
-    params.delete("onlyAvailable");
+    // params.delete("onlyAvailable");
     switch (value) {
       case "price_asc":
         params.set("sortPrice", "1");
@@ -91,12 +93,12 @@ const useBooks = ({ dataBooks }: PropTypes) => {
       case "oldest_saved":
         params.set("sortDate", "oldest_saved");
         break;
-      case "all_stock":
-        params.set("onlyAvailable", "false");
-        break;
-      case "only_availble":
-        params.set("onlyAvailable", "true");
-        break;
+      // case "all_stock":
+      //   params.set("onlyAvailable", "false");
+      //   break;
+      // case "only_available":
+      //   params.set("onlyAvailable", "true");
+      //   break;
     }
 
     let url = `?${params.toString()}`;
@@ -106,14 +108,45 @@ const useBooks = ({ dataBooks }: PropTypes) => {
       router.refresh();
     });
   };
+  const updateFilterStock = (value: FilterBooksSort) => {
+    setLoadingMore(false);
+    setSortStock(value);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "1");
+    if (limit) {
+      params.set("limit", limit.toString());
+    }
+
+    // params.delete("onlyAvailable");
+    switch (value) {
+      case "all_stock":
+        params.set("onlyAvailable", "false");
+        break;
+      case "only_available":
+        params.set("onlyAvailable", "true");
+        break;
+    }
+
+    let url = `?${params.toString()}`;
+
+    console.log("final params: ", params.toString());
+
+    startTransition(() => {
+      handleReplaceRoute(url);
+      router.refresh();
+    });
+  };
 
   return {
     updateFilters,
+    updateFilterStock,
     handleLoadMore,
     loadingMore,
     isPending,
     hasMore,
     sort,
+    sortStock,
   };
 };
 

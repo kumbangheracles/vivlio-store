@@ -25,8 +25,6 @@ interface BookTypes {
   isDisplayStockable?: boolean;
   isSearch?: boolean;
 }
-type OptionType = "newest" | "oldest" | "highest_price" | "lowest_price";
-type StockOption = "all" | "available";
 
 const ListBook: React.FC<BookTypes> = ({
   titleSection,
@@ -37,13 +35,9 @@ const ListBook: React.FC<BookTypes> = ({
   isCategory = false,
   isGenre = false,
   isDisplayFilter = false,
-  isDisplayOnlyAvailbleStock = false,
   isSearch = false,
 }) => {
   const isMobile = useDeviceType();
-  const [isDisplayStock, setDisplayStock] = useState<boolean>(
-    isDisplayOnlyAvailbleStock,
-  );
 
   const {
     handleLoadMore,
@@ -51,72 +45,10 @@ const ListBook: React.FC<BookTypes> = ({
     isPending,
     loadingMore,
     sort,
+    sortStock,
     updateFilters,
+    updateFilterStock,
   } = useBooks({ dataBooks });
-
-  const [selectOption, setSelectedOption] = useState<OptionType>("newest");
-  const toTime = (date?: Date | string) => {
-    if (!date) return 0;
-    return date instanceof Date ? date.getTime() : new Date(date).getTime();
-  };
-
-  const stockSelectValue: StockOption = isDisplayStock ? "available" : "all";
-
-  const handleStockChange = (value: StockOption) => {
-    if (value === "available") {
-      setDisplayStock(true);
-    } else {
-      setDisplayStock(false);
-    }
-  };
-
-  useEffect(() => {
-    setDisplayStock(isDisplayOnlyAvailbleStock);
-  }, [isDisplayOnlyAvailbleStock]);
-
-  // const router = useRouter();
-  // const pathname = usePathname();
-  // const searchParams = useSearchParams();
-
-  // const [filters, setFilters] = useState({
-  //   search: searchParams.get("search") || "",
-  //   sortBy: searchParams.get("sortBy") || "newest",
-  //   minPrice: searchParams.get("minPrice") || "",
-  //   maxPrice: searchParams.get("maxPrice") || "",
-  // });
-
-  // const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // // Apply filters to URL
-  // const applyFilters = () => {
-  //   const params = new URLSearchParams();
-
-  //   Object.entries(filters).forEach(([key, value]) => {
-  //     if (value) params.set(key, value);
-  //   });
-
-  //   router.push(`${pathname}?${params.toString()}`);
-  // };
-
-  // // Clear all filters
-  // const clearFilters = () => {
-  //   setFilters({
-  //     search: "",
-  //     sortBy: "newest",
-  //     minPrice: "",
-  //     maxPrice: "",
-  //   });
-  //   router.push(pathname);
-  // };
-
-  // // Auto-apply on search change (debounced)
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     applyFilters();
-  //   }, 500);
-
-  //   return () => clearTimeout(timer);
-  // }, [filters.search]);
 
   return (
     <>
@@ -136,21 +68,28 @@ const ListBook: React.FC<BookTypes> = ({
               )}
 
               {isDisplayFilter && (
-                <div className="flex  gap-2 px-2 text-[11px] tracking-wider w-full mt-3">
+                <div className="flex gap-2 text-[11px] justify-center tracking-wider w-full mt-3">
                   <Select
-                    style={{ height: 30 }}
+                    className="ml-[50px]"
+                    loading={isPending}
                     size="small"
-                    className="w-full sm:w-auto"
-                    value={stockSelectValue}
+                    placeholder="Filter Stock"
+                    style={{ height: 30, maxWidth: 125, minWidth: 120 }}
+                    value={sortStock}
                     options={[
-                      { value: "all", label: "All Stock" },
-                      { value: "available", label: "Available Only" },
+                      { value: "all_stock", label: "All Stock" },
+                      {
+                        value: "only_available",
+                        label: "Stock Available Only",
+                      },
                     ]}
-                    onChange={handleStockChange}
+                    onChange={(value: FilterBooksSort) =>
+                      updateFilterStock(value)
+                    }
                   />
 
                   <Select
-                    style={{ height: 30 }}
+                    style={{ height: 30, maxWidth: 125, minWidth: 120 }}
                     size="small"
                     className="w-full sm:w-auto"
                     value={sort}
@@ -291,7 +230,7 @@ const ListBook: React.FC<BookTypes> = ({
                         loading={isPending}
                         placeholder="Filter Stock"
                         style={{ minWidth: 150 }}
-                        value={sort}
+                        value={sortStock}
                         options={[
                           { value: "all_stock", label: "All Stock" },
                           {
@@ -300,7 +239,7 @@ const ListBook: React.FC<BookTypes> = ({
                           },
                         ]}
                         onChange={(value: FilterBooksSort) =>
-                          updateFilters(value)
+                          updateFilterStock(value)
                         }
                       />
                       <Select

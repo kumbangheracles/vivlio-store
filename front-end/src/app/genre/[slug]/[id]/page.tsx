@@ -4,16 +4,36 @@ import deslugify from "@/libs/deslugyfy";
 import { Metadata } from "next";
 interface PageProps {
   params: { id: string; slug: string };
+  searchParams: {
+    search?: string;
+    sortBy?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    page?: string;
+    key?: string;
+    sortDate?: string;
+    sortPrice?: number;
+    onlyAvailable?: boolean;
+  };
 }
 export const metadata: Metadata = {
   title: `ViviBook - Genre`,
   description: "Genre",
 };
-const GenrePage = async ({ params }: PageProps) => {
-  const dataBooks = await fetchBooksHome();
-  const filteredBooksByGenre = dataBooks?.results?.filter((item) =>
-    item.genres?.some((genre) => genre.genreid === params.id),
-  );
+const GenrePage = async ({ params, searchParams }: PageProps) => {
+  const sortDate = searchParams?.sortDate;
+  const sortPrice = searchParams?.sortPrice;
+
+  const dataBooks = await fetchBooksHome({
+    limit: 12,
+    sortPrice: sortPrice,
+    sortDate: sortDate,
+    genreId: params.id,
+    onlyAvailable: searchParams.onlyAvailable,
+  });
+
+  const total = dataBooks.total;
+  const shown = dataBooks.results?.length;
 
   const titleList = deslugify(params.slug);
   return (
@@ -21,8 +41,8 @@ const GenrePage = async ({ params }: PageProps) => {
       <ListBook
         isCategory={false}
         isGenre={true}
-        dataBooks={filteredBooksByGenre}
-        titleSection={titleList}
+        dataBooks={dataBooks?.results}
+        titleSection={`Showing ${shown} of ${total} search results for "${titleList}"`}
         isSeeAll={false}
         isDisplayFilter={true}
         isDisplayStockable={true}

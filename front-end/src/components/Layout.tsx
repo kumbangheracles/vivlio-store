@@ -11,7 +11,7 @@ import Navbar from "./Navbar";
 import { UserProperties } from "@/types/user.type";
 import { ConfigProvider } from "antd";
 import GlobalLoading from "./GlobalLoading";
-import { StyleProvider } from "@ant-design/cssinjs";
+import { createCache, StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
 import AntdRegistry from "@/libs/AntdRegistry";
@@ -42,7 +42,7 @@ const AppLayout: React.FC<LayoutProps> = ({
   const pathname = usePathname();
   const isMobile = useDeviceType();
   const { isOverlay, setIsOverlay } = useOverlayStore();
-
+  const cache = createCache();
   const isPageAuth = pathname.startsWith("/auth");
   const isResult = pathname.startsWith("/result");
   useEffect(() => {
@@ -72,7 +72,7 @@ const AppLayout: React.FC<LayoutProps> = ({
       <ConfigProvider>
         <AntdRegistry>
           <StyleSheetManager shouldForwardProp={isPropValid}>
-            <StyleProvider hashPriority="high">
+            <StyleProvider cache={cache} hashPriority="high">
               {isPageAuth || isResult ? (
                 <>{children}</>
               ) : (

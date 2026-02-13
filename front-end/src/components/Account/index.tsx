@@ -30,12 +30,10 @@ const AccountIndex: React.FC<AccountProps> = ({
   fetchWishlist,
   fetchReviews,
 }) => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("key") as TabKey) || "account";
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
-  const isMobile = useDeviceType();
-  const { handlePushRoute } = useGlobalLoadingBar();
+  const { handleReplaceRoute } = useGlobalLoadingBar();
 
   const handleTabChange = (key: string) => {
     setActiveTab(key as TabKey);
@@ -92,7 +90,7 @@ const AccountIndex: React.FC<AccountProps> = ({
     const url = `?key=${activeTab}`;
 
     startTransition(() => {
-      handlePushRoute(url, { scroll: false });
+      handleReplaceRoute(url, { scroll: false });
     });
   }, [activeTab]);
 

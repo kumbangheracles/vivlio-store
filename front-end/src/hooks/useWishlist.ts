@@ -1,5 +1,5 @@
+"use client";
 import { useSearchParams, useRouter } from "next/navigation";
-
 import { useState, useTransition, useEffect } from "react";
 import useDeviceType from "./useDeviceType";
 import useGlobalLoadingBar from "./useGlobalLoadingBar";

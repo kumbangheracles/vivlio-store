@@ -63,6 +63,7 @@ export const initialBookProps: BookProps = {
   author: "",
   price: 0,
   book_type: BookType.Novel,
+  quantity: 0,
   status: "",
   book_cover: "",
   categoryId: "",

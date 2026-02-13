@@ -163,7 +163,7 @@ const BookEdit = () => {
         price: data.price as unknown as number,
         description: data.description,
         genres: data.genres,
-        quantity: data.quantity as unknown as number,
+        quantity: Number(data.quantity),
         status: status,
         book_type: data.book_type,
         categoryId: data.categoryId,
@@ -490,7 +490,7 @@ const BookEdit = () => {
                 onChange={(e) =>
                   setDataBook({
                     ...dataBook,
-                    quantity: e.target.value as unknown as number,
+                    quantity: Number(e.target.value),
                   })
                 }
               />

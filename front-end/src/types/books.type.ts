@@ -21,6 +21,7 @@ export interface BookParams {
   sortDate?: string;
   sortPrice?: number;
   categoryId?: string;
+  genreId?: string;
   onlyAvailable?: boolean;
 }
 export type BookProps = {

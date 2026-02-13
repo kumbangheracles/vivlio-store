@@ -13,6 +13,7 @@ interface PageProps {
     key?: string;
     sortDate?: string;
     sortPrice?: number;
+    onlyAvailable?: boolean;
   };
 }
 
@@ -35,6 +36,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
     sortPrice: sortPrice,
     sortDate: sortDate,
     categoryId: params.id,
+    onlyAvailable: searchParams.onlyAvailable,
   });
 
   const total = dataBooks.total;
