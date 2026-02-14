@@ -54,7 +54,7 @@ const Book = sequelize.define(
       allowNull: true,
     },
     categoryId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
       references: {
         model: "book_category",

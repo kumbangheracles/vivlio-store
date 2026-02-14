@@ -14,6 +14,7 @@ interface PageProps {
     sortDate?: string;
     sortPrice?: number;
     onlyAvailable?: boolean;
+    limit?: number;
   };
 }
 
@@ -32,7 +33,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
   const sortPrice = searchParams?.sortPrice;
 
   const dataBooks = await fetchBooksHome({
-    limit: 12,
+    limit: searchParams?.limit ?? 12,
     sortPrice: sortPrice,
     sortDate: sortDate,
     categoryId: params.id,
@@ -49,6 +50,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
       <ListBook
         isCategory={true}
         dataBooks={dataBooks?.results}
+        isShowLoadMore={true}
         titleSection={`Showing ${shown} of ${total} search results for "${titleList}"`}
         isSeeAll={false}
         isDisplayFilter={true}

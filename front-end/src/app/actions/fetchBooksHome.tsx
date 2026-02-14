@@ -10,7 +10,7 @@ async function fetchBooksHome({
   title = "",
   limit = 0,
   sortDate = "",
-  sortPrice = -1,
+  sortPrice = 0,
   categoryId = "",
   genreId = "",
   onlyAvailable = false,
@@ -38,7 +38,7 @@ async function fetchBooksHome({
     }
 
     if (sortDate) {
-      params.append("sortDate", sortDate);
+      params.append("sortDate", sortDate.toString());
     }
     if (sortPrice) {
       params.append("sortPrice", sortPrice.toString());

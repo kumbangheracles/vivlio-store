@@ -25,25 +25,24 @@ const useBooks = ({ dataBooks }: PropTypes) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { handleReplaceRoute } = useGlobalLoadingBar();
-  const isMobile = useDeviceType();
 
   const [isPending, startTransition] = useTransition();
-  const limitParams = Number(searchParams.get("limit") || 10);
+  // const limitParams = Number(searchParams.get("limit") || 12);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const [limit, setLimit] = useState<number | null>(limitParams || 10);
+  const [limit, setLimit] = useState<number | null>(12);
   const [loadingMore, setLoadingMore] = useState(false);
   useEffect(() => {
     setLoadingMore(false);
-    const currentLimit = Number(searchParams.get("limit") || 10);
+    const currentLimit = Number(searchParams.get("limit") || 12);
     setHasMore((dataBooks?.length as number) >= currentLimit);
   }, [dataBooks, searchParams, loadingMore]);
   const handleLoadMore = () => {
-    const newLimit = (limit as number) + 10;
+    const newLimit = (limit as number) + 12;
 
     setLoadingMore(true);
     setLimit(newLimit);
 
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
     params.set("page", "1");
     params.set("limit", newLimit.toString());
 
@@ -52,15 +51,14 @@ const useBooks = ({ dataBooks }: PropTypes) => {
       params.set("sortPrice", currentSortPrice);
     }
 
-    let url = "";
-    if (isMobile) {
-      url = `?${params.toString()}`;
-    } else {
-      url = `?key=books?${params.toString()}`;
+    const currentSortDate = searchParams.get("sortDate");
+    if (currentSortDate && currentSortDate.trim() !== "") {
+      params.set("sortDate", currentSortDate);
     }
+    let url = `?${params.toString()}`;
 
     startTransition(() => {
-      router.push(url, { scroll: false });
+      router.replace(url, { scroll: false });
       router.refresh();
     });
   };

@@ -14,6 +14,7 @@ interface PageProps {
     sortDate?: string;
     sortPrice?: number;
     onlyAvailable?: boolean;
+    limit?: number;
   };
 }
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ const GenrePage = async ({ params, searchParams }: PageProps) => {
   const sortPrice = searchParams?.sortPrice;
 
   const dataBooks = await fetchBooksHome({
-    limit: 12,
+    limit: searchParams?.limit ?? 12,
     sortPrice: sortPrice,
     sortDate: sortDate,
     genreId: params.id,
@@ -44,6 +45,7 @@ const GenrePage = async ({ params, searchParams }: PageProps) => {
         dataBooks={dataBooks?.results}
         titleSection={`Showing ${shown} of ${total} search results for "${titleList}"`}
         isSeeAll={false}
+        isShowLoadMore={true}
         isDisplayFilter={true}
         isDisplayStockable={true}
         isDisplayOnlyAvailbleStock={true}

@@ -63,6 +63,19 @@ module.exports = {
     try {
       const total = await Book.count({
         where: filters,
+        include: [
+          ...(genreId
+            ? [
+                {
+                  model: Genre,
+                  as: "genres",
+                  where: { genreid: genreId },
+                  required: true,
+                  through: { attributes: [] },
+                },
+              ]
+            : []),
+        ],
       });
 
       const order = [];
@@ -372,6 +385,7 @@ module.exports = {
 
     const parsedSortPrice = parseInt(sortPrice);
     console.log("Full Query: ", req.query);
+    console.log("SortDate: ", sortDate);
     const filters = {};
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
@@ -424,6 +438,19 @@ module.exports = {
 
       const total = await Book.count({
         where: filters,
+        include: [
+          ...(genreId
+            ? [
+                {
+                  model: Genre,
+                  as: "genres",
+                  where: { genreid: genreId },
+                  required: true,
+                  through: { attributes: [] },
+                },
+              ]
+            : []),
+        ],
       });
       const rows = await Book.findAll({
         where: filters,

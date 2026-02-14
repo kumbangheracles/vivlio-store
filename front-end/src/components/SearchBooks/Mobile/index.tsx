@@ -43,7 +43,7 @@ const SearchBookMobileIndex = ({ dataBooks }: PropTypes) => {
       title: keyword,
       status: BookStatusType.PUBLISH,
       page: "1",
-      limit: "10",
+      limit: "5",
     });
 
     let url;

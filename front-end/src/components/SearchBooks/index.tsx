@@ -20,6 +20,7 @@ const SearchBookIndex = ({ dataBooks, shown, total }: PropTypes) => {
         isSeeAll={false}
         isDisplayFilter={true}
         isCategory={false}
+        isShowLoadMore={true}
         isGenre={false}
         isSearch={true}
         dataBooks={dataBooks}

@@ -57,11 +57,13 @@ export default function Navbar({
   const auth = useAuth();
   const router = useRouter();
   const isMobile = useDeviceType();
-  const { isOverlay, setIsOverlay, toggleOverlay, keyword, setKeyword } = useOverlayStore();
+  const { isOverlay, setIsOverlay, toggleOverlay, keyword, setKeyword } =
+    useOverlayStore();
   const [results, setResults] = useState<BookProps[]>([]);
   const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
   const [history, setHistory] = useState<SearchHistory[]>([]);
   const [suggestions, setSuggestions] = useState<BookProps[]>([]);
+  const [searchedTitle, setSearchedTitle] = useState<string>("");
   const [isDisplayRecom, setIsDisplayRecom] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
@@ -213,7 +215,7 @@ export default function Navbar({
       title: keyword,
       status: BookStatusType.PUBLISH,
       page: "1",
-      limit: "10",
+      limit: "5",
     });
 
     let url;
@@ -285,6 +287,7 @@ export default function Navbar({
 
   const handleSearch = async (value?: string) => {
     const searchValue = value ?? keyword;
+    setKeyword(searchValue);
     if (!searchValue.trim()) return;
 
     const res = await fetchBooksSearch(searchValue);
@@ -310,10 +313,12 @@ export default function Navbar({
   }, [results]);
 
   useEffect(() => {
-    if (path === "/") {
+    if (path === "/" || path.includes("/category") || path.includes("/genre")) {
       params.set("key", "");
+
+      setKeyword("");
     }
-  }, [router]);
+  }, [path]);
 
   return (
     <>
@@ -364,7 +369,7 @@ export default function Navbar({
 
                 <div className="flex gap-3 py-3 px-6 w-full bg-white rounded-[50px] border-white border">
                   <input
-                    defaultValue={keyword}
+                    value={keyword}
                     placeholder="Search Books, Blogs, etc"
                     onFocus={() => {
                       (setIsOverlay(true), setIsDisplayRecom(true));
