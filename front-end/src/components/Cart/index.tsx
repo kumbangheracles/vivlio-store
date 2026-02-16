@@ -22,6 +22,8 @@ import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "../GlobalLoading";
 interface PropTypes {
   books: BookProps[];
 }
@@ -82,7 +84,7 @@ const CartIndex = ({ books }: PropTypes) => {
 
   const handleCheckAll = (e: CheckboxChangeEvent) => {
     if (!books?.length) return;
-    router.refresh();
+    // router.refresh();
     const checked = e.target.checked;
     setCheckedAll(checked);
 
@@ -103,8 +105,6 @@ const CartIndex = ({ books }: PropTypes) => {
   const isCheckedIds = isChecked.map((item) => item.idCart);
   useEffect(() => {
     setCheckedIds(isCheckedIds);
-
-    console.log("Ids: ", checkedIds);
   }, [isChecked]);
 
   const handleBulkDelete = async (ids: Array<string>) => {
@@ -184,13 +184,15 @@ const CartIndex = ({ books }: PropTypes) => {
 
       // message.info("checkout success you'll be redirect to midtrans payment");
     } catch (error) {
-      console.log("Error checkout: ", error);
       ErrorHandler(error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <div>
       {/* Navbar Cart */}
@@ -266,6 +268,8 @@ const CartIndex = ({ books }: PropTypes) => {
                       quantity={quantity}
                       setQuantity={setQuantity}
                       quantities={quantities}
+                      loadingCheck={isLoading}
+                      setLoadingCheck={setIsLoading}
                       setQuantities={setQuantities}
                     />
                   ))}

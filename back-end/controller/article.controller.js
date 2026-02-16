@@ -7,12 +7,23 @@ const { sequelize } = require("../config/database");
 //  */
 module.exports = {
   async getAll(req, res) {
-    const { isPopular, title, categoryId, page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
+    const { page = 1, limit = 10, status, title } = req.query;
+    const parsedLimit = limit ? parseInt(limit) : null;
+    const offset = (page - 1) * parsedLimit;
+
+    let filters = [];
+
+    if (status) {
+      filters.status = status;
+    }
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
     try {
       const { count, rows } = await Articles.findAndCountAll({
-        limit: parseInt(limit),
+        limit: parsedLimit,
         distinct: true,
+        filters,
         include: [
           {
             model: ArticleImages,
@@ -31,7 +42,7 @@ module.exports = {
         results: rows,
         total: count,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
+        totalPages: Math.ceil(count / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({

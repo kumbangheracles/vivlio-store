@@ -4,13 +4,31 @@ const UserPurchases = sequelize.define(
   "UserPurchases",
   {
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
+
     bookId: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    orderId: {
+      type: DataTypes.STRING,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    orderGroupId: {
+      type: DataTypes.STRING,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    midtransToken: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM("PENDING", "PAID", "FAILED", "EXPIRED", "CANCELLED"),
+      allowNull: false,
+      defaultValue: "PENDING",
     },
     userId: {
       type: DataTypes.STRING,
@@ -33,8 +51,8 @@ const UserPurchases = sequelize.define(
   },
   {
     tableName: "UserPurchases",
-    timestamps: true,
-  }
+    timestamps: false,
+  },
 );
 
 module.exports = UserPurchases;

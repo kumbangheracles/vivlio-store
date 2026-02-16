@@ -1,21 +1,41 @@
 import myAxios from "@/libs/myAxios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import { ArticleProperties } from "@/types/article.type";
+import {
+  ArticleParams,
+  ArticleProperties,
+  ArticleStatusType,
+} from "@/types/article.type";
 
-async function fetchArticles(): Promise<ArticleProperties[]> {
+async function fetchArticles({
+  limit = 0,
+  status = ArticleStatusType.PUBLISH,
+  sortDate = "",
+}: ArticleParams = {}): Promise<ArticleProperties[]> {
   try {
     const session = await getServerSession(authOptions);
 
     const accessToken = session?.accessToken;
 
     const url = "/articles";
-    const response = await myAxios.get(url, {
+
+    const params = new URLSearchParams({
+      status: status,
+    });
+
+    if (sortDate) {
+      params.append("sortDate", sortDate.toString());
+    }
+    if (limit) {
+      params.append("limit", limit.toString());
+    }
+
+    const response = await myAxios.get(`${url}?${params}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
 
     const filteredArticles = response.data?.results?.filter(
-      (item: ArticleProperties) => item.status === "PUBLISHED"
+      (item: ArticleProperties) => item.status === "PUBLISHED",
     );
 
     return filteredArticles;

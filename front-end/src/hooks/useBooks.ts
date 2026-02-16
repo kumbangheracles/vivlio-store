@@ -136,6 +136,18 @@ const useBooks = ({ dataBooks }: PropTypes) => {
     });
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (params.has("limit")) {
+      params.set("limit", "12");
+
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+
+    setLimit(12);
+  }, []);
+
   return {
     updateFilters,
     updateFilterStock,

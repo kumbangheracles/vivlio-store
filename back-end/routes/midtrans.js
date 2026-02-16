@@ -7,7 +7,18 @@ router.post("/checkout", authMiddleware, midtransController.midtransPost);
 router.post(
   "/bulk-checkout",
   authMiddleware,
-  midtransController.midtransMultiCheckout
+  midtransController.midtransMultiCheckout,
+);
+router.post("/webhook", midtransController.midtransWebhook);
+router.post(
+  "/cancel-payment",
+  authMiddleware,
+  midtransController.cancelPayment,
+);
+router.get(
+  "/detail-order/:orderId",
+  authMiddleware,
+  midtransController.getMidtransOrderDetail,
 );
 
 module.exports = router;

@@ -36,13 +36,14 @@ import {
 } from "@/libs/searchHistoryLibs";
 import CardBookNavbar from "./CardBookNavbar";
 import highlightText from "@/helpers/HighlightText";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "./GlobalLoading";
 interface PropTypes {
   dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
   dataCartedBooks?: BookProps[];
   dataGenres?: GenreProperties[];
   dataBooks?: BookProps[];
-  allBooks?: BookProps[];
 }
 
 export default function Navbar({
@@ -51,7 +52,6 @@ export default function Navbar({
   dataCartedBooks,
   dataGenres,
   dataBooks,
-  allBooks,
 }: PropTypes) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuth();
@@ -63,14 +63,13 @@ export default function Navbar({
   const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
   const [history, setHistory] = useState<SearchHistory[]>([]);
   const [suggestions, setSuggestions] = useState<BookProps[]>([]);
-  const [searchedTitle, setSearchedTitle] = useState<string>("");
   const [isDisplayRecom, setIsDisplayRecom] = useState(false);
   const [isHover, setIshover] = useState<boolean>(false);
   const path = usePathname();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [dropCategory, setIsDropCategory] = useState<boolean>(false);
   const params = new URLSearchParams();
-
+  const mounted = useMounted();
   const [totalLengthCart, setTotalLengthCart] = useState<number>(0);
   const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
   const handleLogout = async () => {
@@ -325,7 +324,8 @@ export default function Navbar({
       {(isMobile && path === "/cart") ||
       (isMobile && path === "/account-mobile") ||
       (isMobile && path === "/account-mobile/wishlist") ||
-      (isMobile && path === "/account-mobile/book-reviews") ? (
+      (isMobile && path === "/account-mobile/book-reviews") ||
+      path === "/payment" ? (
         <></>
       ) : (
         <nav className="fixed top-0 w-full bg-white sm:bg-[#d9eafd] shadow-sm z-[999]  transition-all">
@@ -475,9 +475,17 @@ export default function Navbar({
                   </h4>
 
                   <div className="flex mt-2 gap-2 justify-between flex-wrap">
-                    {dataBooks?.map((item) => (
-                      <CardBookNavbar dataBook={item} key={item.id} />
-                    ))}
+                    {(dataBooks?.length as number) > 0 ? (
+                      <>
+                        {dataBooks?.map((item) => (
+                          <CardBookNavbar dataBook={item} key={item.id} />
+                        ))}
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-center w-full">
+                        <Empty description={"No Recomended Books Availble"} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -653,15 +661,19 @@ export default function Navbar({
                           : "w-[25px] h-[25px]"
                       }  overflow-hidden! rounded-full flex items-center justify-center cursor-pointer`}
                     >
-                      <img
-                        className="object-cover w-full h-full"
-                        src={
-                          auth?.authenticated
-                            ? dataUser?.profileImage?.imageUrl
-                            : "/icons/account.svg"
-                        }
-                        alt="account-icon"
-                      />
+                      {mounted ? (
+                        <img
+                          className="object-cover w-full h-full"
+                          src={
+                            auth?.authenticated
+                              ? dataUser?.profileImage?.imageUrl
+                              : "/icons/account.svg"
+                          }
+                          alt="account-icon"
+                        />
+                      ) : (
+                        <GlobalLoading />
+                      )}
                     </div>
                   </AccountIcon>
                 </Dropdown>

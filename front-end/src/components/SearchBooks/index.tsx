@@ -14,6 +14,7 @@ interface PropTypes {
 const SearchBookIndex = ({ dataBooks, shown, total }: PropTypes) => {
   const params = useSearchParams();
   const key = params.get("key");
+
   return (
     <div className="w-full p-4 mt-[-20px]">
       <ListBook

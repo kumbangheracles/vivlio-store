@@ -11,6 +11,7 @@ import CardBook from "./CardBook";
 import useDeviceType from "@/hooks/useDeviceType";
 import FadeUpWrapper from "../FadeUpWrapper";
 import useBooks, { FilterBooksSort } from "@/hooks/useBooks";
+import { useMounted } from "@/hooks/useMounted";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -39,7 +40,7 @@ const ListBook: React.FC<BookTypes> = ({
   isDisplayFilter = false,
   isSearch = false,
   isShowLoadMore = false,
-  total,
+  // total,
 }) => {
   const isMobile = useDeviceType();
 
@@ -54,6 +55,9 @@ const ListBook: React.FC<BookTypes> = ({
     updateFilterStock,
   } = useBooks({ dataBooks });
 
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <>
       {isMobile ? (

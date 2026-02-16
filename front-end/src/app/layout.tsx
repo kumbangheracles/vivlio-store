@@ -26,7 +26,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const dataBooks = await fetchBooksHome({
     isRecomend: true,
   });
-  const allBooks = await fetchBooksHome();
+
+  console.log("Recomend book: ", dataBooks);
 
   return (
     <html lang="en">
@@ -40,7 +41,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             isAuthPageTampil={false}
             dataGenres={dataGenres}
             dataBooks={dataBooks?.results}
-            allBooks={allBooks.results}
           >
             {children}
           </AppLayout>

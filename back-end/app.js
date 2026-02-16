@@ -14,6 +14,7 @@ const authRoutes = require("./routes/auth");
 const userWishlistRoutes = require("./routes/userWishlist");
 const userCartRoutes = require("./routes/cart");
 const midtransRoutes = require("./routes/midtrans");
+const transactionRoutes = require("./routes/transaction");
 const mediaRoutes = require("./routes/media");
 const articleRoutes = require("./routes/article");
 
@@ -59,6 +60,7 @@ app.use("/roles", rolesRoutes);
 app.use("/media", mediaRoutes);
 app.use("/articles", articleRoutes);
 app.use("/midtrans", midtransRoutes);
+app.use("/transactions", transactionRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -67,7 +69,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 /* ================= ERROR HANDLER ================= */
 

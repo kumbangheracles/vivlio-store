@@ -58,7 +58,7 @@ const Books = () => {
 
   useEffect(() => {
     fetchBooks(page, limit, debouncedSearch);
-    // console.log("Data books: ", dataBooks);
+    console.log("Data books: ", dataBooks);
   }, [page, limit, debouncedSearch]);
 
   const handleStatusChange = async (id: string, status: BookStatusType) => {

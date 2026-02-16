@@ -3,6 +3,14 @@ export enum ArticleStatusType {
   UNPUBLISH = "UNPUBLISHED",
 }
 
+export interface ArticleParams {
+  status?: ArticleStatusType;
+  limit?: number;
+  page?: number;
+  sortDate?: string;
+  title?: string;
+}
+
 export type ArticleProperties = {
   id?: string;
   title?: string;

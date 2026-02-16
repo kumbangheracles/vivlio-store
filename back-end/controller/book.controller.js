@@ -30,6 +30,8 @@ module.exports = {
       sortDate,
       isRecomend,
       onlyAvailable,
+      excludeId,
+      genreIds,
     } = req.query || {};
     const parsedLimit = limit ? parseInt(limit) : null;
     const parsedSortPrice = parseInt(sortPrice);
@@ -37,6 +39,20 @@ module.exports = {
     console.log("Full query:", req.query);
 
     const filters = {};
+    if (excludeId) {
+      filters.id = { [Op.ne]: excludeId };
+    }
+    let genreWhere = null;
+
+    if (genreIds) {
+      genreWhere = {
+        genreid: {
+          [Op.in]: genreIds.split(","),
+        },
+      };
+    } else if (genreId) {
+      genreWhere = { genreid: genreId };
+    }
     if (isRecomend) {
       filters.isRecomend = true;
     }
@@ -63,19 +79,17 @@ module.exports = {
     try {
       const total = await Book.count({
         where: filters,
-        include: [
-          ...(genreId
-            ? [
-                {
-                  model: Genre,
-                  as: "genres",
-                  where: { genreid: genreId },
-                  required: true,
-                  through: { attributes: [] },
-                },
-              ]
-            : []),
-        ],
+        include: genreWhere
+          ? [
+              {
+                model: Genre,
+                as: "genres",
+                where: genreWhere,
+                required: true,
+                through: { attributes: [] },
+              },
+            ]
+          : [],
       });
 
       const order = [];
@@ -111,8 +125,8 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
-            ...(genreId && {
-              where: { genreid: genreId },
+            ...(genreWhere && {
+              where: genreWhere,
               required: true,
             }),
           },
@@ -381,19 +395,34 @@ module.exports = {
       sortPrice,
       onlyAvailable = "",
       sortDate = "",
+      excludeId,
+      genreIds,
     } = req.query;
-
     const parsedSortPrice = parseInt(sortPrice);
     console.log("Full Query: ", req.query);
-    console.log("SortDate: ", sortDate);
     const filters = {};
+    if (isRecomend !== undefined) {
+      filters.isRecomend = isRecomend === "true" || isRecomend === "1";
+    }
+    if (excludeId) {
+      filters.id = { [Op.ne]: excludeId };
+    }
+    let genreWhere = null;
+
+    if (genreIds) {
+      genreWhere = {
+        genreid: {
+          [Op.in]: genreIds.split(","),
+        },
+      };
+    } else if (genreId) {
+      genreWhere = { genreid: genreId };
+    }
+
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
     }
 
-    if (isRecomend) {
-      filters.isRecomend = true;
-    }
     if (categoryId) filters.categoryId = categoryId;
 
     if (title) {
@@ -408,14 +437,14 @@ module.exports = {
       };
     }
     const userId = req.id;
-    const parsedLimit = limit ? parseInt(limit) : null;
+    const parsedLimit = limit ? parseInt(limit) : 10;
 
     const offset = (page - 1) * parsedLimit;
-    console.log(">>> req.id:", req.id);
-    console.log(">>> req.user:", req.user);
-    console.log("search title: ", title);
-    console.log("isPopular:", isPopular);
-    console.log("Login as user");
+    // console.log(">>> req.id:", req.id);
+    // console.log(">>> req.user:", req.user);
+    // console.log("search title: ", title);
+    // console.log("isPopular:", isPopular);
+    // console.log("Login as user");
 
     try {
       const order = [];
@@ -438,19 +467,18 @@ module.exports = {
 
       const total = await Book.count({
         where: filters,
-        include: [
-          ...(genreId
-            ? [
-                {
-                  model: Genre,
-                  as: "genres",
-                  where: { genreid: genreId },
-                  required: true,
-                  through: { attributes: [] },
-                },
-              ]
-            : []),
-        ],
+        include: genreWhere
+          ? [
+              {
+                model: Genre,
+                as: "genres",
+                where: genreWhere,
+                required: true,
+                through: { attributes: [] },
+              },
+            ]
+          : [],
+        distinct: true,
       });
       const rows = await Book.findAll({
         where: filters,
@@ -467,8 +495,8 @@ module.exports = {
             as: "genres",
             through: { attributes: [] },
             attributes: ["genreid", "genre_title"],
-            ...(genreId && {
-              where: { genreid: genreId },
+            ...(genreWhere && {
+              where: genreWhere,
               required: true,
             }),
           },
@@ -577,9 +605,7 @@ module.exports = {
       filters.title = { [Op.like]: `%${title}%` };
     }
 
-    const whereCondition = req.id
-      ? { ...filters, createdByAdminId: req.id }
-      : filters;
+    const whereCondition = filters;
 
     if (isRecomend) {
       filters.isRecomend = true;

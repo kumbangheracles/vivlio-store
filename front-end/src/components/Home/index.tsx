@@ -10,41 +10,26 @@ import useDeviceType from "@/hooks/useDeviceType";
 import MobileBanner from "./components/MobileBanner";
 import ListBlog from "../ListBlog";
 import { ArticleProperties } from "@/types/article.type";
-import { useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useMounted } from "@/hooks/useMounted";
-import { redirect } from "next/navigation";
 import GlobalLoading from "../GlobalLoading";
-import { useAuth } from "@/hooks/useAuth";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
   dataCategories?: CategoryProps[];
   fetchBooks?: any;
+  popularBooks?: BookProps[];
+  newestBooks?: BookProps[];
+  bestSellerBooks?: BookProps[];
   dataArticles?: ArticleProperties[];
 }
 
 export default function HomePage(prop: PropTypes) {
+  const { newestBooks, popularBooks } = prop;
   const { handlePushRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
-  const recentPopularBook = prop.dataBooks
-    ?.filter((item) => item.isPopular)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
-    )
-    .slice(0, 6);
 
   const bestSellerBook = prop.dataBooks?.slice(0, 6);
-  const newestBooks = prop.dataBooks
-    ?.sort((a, b) => {
-      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return dateB - dateA; // terbaru dulu
-    })
-    .slice(0, 6); // ambil 6 teratas
-
-  // const { titleSection } = prop;
 
   const newestArticles = prop.dataArticles
     ?.sort((a, b) => {
@@ -109,7 +94,7 @@ export default function HomePage(prop: PropTypes) {
             <div className="px-3">
               <ListBook
                 isDisplayOnlyAvailbleStock={true}
-                dataBooks={recentPopularBook}
+                dataBooks={popularBooks}
                 titleSection={"Recently Popular"}
                 fetchBooks={prop.fetchBooks}
                 isSeeAll={false}
@@ -148,7 +133,7 @@ export default function HomePage(prop: PropTypes) {
           <div>
             <ListBook
               isDisplayOnlyAvailbleStock={true}
-              dataBooks={recentPopularBook}
+              dataBooks={popularBooks}
               titleSection={"Recently Popular"}
               fetchBooks={prop.fetchBooks}
             />

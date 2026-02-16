@@ -6,7 +6,7 @@ import { FaChevronRight } from "react-icons/fa";
 
 function truncateText(text: string, maxLength: number) {
   if (text.length > maxLength) {
-    return text.slice(0, maxLength) + "…"; // tambahin ellipsis
+    return text.slice(0, maxLength) + "…";
   }
   return text;
 }
@@ -32,13 +32,13 @@ export default function Breadcrumb(prop: PropTypes) {
         return (
           <span key={href} className="flex items-center">
             {!isLast ? (
-              <Link
-                href={href}
+              <div
+                // href={href}
                 className="capitalize hover:underline hover:text-gray-800"
                 title={decoded}
               >
                 {label}
-              </Link>
+              </div>
             ) : (
               <div className="flex items-center gap-0">
                 <span className="capitalize font-medium" title={decoded}>

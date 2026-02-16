@@ -13,6 +13,9 @@ async function fetchBooksHome({
   sortPrice = 0,
   categoryId = "",
   genreId = "",
+  genreIds = "",
+  excludedId = "",
+  isPopular = false,
   onlyAvailable = false,
 }: BookParams = {}): Promise<BaseResponBook<BookProps>> {
   const session = await getServerSession(authOptions);
@@ -23,11 +26,21 @@ async function fetchBooksHome({
     const params = new URLSearchParams({
       status: status,
     });
+    if (isPopular) params.append("isPopular", "true");
+    if (excludedId) {
+      params.append("excludeId", excludedId);
+    }
+
+    if (genreIds) {
+      params.append("genreIds", genreIds.toString());
+    }
 
     if (isRecomend) {
       params.append("isRecomend", isRecomend.toString());
     }
-    params.append("onlyAvailable", onlyAvailable.toString());
+    if (onlyAvailable) {
+      params.append("onlyAvailable", onlyAvailable.toString());
+    }
 
     if (title) {
       params.append("title", title);

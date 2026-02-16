@@ -97,86 +97,92 @@ const Footer = () => {
           )}
         </>
       ) : (
-        <ParentContainer>
-          <Container>
-            {/* Bagian Kiri - Info Kontak */}
-            <div className="flex flex-col gap-[10px] w-[300px]">
-              <IconWrapper>
-                <Image
-                  src={IconLocation}
-                  width={20}
-                  height={20}
-                  alt="location"
-                />
-                <p>North of Westaros, Winterfell</p>
-              </IconWrapper>
-              <IconWrapper>
-                <PhoneFilled />
-                <p>08897231231</p>
-              </IconWrapper>
-              <IconWrapper>
-                <MailFilled />
-                <p>jamal@gmail.com</p>
-              </IconWrapper>
-            </div>
+        <>
+          {path === "/payment" ? (
+            <></>
+          ) : (
+            <ParentContainer>
+              <Container>
+                {/* Bagian Kiri - Info Kontak */}
+                <div className="flex flex-col gap-[10px] w-[300px]">
+                  <IconWrapper>
+                    <Image
+                      src={IconLocation}
+                      width={20}
+                      height={20}
+                      alt="location"
+                    />
+                    <p>North of Westaros, Winterfell</p>
+                  </IconWrapper>
+                  <IconWrapper>
+                    <PhoneFilled />
+                    <p>08897231231</p>
+                  </IconWrapper>
+                  <IconWrapper>
+                    <MailFilled />
+                    <p>jamal@gmail.com</p>
+                  </IconWrapper>
+                </div>
 
-            {/* Bagian Tengah - Navigasi */}
-            <Navigation>
-              <p
-                className="link cursor-pointer"
-                onClick={() => handlePushRoute("/")}
-              >
-                Home
-              </p>
-              <p
-                className="link cursor-pointer"
-                onClick={() => handlePushRoute("/blog")}
-              >
-                Blog
-              </p>
-              <p
-                className="link cursor-pointer"
-                onClick={() => handlePushRoute("/cart")}
-              >
-                Cart
-              </p>
-              <p
-                className="link cursor-pointer"
-                onClick={() => handlePushRoute("/account")}
-              >
-                Account Details
-              </p>
-              <p
-                className="link cursor-pointer"
-                onClick={() => handlePushRoute("/")}
-              >
-                Browse Book
-              </p>
-            </Navigation>
+                {/* Bagian Tengah - Navigasi */}
+                <Navigation>
+                  <p
+                    className="link cursor-pointer"
+                    onClick={() => handlePushRoute("/")}
+                  >
+                    Home
+                  </p>
+                  <p
+                    className="link cursor-pointer"
+                    onClick={() => handlePushRoute("/blog")}
+                  >
+                    Blog
+                  </p>
+                  <p
+                    className="link cursor-pointer"
+                    onClick={() => handlePushRoute("/cart")}
+                  >
+                    Cart
+                  </p>
+                  <p
+                    className="link cursor-pointer"
+                    onClick={() => handlePushRoute("/account")}
+                  >
+                    Account Details
+                  </p>
+                  <p
+                    className="link cursor-pointer"
+                    onClick={() => handlePushRoute("/")}
+                  >
+                    Browse Book
+                  </p>
+                </Navigation>
 
-            {/* Bagian Kanan - Tentang Perusahaan */}
-            <AboutSection>
-              <h1 className="font-bold">About the company</h1>
-              <p className="mt-2.5">
-                ViviBook is here to be your reading companion. We offer a wide
-                selection of books for all ages, believing every page holds a
-                story and meaning worth discovering.
-              </p>
-            </AboutSection>
-          </Container>
+                {/* Bagian Kanan - Tentang Perusahaan */}
+                <AboutSection>
+                  <h1 className="font-bold">About the company</h1>
+                  <p className="mt-2.5">
+                    ViviBook is here to be your reading companion. We offer a
+                    wide selection of books for all ages, believing every page
+                    holds a story and meaning worth discovering.
+                  </p>
+                </AboutSection>
+              </Container>
 
-          <Divider />
+              <Divider />
 
-          {/* Bottom Bar */}
-          <BottomBar>
-            <p>© 2025 kumbangheracles</p>
-            <div className="social-icons">
-              <FacebookOutlined />
-              <InstagramOutlined />
-              <TikTokOutlined />
-            </div>
-          </BottomBar>
-        </ParentContainer>
+              {/* Bottom Bar */}
+              <BottomBar>
+                <p>© 2025 kumbangheracles</p>
+                <div className="social-icons">
+                  <FacebookOutlined />
+                  <InstagramOutlined />
+                  <TikTokOutlined />
+                </div>
+              </BottomBar>
+            </ParentContainer>
+          )}
+        </>
       )}
     </>
   );

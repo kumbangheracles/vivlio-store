@@ -10,12 +10,16 @@ import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { BookImage, BookProps } from "../../types/books.type";
 import { styled } from "styled-components";
+import { RoleProperties } from "../../types/role.type";
 
 const BookDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [dataBook, setDataBook] = useState<BookProps | undefined>(undefined);
   const [dataCat, setDataCat] = useState<CategoryProps | undefined>(undefined);
+  const [dataRole, setDataRole] = useState<RoleProperties | undefined>(
+    undefined,
+  );
   const fetchBook = async () => {
     if (!id) return;
     try {
@@ -30,6 +34,16 @@ const BookDetail = () => {
   useEffect(() => {
     fetchBook();
   }, [id]);
+
+  const fetchAdmin = async (adminId: string) => {
+    if (!adminId) return;
+    try {
+      const res = await myAxios.get(`/roles/${adminId}`);
+      setDataRole(res.data.result);
+    } catch (error) {
+      ErrorHandler(error);
+    }
+  };
 
   const fetchCat = async () => {
     if (!dataBook?.categoryId) return;
@@ -46,6 +60,10 @@ const BookDetail = () => {
   useEffect(() => {
     fetchCat();
   }, [dataBook?.categoryId]);
+  useEffect(() => {
+    fetchAdmin(dataBook?.createdByAdminId as string);
+  }, [dataBook?.createdByAdminId]);
+  console.log("Data book one: ", dataBook);
   return (
     <>
       {" "}
@@ -136,6 +154,10 @@ const BookDetail = () => {
               }
             />
             <DetailItem label="Status" value={<Tag>{dataBook?.status}</Tag>} />
+            <DetailItem
+              label="Created By Admin"
+              value={<Tag>{dataRole?.name}</Tag>}
+            />
           </GridContainer>
           <div>
             <Label>Description</Label>

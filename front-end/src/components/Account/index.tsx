@@ -6,13 +6,11 @@ import Account from "./Account";
 import { UserProperties } from "@/types/user.type";
 import Wishlist from "./Wishlist";
 import { BookWithWishlist } from "@/types/wishlist.type";
-import useDeviceType from "@/hooks/useDeviceType";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import BookReviews from "./BookReviews";
 import { BookReviewsProps } from "@/types/bookreview.type";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import NotFoundPage from "../NotFoundPage";
-import AntdRegistry from "@/libs/AntdRegistry";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "../GlobalLoading";
 interface AccountProps {

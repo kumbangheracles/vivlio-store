@@ -37,22 +37,17 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
   const session = await getServerSession(authOptions);
   const dataCategory = await fetchCategory();
   const accessToken = session?.accessToken;
-  const allBooks = await fetchBooksHome();
+
   try {
     const res = await myAxios.get<{ result: BookProps }>(`/books/${id}`, {
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     });
     const book = res.data.result;
-
-    const similiarBooks = allBooks?.results?.filter(
-      (item) =>
-        item.id !== book.id &&
-        item.genres?.some((genre) =>
-          book.genres?.some(
-            (bookGenre) => bookGenre.genre_title === genre.genre_title,
-          ),
-        ),
-    );
+    const similiarBooks = await fetchBooksHome({
+      excludedId: id,
+      genreIds: book?.genres?.map((g) => g.genreId).join(","),
+      limit: 10,
+    });
 
     if (!book) {
       return (
@@ -86,7 +81,7 @@ export default async function BookDetail({ params }: BookDetailPageProps) {
             quantity: book?.quantity,
           }}
           dataCategory={dataCategory}
-          similiarBooks={similiarBooks}
+          similiarBooks={similiarBooks?.results}
         />
       </div>
     );

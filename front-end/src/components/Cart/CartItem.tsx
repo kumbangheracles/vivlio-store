@@ -22,9 +22,17 @@ interface PropTypes {
   quantities?: Record<string, number>;
   setQuantities?: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   loadingIds?: boolean;
+  loadingCheck?: boolean;
+  setLoadingCheck?: Dispatch<SetStateAction<boolean>>;
 }
 
-const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
+const CartItem = ({
+  book,
+  isChecked,
+  setIsChecked,
+  loadingCheck,
+  setLoadingCheck,
+}: PropTypes) => {
   const router = useRouter();
   const { handlePushRoute } = useGlobalLoadingBar();
   const goToDetail = (id: string) => {
@@ -110,8 +118,9 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
           onChange={(e) => {
             const checked = e.target.checked;
             setIsLoading(true);
+            // setLoadingCheck?.(true);
             setTimeout(() => {
-              router.refresh();
+              // router.refresh();
 
               if (checked) {
                 setIsChecked?.((prev) => [
@@ -123,12 +132,14 @@ const CartItem = ({ book, isChecked, setIsChecked }: PropTypes) => {
                   },
                 ]);
                 setIsLoading(false);
+                // setLoadingCheck?.(true);
               } else {
                 setIsChecked?.((prev) =>
                   prev.filter((item) => item.id !== book?.id),
                 );
 
                 setIsLoading(false);
+                // setLoadingCheck?.(false);
               }
             }, 600);
           }}
