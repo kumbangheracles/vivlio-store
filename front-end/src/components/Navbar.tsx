@@ -325,6 +325,7 @@ export default function Navbar({
       (isMobile && path === "/account-mobile") ||
       (isMobile && path === "/account-mobile/wishlist") ||
       (isMobile && path === "/account-mobile/book-reviews") ||
+      (isMobile && path === "/account-mobile/transactions") ||
       path === "/payment" ? (
         <></>
       ) : (

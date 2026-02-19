@@ -42,7 +42,7 @@ async function fetchTransactions({
     });
 
     const data = res.json();
-    console.log("Res Trans:", res);
+    // console.log("Res Trans:", res);
     return data;
   } catch (error) {
     console.log("Error fetch transaction: ", error);

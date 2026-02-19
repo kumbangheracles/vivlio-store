@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 6,
   });
 
-  console.log("isPopular: ", popularBooks);
+  // console.log("isPopular: ", popularBooks);
   const newestBooks = await fetchBooksHome({
     sortDate: "newest_saved",
     limit: 12,
@@ -40,7 +40,7 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 6,
     status: ArticleStatusType.PUBLISH,
   });
-  console.log("Data Articles: ", articles);
+  // console.log("Data Articles: ", articles);
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve("intentional delay");

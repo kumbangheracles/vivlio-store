@@ -12,6 +12,7 @@ import useDeviceType from "@/hooks/useDeviceType";
 import NotFoundPage from "@/components/NotFoundPage";
 import useWishlist from "@/hooks/useWishlist";
 import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "@/components/GlobalLoading";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
@@ -43,10 +44,9 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
     sort,
     updateFilters,
   } = useWishlist({ dataWish: dataWishlists });
-
   const mounted = useMounted();
 
-  if (!mounted) return null;
+  if (!mounted) return <GlobalLoading />;
   if (!isMobile) {
     return <NotFoundPage />;
   }

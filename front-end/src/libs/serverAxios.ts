@@ -20,11 +20,11 @@ export const createServerAxios = ({
   if (isConsole === true) {
     instance.interceptors.request.use(
       (config) => {
-        console.log(" Server Request:", {
-          url: config.url,
-          method: config.method,
-          hasToken: !!config.headers.Authorization,
-        });
+        // console.log(" Server Request:", {
+        //   url: config.url,
+        //   method: config.method,
+        //   hasToken: !!config.headers.Authorization,
+        // });
         return config;
       },
       (error) => {
@@ -35,18 +35,18 @@ export const createServerAxios = ({
 
     instance.interceptors.response.use(
       (response) => {
-        console.log(" Server Response:", {
-          url: response.config.url,
-          status: response.status,
-        });
+        // console.log(" Server Response:", {
+        //   url: response.config.url,
+        //   status: response.status,
+        // });
         return response;
       },
       (error) => {
-        console.error(" Server Response Error:", {
-          url: error.config?.url,
-          status: error.response?.status,
-          data: error.response?.data,
-        });
+        // console.error(" Server Response Error:", {
+        //   url: error.config?.url,
+        //   status: error.response?.status,
+        //   data: error.response?.data,
+        // });
         return Promise.reject(error);
       },
     );

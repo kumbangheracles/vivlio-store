@@ -7,6 +7,7 @@ import React from "react";
 import CardBookWishlist from "./CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import useWishlist from "@/hooks/useWishlist";
+import FadeUpWrapper from "../Home/FadeUpWrapper";
 
 type PropTypes = {
   dataWish?: BookWithWishlist[];
@@ -53,19 +54,21 @@ const Wishlist = ({ dataWish }: PropTypes) => {
           </div>
           <div className="flex gap-2.5 flex-wrap">
             {dataWish?.length! > 0 ? (
-              dataWish?.map((item) => (
-                <CardBookWishlist
-                  key={item?.id}
-                  id={item?.bookId}
-                  title={String(item?.book?.title)}
-                  author={item?.book?.author as string}
-                  price={Number(item?.book?.price)}
-                  images={item?.book?.images}
-                  categories={item?.book?.categories}
-                  status={""}
-                  book_type={item?.book?.book_type!}
-                  fetchBooks={fetchBooks}
-                />
+              dataWish?.map((item, index) => (
+                <FadeUpWrapper delay={index * 100} key={item?.id}>
+                  <CardBookWishlist
+                    // key={item?.id}
+                    id={item?.bookId}
+                    title={String(item?.book?.title)}
+                    author={item?.book?.author as string}
+                    price={Number(item?.book?.price)}
+                    images={item?.book?.images}
+                    categories={item?.book?.categories}
+                    status={""}
+                    book_type={item?.book?.book_type!}
+                    fetchBooks={fetchBooks}
+                  />
+                </FadeUpWrapper>
               ))
             ) : (
               <div className="flex justify-center items-center w-full">

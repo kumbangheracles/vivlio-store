@@ -1,16 +1,19 @@
 "use client";
 import { ReactNode } from "react";
 import styled from "styled-components";
-
 interface PropTypes {
   value: string | ReactNode;
   label: string;
+  classNameLabel?: string;
+  style?: React.CSSProperties;
 }
 
-const DetailItem = ({ label, value }: PropTypes) => {
+const DetailItem = ({ label, value, classNameLabel, style }: PropTypes) => {
   return (
     <div>
-      <Label>{label}</Label>
+      <Label className={classNameLabel} style={{ ...style }}>
+        {label}
+      </Label>
       {value ? (
         <Value>{value}</Value>
       ) : (

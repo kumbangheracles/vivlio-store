@@ -63,7 +63,7 @@ const AccountPage = async ({ searchParams }: Params) => {
     title: params?.titleOrders,
   });
 
-  console.log("Data Transaction: ", dataTransaction);
+  // console.log("Data Transaction: ", dataTransaction);
   return (
     <AccountIndex
       dataUser={dataUser as UserProperties}

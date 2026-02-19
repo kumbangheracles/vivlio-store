@@ -70,7 +70,7 @@ async function fetchBooksHome({
 
     const data = res.json();
 
-    console.log("Res: ", res);
+    // console.log("Res: ", res);
 
     return data;
   } catch (err) {

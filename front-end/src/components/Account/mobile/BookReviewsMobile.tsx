@@ -18,6 +18,8 @@ import dayjs from "dayjs";
 import ModalReview from "@/components/ModalReview";
 import useDeviceType from "@/hooks/useDeviceType";
 import NotFoundPage from "@/components/NotFoundPage";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "@/components/GlobalLoading";
 interface PropTypes {
   bookReviews: BookReviewsProps[];
   initialStatus?: string;
@@ -86,7 +88,9 @@ const BookReviewsMobile = ({ bookReviews, initialStatus = "" }: PropTypes) => {
     setSelectedOption(status);
     setPage(currentPage);
   }, [searchParams]);
+  const mounted = useMounted();
 
+  if (!mounted) return <GlobalLoading />;
   if (!isMobile) {
     return <NotFoundPage />;
   }

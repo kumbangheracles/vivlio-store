@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     isRecomend: true,
   });
 
-  console.log("Recomend book: ", dataBooks);
+  // console.log("Recomend book: ", dataBooks);
 
   return (
     <html lang="en">

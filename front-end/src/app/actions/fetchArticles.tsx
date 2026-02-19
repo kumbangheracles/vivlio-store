@@ -40,7 +40,7 @@ async function fetchArticles({
 
     return filteredArticles;
   } catch (err: any) {
-    console.log("Error fetch articles:", err || err);
+    // console.log("Error fetch articles:", err || err);
     return [];
   }
 }

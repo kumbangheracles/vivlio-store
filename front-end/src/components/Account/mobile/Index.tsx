@@ -17,6 +17,8 @@ import { useState } from "react";
 import { FaRegMap } from "react-icons/fa";
 import { MdOutlineRateReview } from "react-icons/md";
 import NotFoundPage from "@/components/NotFoundPage";
+import { useMounted } from "@/hooks/useMounted";
+import GlobalLoading from "@/components/GlobalLoading";
 
 interface PropTypes {
   dataUser: UserProperties;
@@ -76,6 +78,10 @@ const AccountMobilePage = ({ dataUser }: PropTypes) => {
       setIsLoading(false);
     }
   };
+
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <>
       <div className="hidden sm:block">
