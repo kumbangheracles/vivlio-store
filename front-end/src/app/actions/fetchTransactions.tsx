@@ -10,6 +10,7 @@ async function fetchTransactions({
   page = 1,
   title = "",
   sortDateOrders = "",
+  sortOrder = "",
 }: TransactionParams = {}): Promise<BaseResponBook<TransactionProps>> {
   const session = await getServerSession(authOptions);
 
@@ -18,6 +19,10 @@ async function fetchTransactions({
       page: page.toString(),
       userId: session?.user?.id as string,
     });
+
+    // if (sortOrder) {
+    //   params.append("sortOrder", sortOrder);
+    // }
 
     if (title) {
       params.append("title", title);

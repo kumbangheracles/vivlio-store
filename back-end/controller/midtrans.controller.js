@@ -164,7 +164,7 @@ module.exports = {
         ],
         expiry: {
           unit: "minute",
-          duration: 1,
+          duration: 2,
         },
         callbacks: {
           finish: `${process.env.REDIRECT_URL_MIDTRANS}?status=success`,
@@ -224,7 +224,7 @@ module.exports = {
         })),
         expiry: {
           unit: "minute",
-          duration: 1,
+          duration: 2,
         },
         callbacks: {
           finish: `${process.env.REDIRECT_URL_MIDTRANS}?status=success`,

@@ -1,9 +1,15 @@
 "use client";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
+import { useMounted } from "@/hooks/useMounted";
 import { Result, Button } from "antd";
+import GlobalLoading from "./GlobalLoading";
 
 const NotFoundPage = () => {
   const { handlePushRoute } = useGlobalLoadingBar();
+
+  const mounted = useMounted();
+
+  if (!mounted) return <GlobalLoading />;
   return (
     <Result
       status="404"

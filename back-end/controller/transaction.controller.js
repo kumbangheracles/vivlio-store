@@ -46,7 +46,6 @@ module.exports = {
       const total = await UserPurchases.count({
         where: filters,
       });
-      console.log(total);
 
       const rows = await UserPurchases.findAll({
         limit: parsedLimit,
@@ -80,7 +79,7 @@ module.exports = {
 
         const purchaseDate = new Date(orderJson.purchaseDate).getTime();
 
-        const expiryTime = new Date(purchaseDate + 1 * 60 * 1000);
+        const expiryTime = new Date(purchaseDate + 2 * 60 * 1000);
 
         return {
           ...orderJson,

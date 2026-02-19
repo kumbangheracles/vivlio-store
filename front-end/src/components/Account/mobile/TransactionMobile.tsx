@@ -6,6 +6,9 @@ import {
   ArrowLeftOutlined,
   ClearOutlined,
   SearchOutlined,
+  UpCircleFilled,
+  UpCircleOutlined,
+  UpOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { Button, DatePicker, Input, Result, Select } from "antd";
@@ -15,6 +18,7 @@ import TransactionItem from "../TransactionItem";
 import { cn } from "@/libs/cn";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "@/components/GlobalLoading";
+import { useRef } from "react";
 
 interface PropTypes {
   dataTransactions?: TransactionProps[];
@@ -40,8 +44,16 @@ const TransactionMobileIndex = ({ dataTransactions }: PropTypes) => {
     updateFilterDate,
     updateFiltersStatus,
   } = useTransaction({ dataTransactions });
+  const myRef = useRef<HTMLDivElement>(null);
+  const goUp = () => {
+    if (myRef) {
+      myRef?.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
   const mounted = useMounted();
-
   if (!mounted) return <GlobalLoading />;
   if (!isMobile) {
     return <NotFoundPage />;
@@ -57,7 +69,7 @@ const TransactionMobileIndex = ({ dataTransactions }: PropTypes) => {
 
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-col gap-3 !w-full p-2 ">
-          <div className="w-full flex items-center gap-4">
+          <div className="w-full flex items-center gap-4" ref={myRef}>
             <Input
               placeholder="Search book name or oder number"
               className="!w-[100%]"
@@ -145,18 +157,28 @@ const TransactionMobileIndex = ({ dataTransactions }: PropTypes) => {
                 ))}
               </div>
 
-              {hasMore && (
-                <div className="flex items-center px-2 justify-start w-full ">
-                  <Button
-                    loading={isPending || loadingMore}
-                    disabled={isPending || loadingMore}
-                    onClick={() => handleLoadMore()}
-                    type="primary"
+              <div className="flex items-center justify-between w-full">
+                {hasMore && (
+                  <div className="flex items-center px-2 justify-start w-full ">
+                    <Button
+                      loading={isPending || loadingMore}
+                      disabled={isPending || loadingMore}
+                      onClick={() => handleLoadMore()}
+                      type="primary"
+                    >
+                      Load More
+                    </Button>
+                  </div>
+                )}
+                {(dataTransactions?.length as number) > 15 && (
+                  <div
+                    onClick={() => goUp()}
+                    className="text-[20px] w-[40px] h-[40px] overflow-hidden flex items-center justify-center p-4 rounded-full bg-white border border-gray-500 mr-6"
                   >
-                    Load More
-                  </Button>
-                </div>
-              )}
+                    <UpOutlined />
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>

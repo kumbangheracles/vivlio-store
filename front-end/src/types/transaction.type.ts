@@ -23,4 +23,5 @@ export interface TransactionParams {
   limitOrders?: string;
   orderStatus?: string;
   sortDateOrders?: string;
+  sortOrder?: string;
 }

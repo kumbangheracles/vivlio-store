@@ -83,7 +83,7 @@ const useBookReviews = ({
     }
 
     startTransition(() => {
-      router.push(url, { scroll: false });
+      router.replace(url, { scroll: false });
       router.refresh();
     });
 

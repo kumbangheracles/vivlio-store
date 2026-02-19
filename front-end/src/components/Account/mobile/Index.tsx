@@ -33,7 +33,7 @@ const AccountMobilePage = ({ dataUser }: PropTypes) => {
       id: 1,
       title: "Transaction",
       icon: <FileDoneOutlined />,
-      path: "/account-mobile/transaction",
+      path: "/account-mobile/transactions",
     },
     {
       id: 2,

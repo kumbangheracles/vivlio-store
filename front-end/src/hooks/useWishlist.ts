@@ -20,7 +20,7 @@ const useWishlist = ({ dataWish }: PropTypes) => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { handlePushRoute } = useGlobalLoadingBar();
+  const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
 
   const [isPending, startTransition] = useTransition();
@@ -56,7 +56,7 @@ const useWishlist = ({ dataWish }: PropTypes) => {
     }
 
     startTransition(() => {
-      router.push(url, { scroll: false });
+      router.replace(url, { scroll: false });
       router.refresh();
     });
   };
@@ -95,7 +95,7 @@ const useWishlist = ({ dataWish }: PropTypes) => {
     }
 
     startTransition(() => {
-      handlePushRoute(url);
+      handleReplaceRoute(url);
       router.refresh();
     });
   };

@@ -504,7 +504,7 @@ const TransactionItem = ({ item, index }: PropTypes) => {
             {item?.paymentStatus === "PENDING" && (
               <div className="mt-4">
                 <h4 className="font-semibold text-xl">Payment Details</h4>
-                <div className="flex items-start gap-3 flex-col justify-between">
+                <div className="flex items-start gap-3 p-3 flex-col justify-between">
                   <DetailItem
                     label="Price Total"
                     value={item?.priceAtPurchases}
