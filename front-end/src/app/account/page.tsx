@@ -6,7 +6,7 @@ import fetchUser from "../actions/fetchUser";
 import fetchWishlist from "../../components/Account/fetchWishlist";
 import fetchBookReviews from "../actions/fetchBookReviews";
 import { BookReviewStatus } from "@/types/bookreview.type";
-
+import fetchTransactions from "../actions/fetchTransactions";
 export const metadata = {
   title: "ViviBook - Profile",
   description: "Profile page",
@@ -19,8 +19,17 @@ interface Params {
     limit?: string;
     sortPrice?: "1" | "-1";
     sortDate?: "newest_saved" | "oldest_saved";
+
+    // wishlist
     pageWish?: string;
     limitWish?: string;
+
+    // transactions
+    orderStatus?: string;
+    limitOrders?: string;
+    sortDateOrders?: string;
+    sortPriceOrders?: string;
+    titleOrders?: string;
   };
 }
 
@@ -47,6 +56,14 @@ const AccountPage = async ({ searchParams }: Params) => {
   });
 
   const dataUser = await fetchUser();
+  const dataTransaction = await fetchTransactions({
+    limitOrders: params?.limitOrders?.toString() ?? "6",
+    orderStatus: params?.orderStatus,
+    sortDateOrders: params?.sortDateOrders,
+    title: params?.titleOrders,
+  });
+
+  console.log("Data Transaction: ", dataTransaction);
   return (
     <AccountIndex
       dataUser={dataUser as UserProperties}
@@ -57,6 +74,7 @@ const AccountPage = async ({ searchParams }: Params) => {
       //   limit: limitWish,
       //   sortPrice,
       // })}
+      dataTransaction={dataTransaction?.results}
       fetchReviews={fetchBookReviews}
     />
   );

@@ -7,13 +7,23 @@ const {
 } = require("../models/index");
 module.exports = {
   async getAllReview(req, res) {
-    const { status, sortBy = "createdAt", sortOrder = "DESC" } = req.query;
+    const {
+      status,
+      sortBy = "createdAt",
+      sortOrder = "DESC",
+      userId,
+    } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     // WHERE hanya kolom valid
     const where = {};
+
+    if (userId) {
+      where.userId = userId;
+    }
+
     if (status) {
       where.status = status;
     }

@@ -294,7 +294,7 @@ const Account = ({ dataUser }: PropsType) => {
   //   }
   // }, [activeKey]);
   return (
-    <Card className="shadow-md">
+    <div className="p-4 rounded-xl border border-gray-200">
       <TitleTab>Account Setting</TitleTab>
       <CardStyled>
         <PictureSide>
@@ -426,7 +426,7 @@ const Account = ({ dataUser }: PropsType) => {
           />
         </div>
       </Modal>
-    </Card>
+    </div>
   );
 };
 

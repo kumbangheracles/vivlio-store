@@ -4,7 +4,9 @@ const { v4: uuidv4 } = require("uuid");
 const userPurchases = require("../models/userPurchases");
 const { BookStats, Book, UserCart } = require("../models/index");
 const axios = require("axios");
+const { Op } = require("sequelize");
 const { sequelize } = require("../config/database");
+const { generateId } = require("../utils/generateId");
 let snap = new Midtrans.Snap({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
@@ -38,12 +40,14 @@ module.exports = {
       }
 
       const purchases = await userPurchases.findAll({
-        where: { orderGroupId: order_id },
+        where: {
+          [Op.or]: [{ orderGroupId: order_id }, { orderId: order_id }],
+        },
         transaction: t,
         lock: true,
       });
 
-      console.log("Finded Purchase: ", purchases);
+      // console.log("Finded Purchase: ", purchases);
 
       if (purchases.length === 0) {
         await t.rollback();
@@ -55,6 +59,31 @@ module.exports = {
       if (purchases.every((p) => p.paymentStatus === "PAID")) {
         await t.commit();
         return res.status(200).json({ message: "Already processed" });
+      }
+      if (transaction_status === "expire") {
+        for (const purchase of purchases) {
+          await purchase.update(
+            { paymentStatus: "CANCELLED" },
+            { transaction: t },
+          );
+          await UserCart.destroy({
+            where: {
+              userId: purchase.userId,
+              bookId: purchase.bookId,
+            },
+            transaction: t,
+          });
+        }
+
+        console.log(
+          "Transaction status now =============================== : ",
+          transaction_status,
+        );
+
+        await t.commit();
+        return res.status(200).json({
+          message: "Payment expired and canceled",
+        });
       }
 
       if (
@@ -135,7 +164,7 @@ module.exports = {
         ],
         expiry: {
           unit: "minute",
-          duration: 2,
+          duration: 1,
         },
         callbacks: {
           finish: `${process.env.REDIRECT_URL_MIDTRANS}?status=success`,
@@ -195,7 +224,7 @@ module.exports = {
         })),
         expiry: {
           unit: "minute",
-          duration: 2,
+          duration: 1,
         },
         callbacks: {
           finish: `${process.env.REDIRECT_URL_MIDTRANS}?status=success`,
@@ -214,6 +243,7 @@ module.exports = {
           priceAtPurchases: Number(item.price),
           midtransToken: transaction.token,
           paymentStatus: "PENDING",
+          order_number: generateId(),
         }));
 
         await userPurchases.bulkCreate(purchaseRows);
@@ -235,16 +265,17 @@ module.exports = {
     }
   },
   async cancelPayment(req, res) {
+    const t = await sequelize.transaction();
     try {
-      const { orderId } = req.body;
-
-      if (!orderId)
+      const { orderGroupId } = req.body;
+      console.log("Order Id: ", orderGroupId);
+      if (!orderGroupId)
         return res.status(403).json({
           message: "Order Id Not Found",
         });
 
       const response = await axios.post(
-        `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`,
+        `https://api.sandbox.midtrans.com/v2/${orderGroupId}/cancel`,
         {},
         {
           headers: {
@@ -254,12 +285,38 @@ module.exports = {
           },
         },
       );
+      const userPurchase = await userPurchases.findOne({
+        where: { orderGroupId },
+        transaction: t,
+        lock: true,
+      });
+      if (!userPurchase) {
+        await t.rollback();
+        return res.status(404).json({
+          message: "Purchase not found",
+        });
+      }
+      await userPurchase.update(
+        { paymentStatus: "CANCELLED" },
+        { transaction: t },
+      );
+
+      await UserCart.destroy({
+        where: {
+          userId: userPurchase.userId,
+          bookId: userPurchase.bookId,
+        },
+        transaction: t,
+      });
+
+      await t.commit(); // ✅ WAJIB
 
       return res.status(200).json({
         message: "Payment cancelled",
         result: response.data,
       });
     } catch (error) {
+      await t.rollback(); // ✅ WAJIB
       console.error(error);
       return res.status(500).json({
         message: "Cancel failed",
@@ -287,7 +344,7 @@ module.exports = {
 
       return res.status(200).json({
         message: "Success",
-        result: { ...response.data, expirityTime: "900000" },
+        result: { ...response.data },
       });
     } catch (error) {
       console.error(error.response?.data || error.message);

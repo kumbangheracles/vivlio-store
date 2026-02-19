@@ -13,12 +13,15 @@ import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import NotFoundPage from "../NotFoundPage";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "../GlobalLoading";
+import TransactionIndex from "./Transaction";
+import { TransactionProps } from "@/types/transaction.type";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
   fetchWishlist?: () => void;
   dataBookReviews?: BookReviewsProps[];
   fetchReviews?: () => void;
+  dataTransaction?: TransactionProps[];
 }
 type TabKey = "account" | "wishlist" | "transaction" | "book-reviews";
 const AccountIndex: React.FC<AccountProps> = ({
@@ -27,6 +30,7 @@ const AccountIndex: React.FC<AccountProps> = ({
   dataWishlist,
   fetchWishlist,
   fetchReviews,
+  dataTransaction,
 }) => {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("key") as TabKey) || "account";
@@ -52,7 +56,9 @@ const AccountIndex: React.FC<AccountProps> = ({
       key: "transaction",
       children: (
         <>
-          <h1>Transaction Page</h1>
+          <TransactionIndex
+            dataTransactions={dataTransaction as TransactionProps[]}
+          />
         </>
       ),
     },
@@ -110,6 +116,7 @@ const AccountIndex: React.FC<AccountProps> = ({
             activeKey={activeTab}
             items={tabItems}
             onChange={handleTabChange}
+            tabBarStyle={{ width: 200 }}
           />
         </CardContainer>
       </div>

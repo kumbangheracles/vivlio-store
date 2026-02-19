@@ -23,7 +23,6 @@ export const submitReview = async ({
   onSuccess,
   onFinally,
 }: SubmitReviewParams) => {
-  // 🔹 Validasi
   if (!data?.comment || isEmpty(data.comment)) {
     message.error("Comment are required!.");
     return;

@@ -213,6 +213,15 @@ BookReview.belongsTo(User, {
 //     user.password = await bcrypt.hash(user.password, 10);
 //   }
 // });
+// Books ↔ UserPurchases
+Book.hasMany(UserPurchases, {
+  foreignKey: "bookId",
+  as: "purchases",
+});
+UserPurchases.belongsTo(Book, {
+  foreignKey: "bookId",
+  as: "book",
+});
 
 module.exports = {
   Book,

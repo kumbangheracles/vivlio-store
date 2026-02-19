@@ -14,6 +14,7 @@ import { ErrorHandler } from "@/helpers/handleError";
 import capitalizeWords from "@/libs/capitalizeEachWord";
 import useCountDown from "@/hooks/useCountDown";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 const PaymentIndex = () => {
   const auth = useAuth();
@@ -23,6 +24,7 @@ const PaymentIndex = () => {
   const params = useSearchParams();
   const { handleReplaceRoute } = useGlobalLoadingBar();
   const paramsStatus = params.get("transaction_status");
+  const router = useRouter();
   const paramsOrderId = params.get("order_id");
   const [loading, setLoading] = useState<boolean>(false);
   const [dataOrder, setDataOrder] = useState<MidtransTransactionDetail | null>(
@@ -68,17 +70,18 @@ const PaymentIndex = () => {
     try {
       setLoading(true);
 
-      await myAxios.post(`/midtrans/cancel-payment`, { orderId });
+      await myAxios.post(`/midtrans/cancel-payment`, { orderGroupId: orderId });
 
       message.success("Cancel payment success");
 
+      handleReplaceRoute("/account?key=transaction");
       // setTimeout(() => {
-      //   handleReplaceRoute("/account?key=transaction");
       // }, 3000);
     } catch (error) {
       ErrorHandler(error);
     } finally {
       setLoading(false);
+      router.refresh();
     }
   };
 

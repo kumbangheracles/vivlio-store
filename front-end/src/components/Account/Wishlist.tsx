@@ -31,7 +31,7 @@ const Wishlist = ({ dataWish }: PropTypes) => {
         <Suspense fallback={<GlobalLoading />}>
           <div className="flex items-center justify-between">
             <h4 className="tracking-wide font-semibold text-2xl mb-5">
-              Wishlist Page
+              Wishlist
             </h4>
 
             <div className="flex items-center gap-2">

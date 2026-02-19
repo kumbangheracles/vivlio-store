@@ -32,6 +32,7 @@ async function fetchBookReviews(
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit,
+      userId: session?.user?.id as string,
     });
 
     if (status && status.trim() !== "") {
