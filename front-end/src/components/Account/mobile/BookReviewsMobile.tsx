@@ -227,8 +227,8 @@ const BookReviewsMobile = ({ bookReviews, initialStatus = "" }: PropTypes) => {
             {hasMore && (
               <Button
                 onClick={handleLoadMore}
-                disabled={loadingLoad}
-                loading={loadingLoad}
+                disabled={loadingLoad || isPending}
+                loading={loadingLoad || isPending}
                 type="primary"
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
               >

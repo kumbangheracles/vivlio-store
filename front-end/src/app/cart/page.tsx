@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const CartPage = async () => {
   const dataCartedBooks = await fetchCartedBooks();
-  console.log("Data Carted Book: ", dataCartedBooks);
+  // console.log("Data Carted Book: ", dataCartedBooks);
   return <CartIndex books={dataCartedBooks} />;
 };
 

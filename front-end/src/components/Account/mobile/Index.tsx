@@ -47,12 +47,7 @@ const AccountMobilePage = ({ dataUser }: PropTypes) => {
       icon: <MdOutlineRateReview />,
       path: "/account-mobile/book-reviews",
     },
-    {
-      id: 4,
-      title: "Address",
-      icon: <FaRegMap />,
-      path: "/account-mobile/address",
-    },
+
     {
       id: 5,
       title: "Account",

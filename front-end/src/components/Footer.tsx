@@ -21,17 +21,19 @@ import { usePathname, useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useMounted } from "@/hooks/useMounted";
 const Footer = () => {
-  const router = useRouter();
   const isMobile = useDeviceType();
   const path = usePathname();
-  const [classFoot, setClassFoot] = useState("");
   const { handlePushRoute } = useGlobalLoadingBar();
+  const [classFoot, setClassFoot] = useState("");
   const handleStyleFoot = (pathName: string) => {
     if (
       pathName === "/" ||
       pathName === "/account-mobile" ||
-      pathName === "/category" ||
-      pathName === "/account-mobile/wishlist"
+      pathName.includes("/category") ||
+      pathName === "/account-mobile/wishlist" ||
+      pathName === "/account-mobile/transactions" ||
+      pathName === "/account-mobile/book-reviews" ||
+      pathName === "/account-mobile/profile"
     ) {
       setClassFoot(
         "bg-white rounded-full w-[40px] h-[40px] p-1 flex items-center transition-all justify-center absolute top-[-20px]",
@@ -86,7 +88,12 @@ const Footer = () => {
               <div className="flex items-center transition-all flex-col relative w-full ">
                 <UserOutlined
                   className={
-                    path === "/account-mobile" ? classFoot : "w-[20px]"
+                    path === "/account-mobile" ||
+                    path === "/account-mobile/transactions" ||
+                    path === "/account-mobile/profile" ||
+                    path === "/account-mobile/book-reviews"
+                      ? classFoot
+                      : "w-[20px]"
                   }
                   onClick={() => handlePushRoute("/account-mobile")}
                 />
