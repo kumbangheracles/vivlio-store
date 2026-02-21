@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const { User, Role } = require("../models");
 const Yup = require("yup");
 const { Op } = require("sequelize");
 const sendEmailVerification = require("../service/email.service");
 // const { v4: uuidv4 } = require("uuid");
 const { generateVerificationCode } = require("../utils/verificationCode");
+const { encrypt } = require("../config/encryption");
 const registerValidateModels = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
@@ -54,7 +54,7 @@ module.exports = {
           data: null,
         });
       }
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await encrypt(password, 10);
       const verificationCode = generateVerificationCode();
       const verificationCodeCreatedAt = new Date();
       const result = await User.create({
@@ -241,13 +241,13 @@ module.exports = {
       console.log("Input Password:", password);
       console.log("DB Password:", userByIdentifier.password);
       // validasi password
-      // const validatePassword = await bcrypt.compare(
-      //   password,
-      //   userByIdentifier.password,
-      // );
+      const validatePassword = await encrypt(
+        password,
+        userByIdentifier.password,
+      );
 
       // untuk sementara
-      const validatePassword = password === userByIdentifier.password;
+      // const validatePassword = password === userByIdentifier.password;
 
       if (!validatePassword) {
         return res.status(403).json({
@@ -313,7 +313,13 @@ module.exports = {
     }
   },
 
-  async changePassword(req, res) {},
+  // async changePassword(req, res) {
+  //   try {
+
+  //   } catch (error) {
+
+  //   }
+  // },
 
   // refresh
   async refresh(req, res) {

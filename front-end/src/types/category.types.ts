@@ -9,6 +9,10 @@ export type CategoryProps = {
   updatedAt: Date;
 };
 
+export type CategoryParams = {
+  status?: boolean;
+};
+
 export const initialCategoryValue: CategoryProps = {
   categoryId: "",
   name: "",

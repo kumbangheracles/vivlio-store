@@ -8,11 +8,17 @@ import React, {
   useState,
 } from "react";
 import { FormKey } from "./AccountMobile";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import AppInput from "@/components/AppInput";
 import { UserProperties } from "@/types/user.type";
 import PasswordCheck from "./PasswordCheck";
 import { cn } from "@/libs/cn";
+import myAxios from "@/libs/myAxios";
+import { useAuth } from "@/hooks/useAuth";
+import { ErrorHandler } from "@/helpers/handleError";
+import { isEmpty } from "@/helpers/validation";
+import { CategoryProps } from "@/types/category.types";
+import { useRouter } from "next/navigation";
 
 interface PropTypes extends HTMLAttributes<HTMLDivElement> {
   keyForm: FormKey | null;
@@ -20,6 +26,8 @@ interface PropTypes extends HTMLAttributes<HTMLDivElement> {
   isOverlay: boolean;
   setIsOverlay: Dispatch<SetStateAction<boolean>>;
   dataUser: UserProperties;
+  dataCategory: CategoryProps[];
+  handleOpenForm: (key: FormKey | null, type: "open" | "close") => void;
 }
 
 const OverlayModal = ({
@@ -28,17 +36,23 @@ const OverlayModal = ({
   setKeyForm,
   setIsOverlay,
   dataUser,
+  dataCategory,
+  handleOpenForm,
   ...htmlAttributes
 }: PropTypes) => {
+  const auth = useAuth();
   const sheetRef = useRef<HTMLDivElement>(null);
   const startY = useRef(0);
+  const router = useRouter();
   const currentY = useRef(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [newDataUser, setNewDataUser] = useState<UserProperties | null>(
     dataUser,
   );
   const [dragging, setDragging] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
+
   const passwordRules = {
     minLength: (newDataUser?.newPassword?.length as number) >= 8,
     lowercase: /[a-z]/.test(newDataUser?.newPassword || ""),
@@ -85,6 +99,84 @@ const OverlayModal = ({
     currentY.current = 0;
   };
 
+  const handleSubmitData = async (data: UserProperties, type: FormKey) => {
+    let payload: UserProperties = {};
+
+    if (type === "fullName") {
+      if ((data?.fullName?.length as number) < 7) {
+        message.error("Full Name minimum 7 character.");
+        return;
+      }
+
+      if (isEmpty(data?.fullName)) {
+        message.error("Full Name is required.");
+        return;
+      }
+
+      payload.fullName = data?.fullName;
+    } else if (type === "password") {
+      if (
+        isEmpty(data?.newPassword) ||
+        isEmpty(data?.oldPassword) ||
+        isEmpty(data?.confirmPassword)
+      ) {
+        message.error("All password field is required.");
+        return;
+      }
+      payload.password = data?.confirmPassword;
+    } else if (type === "preference") {
+      if (selected.length < 5) {
+        message.error("Category preference minimum 5.");
+        return;
+      }
+
+      payload.category_preference = dataCategory?.filter((item) =>
+        selected.includes(item.categoryId),
+      );
+    } else if (type === "username") {
+      if ((data?.username?.length as number) > 20) {
+        message.error("Username maximum 20 character.");
+        return;
+      }
+      if (data?.username?.includes(" ")) {
+        message.error("Username cannot contain spaces.");
+        return;
+      }
+
+      if (isEmpty(data?.username)) {
+        message.error("Username is required.");
+        return;
+      }
+      payload.username = data?.username;
+    }
+
+    try {
+      setLoading(true);
+      const res = await myAxios.patch(`/users/${auth?.user?.id}`, payload);
+
+      if (type === "fullName") {
+        message.success("Success update full name.");
+      } else if (type === "password") {
+        message.success("Success update password.");
+      } else if (type === "preference") {
+        message.success("Success update category preference.");
+      } else if (type === "username") {
+        message.success("Success update username.");
+      }
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoading(false);
+      setKeyForm(null);
+      setIsOverlay(false);
+      router.refresh();
+    }
+  };
+  useEffect(() => {
+    if (dataUser?.category_preference && selected.length === 0) {
+      setSelected(dataUser.category_preference.map((item) => item.categoryId));
+    }
+  }, [dataUser]);
   return (
     <div
       className="fixed inset-0 flex items-end z-50"
@@ -123,10 +215,75 @@ const OverlayModal = ({
                   <AppInput
                     placeholder="Full Name"
                     variant="filled"
+                    onChange={(e) =>
+                      setNewDataUser({
+                        ...newDataUser,
+                        fullName: e.target.value,
+                      })
+                    }
                     className="border !border-gray-500"
                   />
                 </Form.Item>
               </div>
+
+              <Button
+                loading={loading}
+                type="primary"
+                style={{ width: "100%", minHeight: 38 }}
+                disabled={
+                  dataUser?.fullName === newDataUser?.fullName ||
+                  isEmpty(newDataUser?.fullName)
+                }
+                onClick={() =>
+                  handleSubmitData(newDataUser as UserProperties, "fullName")
+                }
+              >
+                Save
+              </Button>
+            </div>
+          )}
+          {keyForm === "username" && (
+            <div className="p-4">
+              <h4 className="font-semibold text-center text-[18px]">
+                Username
+              </h4>
+
+              <p className="text-sm text-gray-500 my-4">
+                This username will be used on several pages.
+              </p>
+              <div>
+                <Form.Item
+                  name={"username"}
+                  initialValue={newDataUser?.username}
+                >
+                  <AppInput
+                    placeholder="Full Name"
+                    variant="filled"
+                    onChange={(e) =>
+                      setNewDataUser({
+                        ...newDataUser,
+                        username: e.target.value,
+                      })
+                    }
+                    className="border !border-gray-500"
+                  />
+                </Form.Item>
+              </div>
+
+              <Button
+                loading={loading}
+                type="primary"
+                style={{ width: "100%", minHeight: 38 }}
+                disabled={
+                  dataUser?.username === newDataUser?.username ||
+                  isEmpty(newDataUser?.username)
+                }
+                onClick={() =>
+                  handleSubmitData(newDataUser as UserProperties, "username")
+                }
+              >
+                Save
+              </Button>
             </div>
           )}
           {keyForm === "password" && (
@@ -205,9 +362,21 @@ const OverlayModal = ({
               </div>
 
               <Button
+                loading={loading}
                 type="primary"
-                disabled={!passwordRules.minLength}
+                disabled={
+                  !passwordRules.minLength ||
+                  !passwordRules.lowercase ||
+                  !passwordRules.numberSymbol ||
+                  !passwordRules.uppercase ||
+                  isEmpty(newDataUser?.newPassword) ||
+                  isEmpty(newDataUser?.oldPassword) ||
+                  isEmpty(newDataUser?.confirmPassword)
+                }
                 style={{ width: "100%", marginTop: "17px", minHeight: 38 }}
+                onClick={() =>
+                  handleSubmitData(newDataUser as UserProperties, "password")
+                }
               >
                 Save
               </Button>
@@ -223,26 +392,41 @@ const OverlayModal = ({
               <p className="text-sm text-gray-500 my-4">
                 Select maximum 5 category which you prefered.
               </p>
-              <div className="flex flex-wrap gap-3 max-h-[270px] overflow-scroll">
-                {[
-                  Array.from({ length: 20 }).map((_, index) => (
-                    <h4
-                      key={index}
-                      onClick={() => {
-                        if (selected.length >= 5) return;
-                        setSelected((prev) =>
-                          prev.includes(index)
-                            ? prev.filter((i) => i !== index)
-                            : [...prev, index],
-                        );
-                      }}
-                      className={`p-3 tracking-wider text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm  ${cn(selected.includes(index) ? "bg-sky-200" : "bg-gray-100")}`}
-                    >
-                      Fantasy
-                    </h4>
-                  )),
-                ]}
+              <div className="flex flex-wrap gap-1 max-h-[270px] overflow-scroll">
+                {dataCategory?.map((item) => (
+                  <h4
+                    key={item?.categoryId}
+                    onClick={() => {
+                      setSelected((prev) => {
+                        const isSelected = prev.includes(item.categoryId);
+
+                        if (isSelected) {
+                          return prev.filter((id) => id !== item.categoryId);
+                        }
+
+                        if (prev.length >= 5) {
+                          return prev;
+                        }
+
+                        return [...prev, item.categoryId];
+                      });
+                    }}
+                    className={`p-3 tracking-wider text-sm flex justify-center items-center  min-w-[90px] rounded-2xl text-[11px] sm:text-sm ${selected.includes(item.categoryId) ? "bg-sky-200" : "bg-gray-100"}`}
+                  >
+                    {item?.name}
+                  </h4>
+                ))}
               </div>
+              <Button
+                loading={loading}
+                type="primary"
+                style={{ width: "100%", marginTop: "17px", minHeight: 38 }}
+                onClick={() =>
+                  handleSubmitData(newDataUser as UserProperties, "preference")
+                }
+              >
+                Save
+              </Button>
             </div>
           )}
         </Form>

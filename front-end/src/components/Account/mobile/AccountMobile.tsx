@@ -8,20 +8,21 @@ import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../../assets/images/profile-default.jpg";
-import { Button, Divider } from "antd";
+import { Button, Divider, Empty } from "antd";
 import { useEffect, useState } from "react";
 import OverlayModal from "./OverlayModal";
+import { CategoryProps } from "@/types/category.types";
 interface PropTypes {
   dataUser: UserProperties;
+  dataCategory: CategoryProps[];
 }
-export type FormKey = "fullName" | "password" | "preference";
-const AccountMobileIndex = ({ dataUser }: PropTypes) => {
+export type FormKey = "fullName" | "password" | "preference" | "username";
+const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
   const router = useRouter();
   const isMobile = useDeviceType();
   const [overlay, setIsOverlay] = useState<boolean>(false);
   const [key, setKey] = useState<FormKey | null>(null);
   const mounted = useMounted();
-
   const handleOpenForm = (key: FormKey | null, type: "open" | "close") => {
     if (type === "open") {
       setIsOverlay(true);
@@ -80,6 +81,18 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
             </div>
             <EditOutlined onClick={() => handleOpenForm("fullName", "open")} />
           </div>
+          {/* Username */}
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <h4 className="font-medium text-[12px] text-gray-500">
+                Username
+              </h4>
+              <h4 className="font-semibold text-[10px]">
+                {dataUser?.username}
+              </h4>
+            </div>
+            <EditOutlined onClick={() => handleOpenForm("username", "open")} />
+          </div>
           {/* Email */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -112,22 +125,24 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
           <h4 className="font-semibold text-sm">Preference</h4>
           <EditOutlined onClick={() => handleOpenForm("preference", "open")} />
         </div>
-        <div className="flex flex-wrap gap-2  mt-4">
-          <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
-            Fantasy
-          </h4>
-          <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
-            Fantasy
-          </h4>
-          <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
-            Fantasy
-          </h4>
-          <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
-            Fantasy
-          </h4>
-          <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
-            Fantasy
-          </h4>
+        <div className="flex flex-wrap gap-1 justify-center  mt-4">
+          {dataUser?.category_preference?.length === 0 ||
+          dataUser?.category_preference === null ? (
+            <div className="flex items-center justify-center w-full">
+              <Empty />
+            </div>
+          ) : (
+            <>
+              {dataUser?.category_preference?.map((item) => (
+                <h4
+                  key={item?.categoryId}
+                  className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
+                >
+                  {item?.name}
+                </h4>
+              ))}
+            </>
+          )}
         </div>
       </div>
 
@@ -140,11 +155,13 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
 
       {overlay && (
         <OverlayModal
+          dataCategory={dataCategory}
           dataUser={dataUser}
           isOverlay={overlay}
           setIsOverlay={setIsOverlay}
           keyForm={key}
           setKeyForm={setKey}
+          handleOpenForm={handleOpenForm}
         />
       )}
     </div>

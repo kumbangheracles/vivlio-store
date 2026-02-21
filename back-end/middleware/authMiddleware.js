@@ -19,7 +19,7 @@ exports.authMiddleware = (req, res, next) => {
 
     if (!roleData) return res.status(403).json({ message: "Invalid Role" });
 
-    const userData = await User.findOne({ where: { username } });
+    const userData = await User.findOne({ where: { id } });
     if (!userData) return res.status(404).json({ message: "Admin not found" });
     console.log("decoded", decoded.UserInfo);
     req.id = userData.id;

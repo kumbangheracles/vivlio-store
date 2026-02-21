@@ -6,6 +6,7 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const { sequelize } = require("../config/database");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
+const { encrypt } = require("../config/encryption");
 router.get(
   "/public",
   authMiddleware,
@@ -291,6 +292,13 @@ router.patch(
       if (!id) {
         return res.status(400).json({ message: "ID is required" });
       }
+
+      if (req.body.fullName.length >= 25) {
+        return res
+          .status(400)
+          .json({ message: "Full Name maximum 25 character." });
+      }
+
       let profileImage = req.body.profileImage;
 
       const user = await User.findByPk(id, { transaction: t });
@@ -311,13 +319,10 @@ router.patch(
       const updateData = { ...req.body };
 
       if (req.body.password) {
-        const isSamePassword = await bcrypt.compare(
-          req.body.password,
-          user.password,
-        );
+        const isSamePassword = await encrypt(req.body.password, user.password);
 
         if (!isSamePassword) {
-          updateData.password = await bcrypt.hash(req.body.password, 10);
+          updateData.password = await encrypt(req.body.password, 10);
         } else {
           delete updateData.password;
         }

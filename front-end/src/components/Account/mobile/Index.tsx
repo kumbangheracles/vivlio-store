@@ -19,6 +19,7 @@ import { MdOutlineRateReview } from "react-icons/md";
 import NotFoundPage from "@/components/NotFoundPage";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "@/components/GlobalLoading";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PropTypes {
   dataUser: UserProperties;
@@ -26,8 +27,14 @@ interface PropTypes {
 
 const AccountMobilePage = ({ dataUser }: PropTypes) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { handlePushRoute } = useGlobalLoadingBar();
+  const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const auth = useAuth();
+
+  if (!auth?.accessToken) {
+    message.info("You must login first!.");
+    handleReplaceRoute("/auth/login");
+  }
   const listSection = [
     {
       id: 1,

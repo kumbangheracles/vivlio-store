@@ -1,3 +1,10 @@
+type CategoryProps = {
+  categoryId: string;
+  name: string;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 export type UserProperties = {
   id?: string;
   fullName?: string;
@@ -15,6 +22,7 @@ export type UserProperties = {
   role?: string;
   oldPassword?: string;
   newPassword?: string;
+  category_preference?: CategoryProps[];
 };
 
 export type UserImage = {

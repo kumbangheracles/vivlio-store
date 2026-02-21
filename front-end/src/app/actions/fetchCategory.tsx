@@ -1,7 +1,9 @@
 import myAxios from "@/libs/myAxios";
-import { CategoryProps } from "@/types/category.types";
+import { CategoryParams, CategoryProps } from "@/types/category.types";
 
-async function fetchCategory(): Promise<CategoryProps[]> {
+async function fetchCategory({ status = true }: CategoryParams = {}): Promise<
+  CategoryProps[]
+> {
   try {
     // const session = await getServerSession(authOptions);
 
@@ -9,13 +11,13 @@ async function fetchCategory(): Promise<CategoryProps[]> {
     //   window.location.href = "/unoutherized";
     // }
 
+    const params = new URLSearchParams({
+      status: status.toString(),
+    });
     const url = "/book-category/public";
-    const response = await myAxios.get(url);
+    const response = await myAxios.get(`${url}?${params}`);
 
-    const filteredCategory = response.data.results.filter(
-      (item: CategoryProps) => item.status === true,
-    );
-    return filteredCategory;
+    return response?.data?.results;
   } catch (err: any) {
     console.log("fetchBooks error:", err.message || err);
     return [];

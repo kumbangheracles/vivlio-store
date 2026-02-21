@@ -40,6 +40,11 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    category_preference: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+      allowNull: true,
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
