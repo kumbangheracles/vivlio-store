@@ -20,6 +20,7 @@ import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
 import { GenreProperties } from "@/types/genre.type";
 import { useOverlayStore } from "@/zustand/useOverlay.store";
+import { useMounted } from "@/hooks/useMounted";
 interface LayoutProps {
   children: ReactNode;
   dataUser?: UserProperties;
@@ -65,6 +66,9 @@ const AppLayout: React.FC<LayoutProps> = ({
       document.body.removeChild(script);
     };
   }, []);
+
+  const mounted = useMounted();
+  if (!mounted) return <GlobalLoading />;
 
   return (
     <>

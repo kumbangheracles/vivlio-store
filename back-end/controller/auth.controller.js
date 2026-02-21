@@ -10,10 +10,16 @@ const registerValidateModels = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
   email: Yup.string().email().required(),
-  password: Yup.string().required(),
+  password: Yup.string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/,
+      "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+    ),
+
   confirmPassword: Yup.string()
-    .required()
-    .oneOf([Yup.ref("password")], "Password not match"),
+    .required("Confirm password is required")
+    .oneOf([Yup.ref("password")], "Passwords do not match"),
   roleId: Yup.string().uuid("Invalid role format").required("Role is required"),
 });
 
@@ -306,6 +312,8 @@ module.exports = {
       });
     }
   },
+
+  async changePassword(req, res) {},
 
   // refresh
   async refresh(req, res) {

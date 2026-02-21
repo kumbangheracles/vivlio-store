@@ -638,11 +638,11 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                     filteredReviews.map((item) => (
                       <div
                         key={item?.id}
-                        className="flex bg-gray-50 p-4 rounded-2xl flex-col gap-2"
+                        className="flex bg-gray-100 p-0 sm:p-4 rounded-2xl flex-col gap-2"
                       >
                         <div
                           key={item?.id}
-                          className="flex bg-gray-50 p-4 rounded-2xl flex-col gap-2"
+                          className="flex bg-gray-100 p-2 sm:p-4 rounded-2xl flex-col gap-2"
                         >
                           <div className="flex relative justify-between sm:flex-row flex-col gap-2">
                             <div className="flex items-center gap-2">
@@ -695,8 +695,8 @@ const BookDetailPage: React.FC<BookDetailProps> = ({
                             </Button>
                           </div>
 
-                          <div className="relative mb-2">
-                            <p className="text-gray-700 text-[10px] sm:text-sm">
+                          <div className="relative mb-2 min-h-[60px] sm:min-h-0">
+                            <p className="text-gray-700 text-[10px] sm:line-clamp-none break-all sm:text-sm">
                               {truncateText(
                                 item?.comment as string,
                                 baseLength,

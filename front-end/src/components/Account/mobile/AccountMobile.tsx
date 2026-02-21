@@ -9,20 +9,40 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../../assets/images/profile-default.jpg";
 import { Button, Divider } from "antd";
+import { useEffect, useState } from "react";
+import OverlayModal from "./OverlayModal";
 interface PropTypes {
   dataUser: UserProperties;
 }
-
+export type FormKey = "fullName" | "password" | "preference";
 const AccountMobileIndex = ({ dataUser }: PropTypes) => {
   const router = useRouter();
   const isMobile = useDeviceType();
+  const [overlay, setIsOverlay] = useState<boolean>(false);
+  const [key, setKey] = useState<FormKey | null>(null);
   const mounted = useMounted();
+
+  const handleOpenForm = (key: FormKey | null, type: "open" | "close") => {
+    if (type === "open") {
+      setIsOverlay(true);
+      setKey(key);
+    } else if (type === "close") {
+      setIsOverlay(false);
+      setKey(null);
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("Key: ", key);
+  //   console.log("Overlay: ", overlay);
+  // }, [key, overlay]);
 
   if (!isMobile) return <NotFoundPage />;
   if (!mounted) return <GlobalLoading />;
+
   return (
     <div>
-      <div className="fixed top-0 bg-white shadow-sm justify-between flex w-full px-3 py-4 z-[999]">
+      <div className="fixed top-0 bg-white shadow-sm justify-between flex w-full px-3 py-4 z-[30]">
         <div className="flex items-center gap-2">
           <ArrowLeftOutlined onClick={() => router.back()} />
           <h4 className="text-sm font-bold tracking-wide">Account</h4>
@@ -58,7 +78,7 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
                 {dataUser?.fullName}
               </h4>
             </div>
-            <EditOutlined />
+            <EditOutlined onClick={() => handleOpenForm("fullName", "open")} />
           </div>
           {/* Email */}
           <div className="flex items-center justify-between">
@@ -79,7 +99,7 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
                   : "*".repeat(dataUser?.password?.length as number)}
               </h4>
             </div>
-            <EditOutlined />
+            <EditOutlined onClick={() => handleOpenForm("password", "open")} />
           </div>
         </div>
       </div>
@@ -90,7 +110,7 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
       <div className="p-4 !mt-[-30px]">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold text-sm">Preference</h4>
-          <EditOutlined />
+          <EditOutlined onClick={() => handleOpenForm("preference", "open")} />
         </div>
         <div className="flex flex-wrap gap-2  mt-4">
           <h4 className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100">
@@ -110,6 +130,23 @@ const AccountMobileIndex = ({ dataUser }: PropTypes) => {
           </h4>
         </div>
       </div>
+
+      {overlay && (
+        <div
+          onClick={() => handleOpenForm(null, "close")}
+          className="inset-0 bg-black/50 transition-opacity duration-300 top-0 left-0 fixed h-screen w-screen z-[40]"
+        ></div>
+      )}
+
+      {overlay && (
+        <OverlayModal
+          dataUser={dataUser}
+          isOverlay={overlay}
+          setIsOverlay={setIsOverlay}
+          keyForm={key}
+          setKeyForm={setKey}
+        />
+      )}
     </div>
   );
 };

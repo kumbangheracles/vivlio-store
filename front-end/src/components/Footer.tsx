@@ -53,7 +53,11 @@ const Footer = () => {
     <>
       {isMobile ? (
         <>
-          {path !== "/cart" ? (
+          {path !== "/cart" &&
+          path !== "/account-mobile/profile" &&
+          path !== "/account-mobile/wishlist" &&
+          path !== "/account-mobile/transactions" &&
+          path !== "/account-mobile/book-reviews" ? (
             <div className="flex base-blue items-center justify-between w-full shadow-[0_-4px_6px_rgba(0,0,0,0.1)] border-gray-400 fixed bottom-0 py-5 px-7 z-50">
               <div className="flex items-center transition-all flex-col relative w-full">
                 <HomeOutlined
@@ -74,7 +78,9 @@ const Footer = () => {
                   width={20}
                   height={20}
                   alt="category-icon"
-                  className={path === "/category" ? classFoot : "w-[20px]"}
+                  className={
+                    path.includes("/category") ? classFoot : "w-[20px]"
+                  }
                 />
               </div>
               <div className="flex items-center transition-all flex-col relative w-full ">
