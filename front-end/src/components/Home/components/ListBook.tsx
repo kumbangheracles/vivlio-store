@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import type { BookProps } from "../../../types/books.type";
-import { Button, Result, Select } from "antd";
+import { Button, message, Result, Select } from "antd";
 import { cn } from "@/libs/cn";
 import GlobalLoading from "@/components/GlobalLoading";
 import { BookWithWishlist } from "@/types/wishlist.type";
@@ -12,10 +12,16 @@ import useDeviceType from "@/hooks/useDeviceType";
 import FadeUpWrapper from "../FadeUpWrapper";
 import useBooks, { FilterBooksSort } from "@/hooks/useBooks";
 import { useMounted } from "@/hooks/useMounted";
+import ModalCategoryProps from "./ModalCategoryPref";
+import { useAuth } from "@/hooks/useAuth";
+import { CategoryProps } from "@/types/category.types";
+import { UserProperties } from "@/types/user.type";
 interface BookTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
+  dataCategory?: CategoryProps[];
   dataWishlist?: BookWithWishlist[];
+  dataUser?: UserProperties;
   fetchBooks?: any;
   isSpace?: boolean;
   isSeeAll?: boolean;
@@ -27,12 +33,14 @@ interface BookTypes {
   isSearch?: boolean;
   isShowLoadMore?: boolean;
   total?: number;
+  isBasedCategory?: boolean;
 }
 
 const ListBook: React.FC<BookTypes> = ({
   titleSection,
   dataBooks,
   fetchBooks,
+  dataCategory,
   isSpace = false,
   isSeeAll = true,
   isCategory = false,
@@ -40,10 +48,13 @@ const ListBook: React.FC<BookTypes> = ({
   isDisplayFilter = false,
   isSearch = false,
   isShowLoadMore = false,
+  isBasedCategory = false,
+  dataUser,
   // total,
 }) => {
   const isMobile = useDeviceType();
-
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const auth = useAuth();
   const {
     handleLoadMore,
     hasMore,
@@ -166,6 +177,23 @@ const ListBook: React.FC<BookTypes> = ({
                                 ? "There are no books available in this genre."
                                 : "There are no books related"
                           }
+                          extra={
+                            isBasedCategory && (
+                              <Button
+                                type="primary"
+                                onClick={() => {
+                                  if (!auth?.accessToken) {
+                                    message.info("You must login first!.");
+                                    return;
+                                  } else {
+                                    setIsOpen(true);
+                                  }
+                                }}
+                              >
+                                Add category preference
+                              </Button>
+                            )
+                          }
                         />
                       )}
                     </>
@@ -208,6 +236,23 @@ const ListBook: React.FC<BookTypes> = ({
                       : isGenre
                         ? "There are no books available in this genre."
                         : "There are no books related"
+                  }
+                  extra={
+                    isBasedCategory && (
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          if (!auth?.accessToken) {
+                            message.info("You must login first!.");
+                            return;
+                          } else {
+                            setIsOpen(true);
+                          }
+                        }}
+                      >
+                        Add category preference
+                      </Button>
+                    )
                   }
                 />
               )}
@@ -328,6 +373,23 @@ const ListBook: React.FC<BookTypes> = ({
                               ? "There are no books available in this genre."
                               : "There are no books related to your search."
                         }
+                        extra={
+                          isBasedCategory && (
+                            <Button
+                              type="primary"
+                              onClick={() => {
+                                if (!auth?.accessToken) {
+                                  message.info("You must login first!.");
+                                  return;
+                                } else {
+                                  setIsOpen(true);
+                                }
+                              }}
+                            >
+                              Add category preference
+                            </Button>
+                          )
+                        }
                       />
                     )}
                   </ListBookWrapper>
@@ -357,12 +419,38 @@ const ListBook: React.FC<BookTypes> = ({
                         ? "There are no books available in this genre."
                         : "There are no books related"
                   }
+                  extra={
+                    isBasedCategory && (
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          if (!auth?.accessToken) {
+                            message.info("You must login first!.");
+                            return;
+                          } else {
+                            setIsOpen(true);
+                          }
+                        }}
+                      >
+                        Add category preference
+                      </Button>
+                    )
+                  }
                 />
               </div>
             </>
           )}
         </>
       )}
+
+      <ModalCategoryProps
+        open={isOpen}
+        footer={false}
+        onCancel={() => setIsOpen(false)}
+        setIsOpen={setIsOpen}
+        dataCategory={dataCategory}
+        dataUser={dataUser}
+      />
     </>
   );
 };

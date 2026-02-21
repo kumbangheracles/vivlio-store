@@ -22,6 +22,7 @@ module.exports = {
       isPopular,
       title,
       categoryId,
+      categoryIds,
       genreId,
       page = 1,
       status,
@@ -43,7 +44,7 @@ module.exports = {
       filters.id = { [Op.ne]: excludeId };
     }
     let genreWhere = null;
-
+    let categoryIdsWhere = null;
     if (genreIds) {
       genreWhere = {
         genreid: {
@@ -52,6 +53,19 @@ module.exports = {
       };
     } else if (genreId) {
       genreWhere = { genreid: genreId };
+    }
+    if (categoryIds) {
+      categoryIdsWhere = {
+        categoryId: {
+          [Op.in]: categoryIds.split(","),
+        },
+      };
+    } else if (categoryId) {
+      categoryIdsWhere = { categoryId: categoryId };
+    }
+
+    if (categoryIdsWhere) {
+      Object.assign(filters, categoryIdsWhere);
     }
     if (isRecomend) {
       filters.isRecomend = true;
@@ -387,6 +401,7 @@ module.exports = {
       isPopular,
       title,
       categoryId,
+      categoryIds,
       genreId,
       page = 1,
       limit,
@@ -408,7 +423,7 @@ module.exports = {
       filters.id = { [Op.ne]: excludeId };
     }
     let genreWhere = null;
-
+    let categoryIdsWhere = null;
     if (genreIds) {
       genreWhere = {
         genreid: {
@@ -418,7 +433,19 @@ module.exports = {
     } else if (genreId) {
       genreWhere = { genreid: genreId };
     }
+    if (categoryIds) {
+      categoryIdsWhere = {
+        categoryId: {
+          [Op.in]: categoryIds.split(","),
+        },
+      };
+    } else if (categoryId) {
+      categoryIdsWhere = { categoryId: categoryId };
+    }
 
+    if (categoryIdsWhere) {
+      Object.assign(filters, categoryIdsWhere);
+    }
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
     }

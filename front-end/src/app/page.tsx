@@ -3,6 +3,8 @@ import fetchBooksHome from "./actions/fetchBooksHome";
 import fetchArticles from "./actions/fetchArticles";
 import fetchCategory from "./actions/fetchCategory";
 import { ArticleStatusType } from "@/types/article.type";
+import fetchUser from "./actions/fetchUser";
+import { UserProperties } from "@/types/user.type";
 
 export const metadata = {
   title: "ViviBook - Home",
@@ -23,7 +25,7 @@ export const revalidate = 60;
 export default async function Home({ searchParams }: PageProps) {
   // const params = await searchParams;
   const books = await fetchBooksHome();
-
+  const dataUser: UserProperties = await fetchUser();
   const popularBooks = await fetchBooksHome({
     isPopular: true,
     limit: 6,
@@ -33,6 +35,13 @@ export default async function Home({ searchParams }: PageProps) {
   const newestBooks = await fetchBooksHome({
     sortDate: "newest_saved",
     limit: 12,
+  });
+  const categoryIds = dataUser?.category_preference
+    ?.map((item) => item?.categoryId)
+    .join(",");
+  const basedOnPreferenceBooks = await fetchBooksHome({
+    limit: 6,
+    categoryIds: categoryIds?.toString(),
   });
 
   const categories = await fetchCategory();
@@ -55,6 +64,8 @@ export default async function Home({ searchParams }: PageProps) {
         popularBooks={popularBooks?.results}
         newestBooks={newestBooks?.results}
         dataArticles={articles}
+        preferenceBooks={basedOnPreferenceBooks?.results}
+        dataUser={dataUser}
       />
 
       {/* </AppLayout> */}

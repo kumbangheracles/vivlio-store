@@ -17,6 +17,7 @@ async function fetchBooksHome({
   excludedId = "",
   isPopular = false,
   onlyAvailable = false,
+  categoryIds = "",
 }: BookParams = {}): Promise<BaseResponBook<BookProps>> {
   const session = await getServerSession(authOptions);
 
@@ -59,6 +60,9 @@ async function fetchBooksHome({
     if (categoryId) {
       params.append("categoryId", categoryId.toString());
     }
+    if (categoryIds) {
+      params.append("categoryIds", categoryIds.toString());
+    }
     if (genreId) {
       params.append("genreId", genreId.toString());
     }
@@ -69,8 +73,6 @@ async function fetchBooksHome({
     });
 
     const data = res.json();
-
-    // console.log("Res: ", res);
 
     return data;
   } catch (err) {

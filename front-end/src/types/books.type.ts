@@ -26,6 +26,7 @@ export interface BookParams {
   genreIds?: string;
   excludedId?: string;
   onlyAvailable?: boolean;
+  categoryIds?: string;
 }
 export type BookProps = {
   id?: string;

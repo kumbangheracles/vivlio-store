@@ -34,9 +34,8 @@ const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
   };
 
   // useEffect(() => {
-  //   console.log("Key: ", key);
-  //   console.log("Overlay: ", overlay);
-  // }, [key, overlay]);
+  //   console.log("Data user: ", dataUser);
+  // }, []);
 
   if (!isMobile) return <NotFoundPage />;
   if (!mounted) return <GlobalLoading />;

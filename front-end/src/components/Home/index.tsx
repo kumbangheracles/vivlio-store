@@ -13,23 +13,30 @@ import { ArticleProperties } from "@/types/article.type";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "../GlobalLoading";
+import { UserProperties } from "@/types/user.type";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
+  dataUser?: UserProperties;
   dataCategories?: CategoryProps[];
   fetchBooks?: any;
   popularBooks?: BookProps[];
   newestBooks?: BookProps[];
   bestSellerBooks?: BookProps[];
   dataArticles?: ArticleProperties[];
+  preferenceBooks?: BookProps[];
 }
 
 export default function HomePage(prop: PropTypes) {
-  const { newestBooks, popularBooks } = prop;
+  const {
+    newestBooks,
+    popularBooks,
+    preferenceBooks,
+    dataCategories,
+    dataUser,
+  } = prop;
   const { handlePushRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
-
-  const bestSellerBook = prop.dataBooks?.slice(0, 6);
 
   const newestArticles = prop.dataArticles
     ?.sort((a, b) => {
@@ -104,8 +111,11 @@ export default function HomePage(prop: PropTypes) {
               <ListBook
                 isDisplayOnlyAvailbleStock={true}
                 isSeeAll={false}
-                titleSection={"Best Seller"}
-                dataBooks={bestSellerBook}
+                titleSection={"Based on your preference"}
+                dataBooks={preferenceBooks}
+                dataCategory={dataCategories}
+                isBasedCategory={true}
+                dataUser={dataUser}
               />
             </div>
             <div className="px-3">
@@ -141,8 +151,11 @@ export default function HomePage(prop: PropTypes) {
           <div>
             <ListBook
               isDisplayOnlyAvailbleStock={true}
-              titleSection={"Best Seller"}
-              dataBooks={bestSellerBook}
+              titleSection={"Based on your preference"}
+              dataBooks={preferenceBooks}
+              dataUser={dataUser}
+              dataCategory={dataCategories}
+              isBasedCategory={true}
             />
           </div>
           <div>

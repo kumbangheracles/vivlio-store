@@ -293,10 +293,12 @@ router.patch(
         return res.status(400).json({ message: "ID is required" });
       }
 
-      if (req.body.fullName.length >= 25) {
-        return res
-          .status(400)
-          .json({ message: "Full Name maximum 25 character." });
+      if (req.body.fullName) {
+        if (req.body.fullName?.length >= 25) {
+          return res
+            .status(400)
+            .json({ message: "Full Name maximum 25 character." });
+        }
       }
 
       let profileImage = req.body.profileImage;
