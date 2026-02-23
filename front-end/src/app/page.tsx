@@ -26,22 +26,27 @@ export default async function Home({ searchParams }: PageProps) {
   // const params = await searchParams;
   const books = await fetchBooksHome();
   const dataUser: UserProperties = await fetchUser();
+  const categoryIds = dataUser?.category_preference?.length
+    ? dataUser.category_preference
+        .map((item) => item.categoryId)
+        .filter(Boolean)
+        .join(",")
+    : "";
+
+  const basedOnPreferenceBooks = categoryIds
+    ? await fetchBooksHome({
+        limit: 6,
+        categoryIds,
+      })
+    : null;
   const popularBooks = await fetchBooksHome({
     isPopular: true,
     limit: 6,
   });
 
-  // console.log("isPopular: ", popularBooks);
   const newestBooks = await fetchBooksHome({
     sortDate: "newest_saved",
     limit: 12,
-  });
-  const categoryIds = dataUser?.category_preference
-    ?.map((item) => item?.categoryId)
-    .join(",");
-  const basedOnPreferenceBooks = await fetchBooksHome({
-    limit: 6,
-    categoryIds: categoryIds?.toString(),
   });
 
   const categories = await fetchCategory();
@@ -49,7 +54,6 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 6,
     status: ArticleStatusType.PUBLISH,
   });
-  // console.log("Data Articles: ", articles);
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve("intentional delay");
@@ -57,7 +61,6 @@ export default async function Home({ searchParams }: PageProps) {
   });
   return (
     <>
-      {/* <AppLayout isAuthPageTampil={false}> */}
       <HomePage
         dataBooks={books?.results}
         dataCategories={categories}
@@ -67,8 +70,6 @@ export default async function Home({ searchParams }: PageProps) {
         preferenceBooks={basedOnPreferenceBooks?.results}
         dataUser={dataUser}
       />
-
-      {/* </AppLayout> */}
     </>
   );
 }

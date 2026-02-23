@@ -60,8 +60,8 @@ async function fetchBooksHome({
     if (categoryId) {
       params.append("categoryId", categoryId.toString());
     }
-    if (categoryIds) {
-      params.append("categoryIds", categoryIds.toString());
+    if (categoryIds && categoryIds.trim().length > 0) {
+      params.append("categoryIds", categoryIds);
     }
     if (genreId) {
       params.append("genreId", genreId.toString());
@@ -72,6 +72,7 @@ async function fetchBooksHome({
       cache: "no-store",
     });
 
+    // console.log("PARAMS:", params.toString());
     const data = res.json();
 
     return data;

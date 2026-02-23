@@ -22,7 +22,7 @@ module.exports = {
       isPopular,
       title,
       categoryId,
-      categoryIds,
+      categoryIds = "",
       genreId,
       page = 1,
       status,
@@ -414,7 +414,7 @@ module.exports = {
       genreIds,
     } = req.query;
     const parsedSortPrice = parseInt(sortPrice);
-    console.log("Full Query: ", req.query);
+    console.log("Full Query Books ================= : ", req.query);
     const filters = {};
     if (isRecomend !== undefined) {
       filters.isRecomend = isRecomend === "true" || isRecomend === "1";
@@ -433,16 +433,15 @@ module.exports = {
     } else if (genreId) {
       genreWhere = { genreid: genreId };
     }
-    if (categoryIds) {
+    if (typeof categoryIds === "string" && categoryIds.trim() !== "") {
+      const ids = categoryIds.split(",").map((id) => id.trim());
+
       categoryIdsWhere = {
         categoryId: {
-          [Op.in]: categoryIds.split(","),
+          [Op.in]: ids,
         },
       };
-    } else if (categoryId) {
-      categoryIdsWhere = { categoryId: categoryId };
     }
-
     if (categoryIdsWhere) {
       Object.assign(filters, categoryIdsWhere);
     }

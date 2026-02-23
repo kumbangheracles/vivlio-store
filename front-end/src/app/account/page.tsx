@@ -2,7 +2,7 @@ import AccountIndex from "@/components/Account";
 
 import { UserProperties } from "@/types/user.type";
 import fetchUser from "../actions/fetchUser";
-
+import fetchCategory from "../actions/fetchCategory";
 import fetchWishlist from "../../components/Account/fetchWishlist";
 import fetchBookReviews from "../actions/fetchBookReviews";
 import { BookReviewStatus } from "@/types/bookreview.type";
@@ -43,7 +43,7 @@ const AccountPage = async ({ searchParams }: Params) => {
     status: status as BookReviewStatus,
     limit: limit.toString(),
   });
-
+  const dataCategory = await fetchCategory();
   const pageWish = Number(params?.pageWish ?? 1);
   const limitWish = params?.limitWish ?? "5";
   const sortPrice = params?.sortPrice;
@@ -69,6 +69,7 @@ const AccountPage = async ({ searchParams }: Params) => {
       dataUser={dataUser as UserProperties}
       dataWishlist={dataWishlist}
       dataBookReviews={dataBookReviews}
+      dataCategory={dataCategory}
       // fetchWishlist={fetchWishlist({
       //   page: pageWish,
       //   limit: limitWish,

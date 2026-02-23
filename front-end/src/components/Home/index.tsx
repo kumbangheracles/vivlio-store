@@ -14,6 +14,7 @@ import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "../GlobalLoading";
 import { UserProperties } from "@/types/user.type";
+import { useAuth } from "@/hooks/useAuth";
 interface PropTypes {
   titleSection?: string;
   dataBooks?: BookProps[];
@@ -37,7 +38,13 @@ export default function HomePage(prop: PropTypes) {
   } = prop;
   const { handlePushRoute } = useGlobalLoadingBar();
   const isMobile = useDeviceType();
+  const auth = useAuth();
 
+  let fallBackPref: BookProps[] = [];
+
+  if (auth?.accessToken) {
+    fallBackPref = preferenceBooks ?? [];
+  }
   const newestArticles = prop.dataArticles
     ?.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -112,7 +119,7 @@ export default function HomePage(prop: PropTypes) {
                 isDisplayOnlyAvailbleStock={true}
                 isSeeAll={false}
                 titleSection={"Based on your preference"}
-                dataBooks={preferenceBooks}
+                dataBooks={fallBackPref}
                 dataCategory={dataCategories}
                 isBasedCategory={true}
                 dataUser={dataUser}
@@ -152,7 +159,7 @@ export default function HomePage(prop: PropTypes) {
             <ListBook
               isDisplayOnlyAvailbleStock={true}
               titleSection={"Based on your preference"}
-              dataBooks={preferenceBooks}
+              dataBooks={fallBackPref}
               dataUser={dataUser}
               dataCategory={dataCategories}
               isBasedCategory={true}

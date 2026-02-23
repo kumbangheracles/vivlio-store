@@ -3,15 +3,21 @@ import GlobalLoading from "@/components/GlobalLoading";
 import NotFoundPage from "@/components/NotFoundPage";
 import useDeviceType from "@/hooks/useDeviceType";
 import { useMounted } from "@/hooks/useMounted";
-import { UserProperties } from "@/types/user.type";
+import { initialUser, UserImage, UserProperties } from "@/types/user.type";
 import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DefaultImage from "../../../assets/images/profile-default.jpg";
-import { Button, Divider, Empty } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Divider, Empty, message, Modal, UploadFile } from "antd";
+import { useCallback, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import OverlayModal from "./OverlayModal";
 import { CategoryProps } from "@/types/category.types";
+import getCroppedImg from "@/helpers/getCroppedImage";
+import Upload, { UploadChangeParam, RcFile } from "antd/es/upload";
+import AppButton, { MyButton } from "@/components/AppButton";
+import Cropper from "react-easy-crop";
+import myAxios from "@/libs/myAxios";
 interface PropTypes {
   dataUser: UserProperties;
   dataCategory: CategoryProps[];
@@ -19,9 +25,19 @@ interface PropTypes {
 export type FormKey = "fullName" | "password" | "preference" | "username";
 const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
   const router = useRouter();
+
   const isMobile = useDeviceType();
   const [overlay, setIsOverlay] = useState<boolean>(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [isDataUser, setIsDataUser] = useState<UserProperties>(initialUser);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [key, setKey] = useState<FormKey | null>(null);
+  const [previewImage, setPreviewImage] = useState<string>("");
   const mounted = useMounted();
   const handleOpenForm = (key: FormKey | null, type: "open" | "close") => {
     if (type === "open") {
@@ -36,6 +52,151 @@ const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
   // useEffect(() => {
   //   console.log("Data user: ", dataUser);
   // }, []);
+
+  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+  const handleCropSave = async () => {
+    // return;
+
+    try {
+      setLoading(true);
+      const croppedImage = await getCroppedImg(
+        selectedImage,
+        croppedAreaPixels,
+      );
+      setCropModalOpen(false);
+
+      // Upload hasil cropping ke Cloudinary
+      const formData = new FormData();
+      formData.append("file", croppedImage);
+      formData.append("upload_preset", "vivlio-store");
+
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/don5olb8f/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const data = await res.json();
+
+      const mappedImage = [
+        {
+          userId: uuidv4(),
+          imageUrl: data.secure_url,
+          public_id: data.public_id,
+        },
+      ];
+
+      setPreviewImage(data.secure_url);
+      setIsDataUser((prev) => ({ ...prev, profileImage: mappedImage }));
+      setFileList([
+        {
+          uid: uuidv4(),
+          name: "profile.jpg",
+          status: "done",
+          url: data.secure_url,
+          response: data,
+        },
+      ]);
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to crop image");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
+    const latestFileList = info.fileList.slice(-1);
+    setFileList(latestFileList);
+
+    const mappedImages: UserImage[] = latestFileList
+      .filter((file) => file.status === "done" && !!file.response?.secure_url)
+      .map((file) => ({
+        userId: uuidv4() as string,
+        imageUrl: file.response.secure_url as string,
+        public_id: file.response.public_id as string,
+      }));
+    const latestFile = latestFileList[0]?.originFileObj;
+    if (latestFile) {
+      const imageUrl = await getBase64(latestFile as RcFile);
+      setPreviewImage(imageUrl);
+      setCropModalOpen(true);
+      setSelectedImage(imageUrl);
+      setIsDataUser((prev) => ({
+        ...prev,
+        profileImage: mappedImages,
+      }));
+    }
+  };
+
+  const getBase64 = (file: File | Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const beforeUpload = (file: RcFile): boolean => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+
+    if (!isJpgOrPng) {
+      message.error("Invalid image format");
+      setTimeout(() => {
+        setCropModalOpen(false);
+        setSelectedImage("");
+      }, 200);
+      return false;
+    }
+
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image size maximum 2MB");
+      setTimeout(() => {
+        setCropModalOpen(false);
+        setSelectedImage("");
+      }, 200);
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (data: UserProperties) => {
+    try {
+      setLoading(true);
+
+      let payload: Record<string, any> = {
+        profileImage:
+          JSON.stringify(data.profileImage) ??
+          JSON.stringify(dataUser?.profileImage),
+      };
+
+      console.log("Payload", payload);
+
+      const res = await myAxios.patch(`/users/${dataUser?.id}`, payload);
+      if (res) {
+        message.success("Success update data");
+      }
+
+      setPreviewImage("");
+      router.refresh();
+    } catch (error) {
+      if (!dataUser?.id) {
+        message.error("Failed submit data");
+        console.log("Failed submit data: ", error);
+      } else {
+        message.error("Failed update data");
+        console.log("Failed update data: ", error);
+      }
+    } finally {
+      setLoading(false);
+      router.refresh();
+    }
+  };
 
   if (!isMobile) return <NotFoundPage />;
   if (!mounted) return <GlobalLoading />;
@@ -52,7 +213,9 @@ const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
       <div>
         <div className="w-[150px] h-[150px] m-auto rounded-full overflow-hidden">
           <Image
-            src={dataUser?.profileImage?.imageUrl || DefaultImage}
+            src={
+              previewImage || dataUser?.profileImage?.imageUrl || DefaultImage
+            }
             alt={`img-${dataUser?.username}`}
             width={500}
             height={500}
@@ -60,7 +223,46 @@ const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
           />
         </div>
         <div className="mt-[14px] flex items-center justify-center">
-          <Button>Change Profile Picture</Button>
+          {previewImage ? (
+            <div className="flex items-center gap-1">
+              <AppButton
+                loading={loading}
+                label="Cancel"
+                customColor="danger"
+                onClick={() => setPreviewImage("")}
+                style={{ fontSize: 12 }}
+              />
+
+              <Upload
+                fileList={fileList}
+                showUploadList={false}
+                onChange={handleUpload}
+                maxCount={1}
+                beforeUpload={beforeUpload}
+              >
+                <MyButton loading={loading} style={{ fontSize: 12 }}>
+                  Change Profile Photo
+                </MyButton>
+              </Upload>
+
+              <AppButton
+                label="Submit"
+                style={{ fontSize: 12 }}
+                loading={loading}
+                onClick={() => handleSubmit(isDataUser as UserProperties)}
+              />
+            </div>
+          ) : (
+            <Upload
+              fileList={fileList}
+              showUploadList={false}
+              onChange={handleUpload}
+              maxCount={1}
+              beforeUpload={beforeUpload}
+            >
+              <AppButton label="Change Profile Photo" loading={loading} />
+            </Upload>
+          )}
         </div>
       </div>
 
@@ -163,6 +365,35 @@ const AccountMobileIndex = ({ dataUser, dataCategory }: PropTypes) => {
           handleOpenForm={handleOpenForm}
         />
       )}
+
+      <Modal
+        open={cropModalOpen}
+        onCancel={() => {
+          (setCropModalOpen(false), setPreviewImage(""));
+        }}
+        onOk={handleCropSave}
+        okText="Save"
+        loading={loading}
+      >
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            height: 400,
+          }}
+        >
+          <Cropper
+            image={selectedImage}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            cropShape="round"
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={onCropComplete}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

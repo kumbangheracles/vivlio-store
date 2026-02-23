@@ -15,6 +15,7 @@ import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "../GlobalLoading";
 import TransactionIndex from "./Transaction";
 import { TransactionProps } from "@/types/transaction.type";
+import { CategoryProps } from "@/types/category.types";
 interface AccountProps {
   dataUser?: UserProperties;
   dataWishlist?: BookWithWishlist[];
@@ -22,6 +23,7 @@ interface AccountProps {
   dataBookReviews?: BookReviewsProps[];
   fetchReviews?: () => void;
   dataTransaction?: TransactionProps[];
+  dataCategory?: CategoryProps[];
 }
 type TabKey = "account" | "wishlist" | "transaction" | "book-reviews";
 const AccountIndex: React.FC<AccountProps> = ({
@@ -31,6 +33,7 @@ const AccountIndex: React.FC<AccountProps> = ({
   fetchWishlist,
   fetchReviews,
   dataTransaction,
+  dataCategory,
 }) => {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("key") as TabKey) || "account";
@@ -47,7 +50,10 @@ const AccountIndex: React.FC<AccountProps> = ({
       key: "account",
       children: (
         <>
-          <Account dataUser={dataUser} />
+          <Account
+            dataCategory={dataCategory as CategoryProps[]}
+            dataUser={dataUser}
+          />
         </>
       ),
     },

@@ -64,7 +64,7 @@ const ModalCategoryProps = ({
     }
   }, [dataUser]);
   return (
-    <Modal {...props}>
+    <Modal open={isOpen} {...props}>
       <div className="p-4">
         <h4 className="font-semibold text-center text-[18px]">
           Category Preference

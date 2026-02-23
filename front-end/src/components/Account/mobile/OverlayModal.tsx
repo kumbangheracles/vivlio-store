@@ -125,11 +125,6 @@ const OverlayModal = ({
       }
       payload.password = data?.confirmPassword;
     } else if (type === "preference") {
-      if (selected.length < 5) {
-        message.error("Category preference minimum 5.");
-        return;
-      }
-
       payload.category_preference = dataCategory?.filter((item) =>
         selected.includes(item.categoryId),
       );

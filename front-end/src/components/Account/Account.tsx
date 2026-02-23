@@ -1,5 +1,5 @@
 "use client";
-import { Card, Form, message, Modal, Upload } from "antd";
+import { Card, Empty, Form, message, Modal, Upload } from "antd";
 import Cropper from "react-easy-crop";
 import Image from "next/image";
 import styled from "styled-components";
@@ -16,13 +16,17 @@ import getCroppedImg from "@/helpers/getCroppedImage";
 import { v4 as uuidv4 } from "uuid";
 import { RcFile, UploadChangeParam, UploadFile } from "antd/es/upload";
 import AccountForm from "./AccountForm";
+import OverlayModal from "./mobile/OverlayModal";
+import { CategoryProps } from "@/types/category.types";
+import ModalCategoryProps from "../Home/components/ModalCategoryPref";
 type FieldKey = "fullName" | "username" | "email" | "password" | "";
 
 interface PropsType {
   dataUser?: UserProperties;
+  dataCategory?: CategoryProps[];
 }
 
-const Account = ({ dataUser }: PropsType) => {
+const Account = ({ dataUser, dataCategory }: PropsType) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [activeKey, setActiveKey] = useState<FieldKey>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -36,7 +40,7 @@ const Account = ({ dataUser }: PropsType) => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-
+  const [modalCat, setModalCat] = useState<boolean>(false);
   const handleModalOpen = (key: FieldKey) => {
     setModalOpen(true);
     setActiveKey(key);
@@ -287,12 +291,7 @@ const Account = ({ dataUser }: PropsType) => {
 
     return true;
   };
-  // useEffect(() => {
-  //   if (activeKey) {
-  //     const [form] = Form.useForm();
-  //     form.setFieldsValue(dataUser);
-  //   }
-  // }, [activeKey]);
+
   return (
     <div className="p-4 rounded-xl border border-gray-200">
       <TitleTab>Account Setting</TitleTab>
@@ -367,8 +366,43 @@ const Account = ({ dataUser }: PropsType) => {
               <DetailItem label="Password" value="**********" />
               <EditOutlined onClick={() => handleModalOpen("password")} />
             </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold text-sm">Preference</h4>
+                <EditOutlined onClick={() => setModalCat(true)} />
+              </div>
+              <div className="flex flex-wrap gap-1 justify-center  mt-4">
+                {dataUser?.category_preference?.length === 0 ||
+                dataUser?.category_preference === null ? (
+                  <div className="flex items-center justify-center w-full">
+                    <Empty />
+                  </div>
+                ) : (
+                  <>
+                    {dataUser?.category_preference?.map((item) => (
+                      <h4
+                        key={item?.categoryId}
+                        className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
+                      >
+                        {item?.name}
+                      </h4>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </DataSide>
+
+        <ModalCategoryProps
+          onCancel={() => setModalCat(false)}
+          dataCategory={dataCategory}
+          dataUser={dataUser}
+          isOpen={modalCat}
+          setIsOpen={setModalCat}
+          footer={false}
+        />
       </CardStyled>
 
       <Modal
@@ -426,6 +460,15 @@ const Account = ({ dataUser }: PropsType) => {
           />
         </div>
       </Modal>
+
+      <ModalCategoryProps
+        onCancel={() => setModalCat(false)}
+        dataCategory={dataCategory}
+        dataUser={dataUser}
+        isOpen={modalCat}
+        setIsOpen={setModalCat}
+        footer={false}
+      />
     </div>
   );
 };
