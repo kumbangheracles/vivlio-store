@@ -13,6 +13,7 @@ import NotFoundPage from "@/components/NotFoundPage";
 import useWishlist from "@/hooks/useWishlist";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "@/components/GlobalLoading";
+import FadeUpWrapper from "@/components/Home/FadeUpWrapper";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
@@ -80,19 +81,21 @@ const WishlistMobile = ({ dataWishlists }: PropTypes) => {
         <>
           <div className="flex items-center justify-center bg-gray-100 py-3 mx-2 rounded-md gap-2.5 flex-wrap">
             {dataWishlists!.length > 0 ? (
-              dataWishlists!.map((item) => (
-                <CardBookWishlist
-                  key={item?.id}
-                  id={item?.bookId}
-                  title={String(item?.book?.title)}
-                  author={item?.book?.author as string}
-                  price={Number(item?.book?.price)}
-                  images={item?.book?.images}
-                  categories={item?.book?.categories}
-                  status={""}
-                  book_type={item?.book?.book_type!}
-                  fetchBooks={fetchBooks}
-                />
+              dataWishlists!.map((item, index) => (
+                <FadeUpWrapper delay={index * 100} key={item.id}>
+                  <CardBookWishlist
+                    key={item?.id}
+                    id={item?.bookId}
+                    title={String(item?.book?.title)}
+                    author={item?.book?.author as string}
+                    price={Number(item?.book?.price)}
+                    images={item?.book?.images}
+                    categories={item?.book?.categories}
+                    status={""}
+                    book_type={item?.book?.book_type!}
+                    fetchBooks={fetchBooks}
+                  />
+                </FadeUpWrapper>
               ))
             ) : (
               <div className="flex justify-center items-center w-full">

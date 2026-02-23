@@ -183,7 +183,9 @@ const CardBookWishlist: React.FC<PropTypes> = ({
               style={{ marginTop: 8 }}
             >
               <div className="flex flex-col leading-[17px] w-full">
-                <p className="text-gray-500 text-center">{author}</p>
+                <p className="text-gray-500 text-center text-[12px]">
+                  {author}
+                </p>
                 <p className="font-medium text-start text-xs">
                   {title.length > 50
                     ? title.slice(0, 50) + " . . . . ."
