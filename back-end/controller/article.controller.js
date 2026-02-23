@@ -7,10 +7,10 @@ const { sequelize } = require("../config/database");
 //  */
 module.exports = {
   async getAll(req, res) {
-    const { page = 1, limit = 10, status, title } = req.query;
+    const { page = 1, limit = 10, status, title, sortDate = "" } = req.query;
     const parsedLimit = limit ? parseInt(limit) : null;
     const offset = (page - 1) * parsedLimit;
-
+    console.log("Full Query Articles ===============: ", req.query);
     let filters = [];
 
     if (status) {
@@ -20,8 +20,18 @@ module.exports = {
       filters.title = { [Op.like]: `%${title}%` };
     }
     try {
+      let order = [];
+
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
       const { count, rows } = await Articles.findAndCountAll({
         limit: parsedLimit,
+        order,
         distinct: true,
         filters,
         include: [

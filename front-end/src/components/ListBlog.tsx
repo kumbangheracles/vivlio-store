@@ -129,16 +129,16 @@ const ListBlog: React.FC<PropTypes> = ({ dataArticles }) => {
         <>
           <div className="w-full overflow-x-scroll mobile-cardList">
             <div className="flex items-center gap-5 w-full p-4 mobile-cardList">
-              {dataArticles.map((item) => (
-                <BlogCard key={item.id} dataAricle={item} />
+              {dataArticles.map((item, index) => (
+                <BlogCard key={item.id} dataAricle={item} index={index} />
               ))}
             </div>
           </div>
         </>
       ) : (
         <div ref={carouselRef} className="carousel-blog">
-          {dataArticles.map((item) => (
-            <BlogCard key={item.id} dataAricle={item} />
+          {dataArticles.map((item, index) => (
+            <BlogCard key={item.id} dataAricle={item} index={index} />
           ))}
         </div>
       )}

@@ -69,7 +69,7 @@ const ArticleIndex = () => {
         try {
           setLoading(true);
           const promises = uniqueAdminIds.map((id) =>
-            myAxios.get(`/users/${id}`)
+            myAxios.get(`/users/${id}`),
           );
           const responses = await Promise.all(promises);
 
@@ -133,7 +133,7 @@ const ArticleIndex = () => {
       dataIndex: "articleImages",
       key: "articleImages",
       render: (_: any, record: ArticleProperties) => {
-        const src = record.articleImages?.imageUrl || DefaultImage;
+        const src = record?.articleImages?.imageUrl || DefaultImage;
 
         return (
           <div
@@ -149,7 +149,7 @@ const ArticleIndex = () => {
           >
             <Image
               src={src}
-              alt={record.title}
+              alt={record?.title}
               width={150}
               height={150}
               style={{
@@ -188,10 +188,10 @@ const ArticleIndex = () => {
       width: 130,
 
       render: (_: any, record: ArticleProperties) => {
-        if (!record.createdByAdminId) return <Tag>Unknown</Tag>;
-        const user = dataUser.find(
+        if (!record?.createdByAdminId) return <Tag>Unknown</Tag>;
+        const user = dataUser?.find(
           (item: UserProperties) =>
-            (item.id as string) === record.createdByAdminId
+            (item?.id as string) === record?.createdByAdminId,
         );
         return <Tag>{user ? user.username : "Unknown"}</Tag>;
       },
@@ -203,10 +203,10 @@ const ArticleIndex = () => {
       render: (_: any, record: ArticleProperties) => {
         return (
           <AppStatusSelect
-            value={record.status as string}
+            value={record?.status as string}
             onChange={(value) => {
               const newStatus = value as ArticleStatusType;
-              handleStatusChange(record.id as string, newStatus);
+              handleStatusChange(record?.id as string, newStatus);
             }}
             options={Object.values(ArticleStatusType).map((i) => ({
               value: i,
@@ -215,8 +215,8 @@ const ArticleIndex = () => {
                 i === ArticleStatusType.PUBLISH
                   ? "success"
                   : i === ArticleStatusType.UNPUBLISH
-                  ? "normal"
-                  : "",
+                    ? "normal"
+                    : "",
             }))}
           />
         );
@@ -242,17 +242,17 @@ const ArticleIndex = () => {
               {
                 key: "detail",
                 label: "Detail",
-                onClick: () => navigate(`${record.id}/detail`),
+                onClick: () => navigate(`${record?.id}/detail`),
               },
               {
                 key: "edit",
                 label: "Edit",
-                onClick: () => navigate(`${record.id}/edit`),
+                onClick: () => navigate(`${record?.id}/edit`),
               },
               {
                 key: "delete",
                 label: "Delete",
-                onClick: () => handleModalOpen(record.id as string),
+                onClick: () => handleModalOpen(record?.id as string),
                 danger: true,
               },
             ]}
@@ -270,7 +270,7 @@ const ArticleIndex = () => {
   useEffect(() => {
     if (debouncedSearch) {
       const filtered = dataArticle.filter((item: ArticleProperties) =>
-        item.title?.toLowerCase().includes(debouncedSearch.toLowerCase())
+        item.title?.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setFilteredData(filtered);
     } else {

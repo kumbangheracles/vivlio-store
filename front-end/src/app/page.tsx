@@ -54,6 +54,7 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 6,
     status: ArticleStatusType.PUBLISH,
   });
+
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve("intentional delay");
