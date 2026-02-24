@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
-const Book = require("./books");
 const BookCategory = sequelize.define(
   "book_category",
   {
@@ -29,11 +28,16 @@ const BookCategory = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    isSuggested: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   {
     tableName: "book_category",
     timestamps: true,
-  }
+  },
 );
 
 // BookCategory.hasMany(Book, {

@@ -11,6 +11,9 @@ export type CategoryProps = {
 
 export type CategoryParams = {
   status?: boolean;
+  isSuggested?: boolean;
+  sortDate?: string;
+  limit?: number;
 };
 
 export const initialCategoryValue: CategoryProps = {

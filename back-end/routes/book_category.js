@@ -6,20 +6,32 @@ const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { sequelize } = require("../config/database");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 router.get("/public", async (req, res) => {
-  const { isPopular, title } = req.query;
+  const { isPopular, title, isSuggested, sortDate } = req.query;
 
   const filters = {};
   if (isPopular !== undefined) {
     filters.isPopular = isPopular === "true" || isPopular === "1";
   }
+
+  if (isSuggested !== undefined) {
+    filters.isSuggested = isSuggested === "true" || isSuggested === "1";
+  }
   if (title) {
     filters.title = { [Op.like]: `%${title}%` };
   }
+  let order = [];
 
+  if (sortDate === "newest_saved") {
+    order.push(["createdAt", "DESC"]);
+  }
+
+  if (sortDate === "oldest_saved") {
+    order.push(["createdAt", "ASC"]);
+  }
   try {
     const allCategory = await BookCategory.findAll({
       where: filters,
-      order: [["createdAt", "DESC"]],
+      order: order,
       include: [
         {
           model: CategoryImage,
@@ -207,8 +219,20 @@ router.patch(
     const t = await sequelize.transaction();
     try {
       const { categoryId } = req.params;
-      const { status } = req.body;
+      const { status, isSuggested } = req.body;
       let categoryImage = req.body.categoryImage;
+
+      if (isSuggested === true) {
+        const allCatSuggested = await BookCategory.count({
+          where: { isSuggested: true },
+        });
+
+        if (allCatSuggested >= 6) {
+          return res.status(405).json({
+            message: "Suggested category maximum 6.",
+          });
+        }
+      }
 
       const category = await BookCategory.findByPk(categoryId, {
         transaction: t,
@@ -219,10 +243,18 @@ router.patch(
         return res.status(404).json({ message: "Category not found" });
       }
 
-      if (typeof status !== "boolean") {
-        return res.status(400).json({ error: "Invalid status" });
+      if (
+        (status !== undefined && typeof status !== "boolean") ||
+        (isSuggested !== undefined && typeof isSuggested !== "boolean")
+      ) {
+        return res.status(400).json({
+          error: "Invalid type for status or isSuggested",
+        });
       }
-      await BookCategory.update({ ...req.body }, { where: { categoryId } });
+      const result = await BookCategory.update(
+        { ...req.body },
+        { where: { categoryId } },
+      );
 
       if (typeof categoryImage === "string") {
         try {
@@ -287,6 +319,7 @@ router.patch(
       res.status(200).json({
         status: 200,
         message: "Category updated successfully",
+        result: result,
       });
     } catch (error) {
       await t.rollback();

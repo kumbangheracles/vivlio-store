@@ -1,5 +1,5 @@
 "use client";
-
+import { PiArticleMedium } from "react-icons/pi";
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import IconLocation from "../assets/icons/icon-location.svg";
@@ -13,7 +13,6 @@ import {
   TikTokOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import Link from "next/link";
 import CategoryOutlined from "../assets/icons/category-icon.svg";
 import useDeviceType from "@/hooks/useDeviceType";
 import Image from "next/image";
@@ -30,7 +29,7 @@ const Footer = () => {
       pathName === "/" ||
       pathName === "/account-mobile" ||
       pathName.includes("/category") ||
-      pathName === "/account-mobile/wishlist" ||
+      pathName.includes("/articles") ||
       pathName === "/account-mobile/transactions" ||
       pathName === "/account-mobile/book-reviews" ||
       pathName === "/account-mobile/profile"
@@ -84,11 +83,11 @@ const Footer = () => {
                 />
               </div>
               <div className="flex items-center transition-all flex-col relative w-full ">
-                <HeartOutlined
+                <PiArticleMedium
                   className={
-                    path === "/account-mobile/wishlist" ? classFoot : "w-[20px]"
+                    path.includes("/articles") ? classFoot : "w-[20px]"
                   }
-                  onClick={() => handlePushRoute("/account-mobile/wishlist")}
+                  onClick={() => handlePushRoute("/articles")}
                 />
               </div>
               <div className="flex items-center transition-all flex-col relative w-full ">

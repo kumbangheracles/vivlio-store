@@ -24,12 +24,14 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle, index }) => {
   };
   return (
     <>
-      <FadeUpWrapper delay={(index as number) * 100}>
-        {isMobile ? (
+      {isMobile ? (
+        <FadeUpWrapper
+          delay={(index as number) * 100}
+          className="relative rounded-md flex-none basis-[8.5em] overflow-hidden h-[200px] border border-[#cacaca]"
+        >
           <div
             key={dataAricle?.id}
             onClick={() => handleGoToDetail(dataAricle?.id as string)}
-            className="relative rounded-md flex-none basis-[8.5em] overflow-hidden h-[200px] border border-[#cacaca]"
           >
             <span className="absolute text-[7px] sm:text-sm tracking-wide p-2 top-0 right-0 bg-white rounded-bl-2xl w-auto">
               {dayjs(dataAricle?.createdAt).format("YYYY-MM-DD") ||
@@ -60,7 +62,9 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle, index }) => {
               ></div>
             </div>
           </div>
-        ) : (
+        </FadeUpWrapper>
+      ) : (
+        <FadeUpWrapper delay={(index as number) * 100}>
           <div
             onClick={() => handleGoToDetail(dataAricle?.id as string)}
             className="blog-card rounded-md border bg-white border-[#cacaca] w-[200px] h-[200px]  sm:w-[350px] sm:h-[300px] relative overflow-hidden cursor-pointer transition-all hover:shadow-xl "
@@ -93,8 +97,8 @@ const BlogCard: React.FC<PropTypes> = ({ dataAricle, index }) => {
               ></div>
             </div>
           </div>
-        )}
-      </FadeUpWrapper>
+        </FadeUpWrapper>
+      )}
     </>
   );
 };

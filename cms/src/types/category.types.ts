@@ -2,11 +2,12 @@ export type CategoryProps = {
   categoryId: string;
   name: string;
   description?: string;
-  categoryImage?: any;
+  categoryImage?: CategoryImage;
   isPopular?: boolean;
   status?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
+  isSuggested?: boolean;
 };
 
 export const initialCategoryValue: CategoryProps = {

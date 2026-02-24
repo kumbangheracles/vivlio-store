@@ -86,14 +86,14 @@ export default function HomePage(prop: PropTypes) {
                 See All
               </span>
             </div>
-            <div className="flex  overflow-x-scroll">
-              <div className="w-[1000px] py-2 scrollbar-hide px-1">
-                <div className="flex items-center gap-3 py-2 px-1 justify-center">
-                  {prop.dataCategories?.slice(0, 5).map((item) => (
+            <div className="flex overflow-x-auto">
+              <div className="w-max py-2 scrollbar-hide px-1">
+                <div className="flex items-center gap-3 py-2 px-1">
+                  {prop.dataCategories?.map((item) => (
                     <span
                       onClick={() => goToCategory(item?.name, item?.categoryId)}
                       key={item.categoryId}
-                      className="p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center !min-w-[90px] rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
+                      className="w-fit flex-shrink-0 whitespace-nowrap p-3 tracking-wider bg-gray-100 text-sm flex justify-center items-center rounded-2xl text-[11px] sm:text-sm active:bg-sky-100"
                     >
                       {item.name}
                     </span>
@@ -144,7 +144,7 @@ export default function HomePage(prop: PropTypes) {
             <Banner />
           </div>
           <div className="mt-7">
-            <TitleList>Popular Category</TitleList>
+            <TitleList>Suggested Category</TitleList>
             <ListCategory dataCategories={prop.dataCategories} />
           </div>
           <div>

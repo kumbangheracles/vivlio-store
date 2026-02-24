@@ -4,9 +4,13 @@ const { v4: uuidv4 } = require("uuid");
 const userPurchases = require("../models/userPurchases");
 const { BookStats, Book, UserCart } = require("../models/index");
 const axios = require("axios");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { sequelize } = require("../config/database");
 const { generateId } = require("../utils/generateId");
+const {
+  updateBookPopularity,
+  updateBookPopularityWithTransaction,
+} = require("../helpers/updatePopularityBook");
 let snap = new Midtrans.Snap({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
@@ -113,11 +117,27 @@ module.exports = {
             });
           }
 
+          const now = new Date();
+
+          if (
+            purchase?.expiry_time &&
+            new Date(purchase.expiry_time) <= now &&
+            purchase?.transaction_status === "expire"
+          ) {
+            await purchase.destroy({ transaction: t });
+          }
+
           // kurangi stock
           await book.update(
             { quantity: book.quantity - purchase.quantity },
             { transaction: t },
           );
+
+          await BookStats.increment("purchases", {
+            by: purchase.quantity,
+            where: { bookId: purchase.bookId },
+            transaction: t,
+          });
 
           // hapus dari cart
           await UserCart.destroy({
@@ -130,7 +150,16 @@ module.exports = {
         }
       }
 
+      console.log({
+        order_id,
+        transaction_status,
+        fraud_status,
+        purchasesFound: purchases.length,
+      });
       await t.commit();
+      for (const purchase of purchases) {
+        await updateBookPopularity(purchase.bookId);
+      }
 
       return res.status(200).json({
         message: "Webhook processed",

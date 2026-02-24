@@ -6,6 +6,7 @@ export type ArticleProperties = {
   createdByAdminId?: string;
   isPopular?: boolean;
   articleImages?: any;
+  isSuggested?: boolean;
 };
 
 export type ArticleImage = {

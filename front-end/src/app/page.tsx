@@ -42,6 +42,7 @@ export default async function Home({ searchParams }: PageProps) {
   const popularBooks = await fetchBooksHome({
     isPopular: true,
     limit: 6,
+    sortDate: "newest_saved",
   });
 
   const newestBooks = await fetchBooksHome({
@@ -49,7 +50,13 @@ export default async function Home({ searchParams }: PageProps) {
     limit: 12,
   });
 
-  const categories = await fetchCategory();
+  const categories = await fetchCategory({
+    isSuggested: true,
+    limit: 6,
+    sortDate: "newest_saved",
+  });
+
+  console.log("Categories: ", categories);
   const articles = await fetchArticles({
     limit: 6,
     status: ArticleStatusType.PUBLISH,

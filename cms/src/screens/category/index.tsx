@@ -28,7 +28,6 @@ const Category = () => {
   const navigate = useNavigate();
   const [dataCategory, setDataCategory] = useState<CategoryProps[]>([]);
   const [loading, setloading] = useState<boolean>(false);
-  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -36,12 +35,12 @@ const Category = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<CategoryProps[]>([]);
-  const [currentPage, setCurrentPage] = useState<number | null>(0);
-  const fetchCategory = async (page: number, limit: number) => {
+  const [currentPage, setCurrentPage] = useState<number | null>(1);
+  const fetchCategory = async (currentPage: number, limit: number) => {
     try {
       setloading(true);
       const res = await myAxios.get("/book-category", {
-        params: { page, limit },
+        params: { page: currentPage, limit },
       });
       console.log("data category: ", res.data);
       setDataCategory(res.data.results);
@@ -54,25 +53,33 @@ const Category = () => {
     }
   };
   useEffect(() => {
-    fetchCategory(page, limit);
-  }, [page, limit]);
+    fetchCategory(currentPage as number, limit);
+  }, [currentPage, limit]);
 
-  const handleStatusChange = async (id: string, status: boolean) => {
+  const handleStatusChange = async (
+    id: string,
+    value: boolean,
+    type: "status" | "suggested",
+  ) => {
     try {
       setloading(true);
 
-      const res = await myAxios.patch(`/book-category/${id}`, { status });
-      setDataCategory((prev) =>
-        prev.map((item) => (item?.categoryId === id ? res.data.result : item))
+      const payload =
+        type === "status" ? { status: value } : { isSuggested: value };
+
+      const res = await myAxios.patch(`/book-category/${id}`, payload);
+
+      setDataCategory((prev = []) =>
+        prev.map((item) => (item?.categoryId === id ? res.data.result : item)),
       );
 
-      message.success("Success update status");
-      console.log("response: ", res.data.result);
+      message.success(`Success update ${type}`);
     } catch (error) {
+      console.log("ERROR:", error);
       ErrorHandler(error);
     } finally {
-      fetchCategory(page, limit);
       setloading(false);
+      fetchCategory(currentPage as number, limit);
     }
   };
 
@@ -81,14 +88,14 @@ const Category = () => {
       setloading(true);
       await myAxios.delete(`book-category/${selectedId}`);
       const record = dataCategory.find(
-        (item) => item.categoryId === selectedId
+        (item) => item.categoryId === selectedId,
       );
 
       message.success(`Successfully delete category ${record?.name}`);
     } catch (error) {
       ErrorHandler(error);
     } finally {
-      await fetchCategory(page, limit);
+      await fetchCategory(currentPage as number, limit);
       setIsModalOpen(false);
       setSelectedId("");
       setloading(false);
@@ -103,7 +110,7 @@ const Category = () => {
   useEffect(() => {
     if (debouncedSearch) {
       const filtered = dataCategory.filter((item: CategoryProps) =>
-        item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+        item.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setFilteredData(filtered);
     } else {
@@ -153,15 +160,35 @@ const Category = () => {
           : text || "No Content",
     },
     {
+      title: "Suggested",
+      dataIndex: "isSuggested",
+      key: "isSuggested",
+      render: (_: any, record: CategoryProps) => {
+        return (
+          <Switch
+            loading={loading}
+            value={record?.isSuggested as boolean}
+            onChange={(value) => {
+              handleStatusChange(record?.categoryId, value, "suggested");
+            }}
+            style={{
+              backgroundColor: record?.isSuggested ? "lightgreen" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (_: any, record: CategoryProps) => {
         return (
           <Switch
-            value={record?.status!}
+            loading={loading}
+            value={record?.status as boolean}
             onChange={(value) => {
-              handleStatusChange(record?.categoryId, value);
+              handleStatusChange(record?.categoryId, value, "status");
             }}
             style={{ backgroundColor: record?.status ? "lightgreen" : "gray" }}
           />
@@ -243,11 +270,11 @@ const Category = () => {
         loading={loading}
         rowKey={"categoryId"}
         pagination={{
-          current: page,
+          current: currentPage as number,
           pageSize: limit,
           total: totalItems,
           onChange: (newPage, newPageSize) => {
-            setPage(newPage);
+            setCurrentPage(newPage);
             setLimit(newPageSize);
           },
           showSizeChanger: true,

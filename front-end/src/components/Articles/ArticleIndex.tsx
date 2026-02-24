@@ -103,6 +103,7 @@ const ArticleIndex = ({ dataArticles }: PropTypes) => {
                   loading={loadingMore || isPending}
                   placeholder={"Filter By"}
                   defaultValue={sort}
+                  style={{ minWidth: 150 }}
                   onChange={(value) => updateFilters(value)}
                   options={[
                     { label: "Newest Saved", value: "newest_saved" },

@@ -1,9 +1,12 @@
 import myAxios from "@/libs/myAxios";
 import { CategoryParams, CategoryProps } from "@/types/category.types";
 
-async function fetchCategory({ status = true }: CategoryParams = {}): Promise<
-  CategoryProps[]
-> {
+async function fetchCategory({
+  status = true,
+  isSuggested = false,
+  limit = 10,
+  sortDate = "newest_saved",
+}: CategoryParams = {}): Promise<CategoryProps[]> {
   try {
     // const session = await getServerSession(authOptions);
 
@@ -13,10 +16,20 @@ async function fetchCategory({ status = true }: CategoryParams = {}): Promise<
 
     const params = new URLSearchParams({
       status: status.toString(),
+      limit: limit.toString(),
     });
+
+    if (isSuggested) {
+      params.append("isSuggested", isSuggested.toString());
+    }
+    if (sortDate) {
+      params.append("sortDate", sortDate);
+    }
+
     const url = "/book-category/public";
     const response = await myAxios.get(`${url}?${params}`);
 
+    console.log("response cat: ", response);
     return response?.data?.results;
   } catch (err: any) {
     console.log("fetchBooks error:", err.message || err);

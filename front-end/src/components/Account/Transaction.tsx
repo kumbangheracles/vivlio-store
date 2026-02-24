@@ -1,5 +1,5 @@
 "use client";
-import { Button, DatePicker, Input, Result, Select } from "antd";
+import { Button, DatePicker, Input, Result, Select, Spin } from "antd";
 import { ClearOutlined, SearchOutlined } from "@ant-design/icons";
 import { TransactionProps } from "@/types/transaction.type";
 import useTransaction from "@/hooks/useTransactions";
@@ -94,15 +94,21 @@ const TransactionIndex = ({ dataTransactions }: PropTypes) => {
                 />
 
                 {sortDate && (
-                  <div
-                    onClick={() => {
-                      setSortDate(null);
-                      updateFilterDate("");
-                    }}
-                    className="!p-4 transition-all flex items-center justify-center rounded-full w-[10px] h-[10px] hover:!bg-gray-300"
-                  >
-                    <ClearOutlined />
-                  </div>
+                  <>
+                    {loadingMore || isPending ? (
+                      <Spin />
+                    ) : (
+                      <div
+                        onClick={() => {
+                          setSortDate(null);
+                          updateFilterDate("");
+                        }}
+                        className="!p-4 transition-all flex items-center justify-center rounded-full w-[10px] h-[10px] hover:!bg-gray-300"
+                      >
+                        <ClearOutlined />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -116,7 +122,7 @@ const TransactionIndex = ({ dataTransactions }: PropTypes) => {
                 <Result
                   status={"404"}
                   title={"No Transaction Found"}
-                  subTitle={`There's no transaction available for status ${sort}.`}
+                  subTitle={`There's no transaction available.`}
                 />
               </div>
             ) : (

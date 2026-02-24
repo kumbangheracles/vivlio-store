@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const CategoryIndex = async () => {
-  const dataCategories = await fetchCategory();
+  const dataCategories = await fetchCategory({ status: true });
   return (
     <>
       <CategoryIndexPage dataCategories={dataCategories} />

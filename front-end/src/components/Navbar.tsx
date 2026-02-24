@@ -324,6 +324,7 @@ export default function Navbar({
       {(isMobile && path === "/cart") ||
       (isMobile && path === "/account-mobile") ||
       (isMobile && path === "/account-mobile/wishlist") ||
+      (isMobile && path.includes("/articles/detail")) ||
       (isMobile && path === "/account-mobile/book-reviews") ||
       (isMobile && path === "/account-mobile/transactions") ||
       (isMobile && path === "/account-mobile/profile") ||
