@@ -620,8 +620,13 @@ module.exports = {
       page = 1,
       limit = 10,
       isRecomend,
+      status,
+      sortDate,
+      sortPrice,
+      mostWishes,
+      mostPurchased,
     } = req.query;
-
+    const parsedSortPrice = parseInt(sortPrice);
     const filters = {};
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
@@ -630,19 +635,39 @@ module.exports = {
     if (title) {
       filters.title = { [Op.like]: `%${title}%` };
     }
-
-    const whereCondition = filters;
-
-    if (isRecomend) {
-      filters.isRecomend = true;
+    if (status !== undefined) {
+      filters.status = status;
     }
+
+    if (isRecomend !== undefined) {
+      filters.isRecomend = isRecomend === "true" || isRecomend === "1";
+    }
+    const whereCondition = filters;
+    console.log("All Query: ", req.query);
     const offset = (page - 1) * limit;
     try {
+      const order = [];
+
+      if (parsedSortPrice) {
+        order.push(["price", parsedSortPrice === 1 ? "ASC" : "DESC"]);
+      }
+
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
+
+      if (isPopular) {
+        order.push([{ model: BookStats, as: "stats" }, "views", "DESC"]);
+      }
       console.log("userId logined: ", req.id);
       const { count, rows } = await Book.findAndCountAll({
         where: whereCondition,
         distinct: true,
-        order: [["createdAt", "DESC"]],
+        order: order,
         limit: parseInt(limit),
         include: [
           {
@@ -719,6 +744,152 @@ module.exports = {
         total: count,
         currentPage: parseInt(page),
         totalPages: Math.ceil(count / limit),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
+      });
+    }
+  },
+
+  async cmsDashboardGetAll(req, res) {
+    const {
+      isPopular,
+      title,
+      categoryId,
+      page = 1,
+      limit = 10,
+      isRecomend,
+      mostWishes,
+      mostPurchased,
+    } = req.query;
+
+    const filters = {};
+    if (isPopular !== undefined) {
+      filters.isPopular = isPopular === "true" || isPopular === "1";
+    }
+    if (categoryId) filters.categoryId = categoryId;
+    if (title) {
+      filters.title = { [Op.like]: `%${title}%` };
+    }
+
+    const whereCondition = filters;
+
+    if (isRecomend) {
+      filters.isRecomend = true;
+    }
+    const offset = (page - 1) * limit;
+
+    let orderCondition = [["createdAt", "DESC"]];
+
+    if (mostWishes === "true" || mostWishes === "1") {
+      orderCondition = [
+        [{ model: BookStats, as: "stats" }, "wishlistCount", "DESC"],
+      ];
+    }
+
+    if (mostPurchased === "true" || mostPurchased === "1") {
+      orderCondition = [
+        [{ model: BookStats, as: "stats" }, "purchases", "DESC"],
+      ];
+    }
+
+    console.log("Full Query CMS Books ======= : ", req.query);
+    try {
+      console.log("userId logined: ", req.id);
+      const { count, rows } = await Book.findAndCountAll({
+        where: whereCondition,
+        distinct: true,
+        order: orderCondition,
+        limit: parseInt(limit),
+        subQuery: false,
+        include: [
+          {
+            model: BookImage,
+            as: "images",
+            attributes: ["id", "imageUrl", "public_id"],
+          },
+          {
+            model: Genre,
+            as: "genres",
+            through: { attributes: [] },
+            attributes: ["genreid", "genre_title"],
+          },
+          {
+            model: BookReview,
+            as: "reviews",
+            attributes: ["id", "rating", "comment", "createdAt", "updatedAt"],
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["id", "username"],
+              include: [
+                {
+                  model: UserImage,
+                  as: "profileImage",
+                  attributes: ["id", "imageUrl", "public_id"],
+                },
+              ],
+            },
+          },
+          {
+            model: BookStats,
+            as: "stats",
+            attributes: [
+              "id",
+              "views",
+              "wishlistCount",
+              "cartCount",
+              "purchases",
+            ],
+            required: true,
+          },
+          // ...(req.id
+          //   ? [
+          //       {
+          //         model: User,
+          //         as: "wishlistUsers",
+          //         through: {
+          //           model: UserWishlist,
+          //           attributes: [],
+          //         },
+          //         where: { id: req.id },
+          //         required: false,
+          //
+          //       },
+          //     ]
+          //   : []),
+        ],
+        offset,
+        // logging: console.log,
+      });
+      const results = rows.map((book) => {
+        const bookJson = book.toJSON();
+        return {
+          ...bookJson,
+          isWishlisted:
+            bookJson.wishlistUsers && bookJson.wishlistUsers.length > 0,
+          isInCart: bookJson.cartUsers && bookJson.cartUsers.length > 0,
+        };
+      });
+
+      let finalCount = count;
+
+      if (mostWishes === "true" || mostPurchased === "true") {
+        finalCount = rows.length;
+      } else {
+        finalCount = count;
+      }
+
+      res.status(200).json({
+        status: 200,
+        message: "Success",
+        results: results,
+        total: finalCount,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(finalCount / limit),
       });
     } catch (error) {
       res.status(500).json({

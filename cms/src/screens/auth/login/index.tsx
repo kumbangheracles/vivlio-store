@@ -88,7 +88,7 @@ const LoginForm: React.FC = () => {
   });
   return (
     <>
-      <Container data-aos="fade-up">
+      <Container>
         <CardRegister className="shadow-md">
           <WrapperHeader>
             <TitleRegister>Sign in</TitleRegister>

@@ -6,7 +6,6 @@ import {
   message,
   Modal,
   Row,
-  Select,
   Space,
   Switch,
 } from "antd";
@@ -17,7 +16,7 @@ import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
@@ -27,6 +26,10 @@ import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 import { UserProperties } from "../../types/user.type";
 import BookDefault from "../../assets/images/bookDefault.png";
 import AppStatusSelect from "../../components/AppStatusSelect";
+import AppSelect from "../../components/AppSelect";
+
+type SortDateKey = "newest_saved" | "oldest_saved";
+
 const Books = () => {
   const navigate = useNavigate();
   const [dataBooks, setDataBooks] = useState<BookProps[]>([]);
@@ -40,11 +43,55 @@ const Books = () => {
   const auth = useAuthUser<UserProperties>();
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<BookProps[]>([]);
-  const fetchBooks = async (page: number, limit: number, search?: string) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState<SortDateKey | null>(null);
+  const [sortPrice, setSortPrice] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<BookStatusType | null>(null);
+  const [isRecomend, setIsRecomend] = useState<boolean>(false);
+
+  const updateParams = (
+    updates: Record<
+      string,
+      string | number | undefined | BookStatusType | null | boolean
+    >,
+  ) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.set(key, String(value));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      return params;
+    });
+  };
+
+  const fetchBooks = async (
+    page: number,
+    limit: number,
+    search?: string,
+    sortDate?: SortDateKey | null,
+    sortPrice?: string | null,
+    status?: BookStatusType | null,
+    isRecomend?: boolean,
+  ) => {
+    if (loading) return;
     try {
       setloading(true);
       const res = await myAxios.get("/books/admin", {
-        params: { page, limit, search },
+        params: {
+          page,
+          limit,
+          title: search,
+          sortDate,
+          sortPrice,
+          status,
+          isRecomend: isRecomend?.toString(),
+        },
       });
 
       setDataBooks(res.data.results);
@@ -55,17 +102,46 @@ const Books = () => {
       setloading(false);
     }
   };
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   useEffect(() => {
-    fetchBooks(page, limit, debouncedSearch);
+    fetchBooks(
+      page,
+      limit,
+      debouncedSearch,
+      sort,
+      sortPrice,
+      filterStatus,
+      isRecomend,
+    );
     console.log("Data books: ", dataBooks);
-  }, [page, limit, debouncedSearch]);
+
+    updateParams({
+      page,
+      limit,
+      status: filterStatus,
+      sortDate: sort,
+      sortPrice: sortPrice,
+      isRecomend: isRecomend,
+    });
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    sort,
+    sortPrice,
+    filterStatus,
+    isRecomend,
+    searchParams,
+  ]);
 
   const handleStatusChange = async (id: string, status: BookStatusType) => {
     try {
       setloading(true);
 
-      const res = await myAxios.patch(`/books/${id}`, { status });
+      await myAxios.patch(`/books/${id}`, { status });
       // setDataBooks((prev) =>
       //   prev.map((item) => (item?.categoryId === id ? res.data : item)),
       // );
@@ -107,7 +183,15 @@ const Books = () => {
       ErrorHandler(error);
     } finally {
       setloading(false);
-      await fetchBooks(page, limit);
+      await fetchBooks(
+        page,
+        limit,
+        debouncedSearch,
+        sort,
+        sortPrice,
+        filterStatus,
+        isRecomend,
+      );
     }
   };
 
@@ -147,6 +231,7 @@ const Books = () => {
       setFilteredData(dataBooks);
     }
   }, [debouncedSearch, dataBooks]);
+
   const bookColumns: ColumnsType<BookProps> = [
     {
       title: "Image",
@@ -298,12 +383,54 @@ const Books = () => {
         }
       />
 
-      <Row>
+      <Row justify={"space-between"}>
         <Col>
           <AppInput
             icon={<SearchOutlined />}
             placeholder="Search by book name"
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              (setSearch(e.target.value), setPage(1));
+            }}
+          />
+        </Col>
+        <Col className="flex items-center gap-2">
+          <div className="flex gap-2 items-center rounded-md !px-3 !py-2  text-black border border-gray-200">
+            <h4>Recomend Only</h4>
+            <Switch
+              loading={loading}
+              value={isRecomend}
+              onChange={() => setIsRecomend((prev) => !prev)}
+              style={{
+                backgroundColor: isRecomend ? "lightgreen" : "gray",
+              }}
+            />
+          </div>
+          <AppSelect
+            placeholder="Filter By Status"
+            value={filterStatus}
+            options={[
+              { label: "Published", value: "PUBLISHED" },
+              { label: "Unpublished", value: "UNPUBLISHED" },
+            ]}
+            onChange={(value) => setFilterStatus(value)}
+          />
+          <AppSelect
+            placeholder="Filter By Latest"
+            value={sort}
+            options={[
+              { label: "Newest Saved", value: "newest_saved" },
+              { label: "Oldest Saved", value: "oldest_saved" },
+            ]}
+            onChange={(value) => setSort(value)}
+          />
+          <AppSelect
+            placeholder="Filter By Price"
+            value={sortPrice}
+            options={[
+              { label: "Highest Price", value: "0" },
+              { label: "Lowest Price", value: "1" },
+            ]}
+            onChange={(value) => setSortPrice(value)}
           />
         </Col>
       </Row>

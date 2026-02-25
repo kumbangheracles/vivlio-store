@@ -8,13 +8,26 @@ import { MoreOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
 import myAxios from "../../helper/myAxios";
+import { ErrorHandler } from "../../helper/handleError";
+import {
+  Tooltip,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+} from "chart.js";
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [dataBooks, setDataBooks] = useState<BookProps[]>([]);
   const [loading, setloading] = useState<boolean>(false);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
-  const [totalItems, setTotalItems] = useState(0);
+  const [pageWishes, setPageWishes] = useState(1);
+  const [limitWishes, setLimitWishes] = useState(15);
+  const [pagePurchased, setPagePurchased] = useState(1);
+  const [limitPurchased, setLimitPurchased] = useState(15);
+  const [totalItemsWishes, setTotalItemsWishes] = useState(0);
+  const [totalItemsPurchased, setTotalItemsPurchased] = useState(0);
+
   const [dataMostWishesBooks, setDataMostWishesBooks] = useState<BookProps[]>(
     [],
   );
@@ -27,40 +40,46 @@ const Dashboard = () => {
   const fetchBooks = async (
     page: number,
     limit: number,
-    search?: string,
-    mostWishes?: boolean,
-    mostPurchase?: boolean,
+
     type?: "wishes" | "purchase",
   ) => {
     try {
       setloading(true);
 
       if (type === "wishes") {
-        const res = await myAxios.get("/books/admin", {
-          params: { page, limit, search, mostWishes },
+        const res = await myAxios.get("/books/admin-dashboard", {
+          params: { page, limit, mostWishes: "true" },
         });
 
         setDataMostWishesBooks(res.data.results);
-        setTotalItems(res.data.total);
-      } else {
-        const res = await myAxios.get("/books/admin", {
-          params: { page, limit, search, mostPurchase },
+        setTotalItemsWishes(res.data.total);
+      } else if (type === "purchase") {
+        const res = await myAxios.get("/books/admin-dashboard", {
+          params: { page, limit, mostPurchased: "true" },
         });
 
         setDataMostPurchasedBooks(res.data.results);
-        setTotalItems(res.data.total);
+        setTotalItemsPurchased(res.data.total);
       }
     } catch (error) {
       console.log(error);
+      ErrorHandler(error);
     } finally {
       setloading(false);
     }
   };
 
+  // Wish
   useEffect(() => {
-    fetchBooks(page, limit);
-    console.log("Data books: ", dataBooks);
-  }, [page, limit]);
+    fetchBooks(pageWishes, limitWishes, "wishes");
+    // console.log("Data books: ", dataBooks);
+  }, [pageWishes, limitWishes]);
+
+  // Purchase
+  useEffect(() => {
+    fetchBooks(pagePurchased, limitPurchased, "purchase");
+    // console.log("Data books: ", dataBooks);
+  }, [pagePurchased, limitPurchased]);
   const bookColumns = [
     {
       title: "Image",
@@ -144,6 +163,11 @@ const Dashboard = () => {
     <>
       <HeaderPage title="Dashboard" breadcrumb="Home / Dashboard" />
 
+      <div>
+        <h4 className="text-[18px] font-semibold tracking-wide !mb-2">
+          Total Income
+        </h4>
+      </div>
       <div className="flex gap-3 w-full flex-col">
         <div className="w-full">
           <h4 className="text-[18px] font-semibold tracking-wide !mb-2">
@@ -152,16 +176,16 @@ const Dashboard = () => {
           <AppTable
             columns={bookColumns}
             className="w-full"
-            dataSource={dataBooks}
+            dataSource={dataMostWishesBooks}
             loading={loading}
             rowKey={"id"}
             pagination={{
-              current: page,
-              pageSize: limit,
-              total: totalItems,
+              current: pageWishes,
+              pageSize: limitWishes,
+              total: totalItemsWishes,
               onChange: (newPage, newPageSize) => {
-                setPage(newPage);
-                setLimit(newPageSize);
+                setPageWishes(newPage);
+                setLimitWishes(newPageSize);
               },
               showSizeChanger: true,
               position: ["bottomLeft"],
@@ -176,16 +200,16 @@ const Dashboard = () => {
           <AppTable
             columns={bookColumns}
             className="w-full"
-            dataSource={dataBooks}
+            dataSource={dataMostPurchasedBooks}
             loading={loading}
             rowKey={"id"}
             pagination={{
-              current: page,
-              pageSize: limit,
-              total: totalItems,
+              current: pagePurchased,
+              pageSize: limitPurchased,
+              total: totalItemsPurchased,
               onChange: (newPage, newPageSize) => {
-                setPage(newPage);
-                setLimit(newPageSize);
+                setPagePurchased(newPage);
+                setLimitPurchased(newPageSize);
               },
               showSizeChanger: true,
               position: ["bottomLeft"],

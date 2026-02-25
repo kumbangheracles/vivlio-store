@@ -16,6 +16,12 @@ router.get(
   [authMiddleware, checkRole(["admin", "super_admin"])],
   bookController.cmsGetAll,
 );
+// Cms dashboard get All Books
+router.get(
+  "/admin-dashboard",
+  [authMiddleware, checkRole(["admin", "super_admin"])],
+  bookController.cmsDashboardGetAll,
+);
 
 router.get("/:id", authMiddleware, bookController.getOne);
 
