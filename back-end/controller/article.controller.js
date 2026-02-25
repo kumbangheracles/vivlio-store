@@ -1,5 +1,6 @@
 const { Articles, ArticleImages } = require("../models/index");
 const { sequelize } = require("../config/database");
+const { Op, or } = require("sequelize");
 // /**field tambahan untuk endpoint article
 //  * 1. isPopular: boolean,
 //  * 2. isPublished: Enum,
@@ -11,7 +12,7 @@ module.exports = {
     const parsedLimit = limit ? parseInt(limit) : null;
     const offset = (page - 1) * parsedLimit;
     console.log("Full Query Articles ===============: ", req.query);
-    let filters = [];
+    let filters = {};
 
     if (status) {
       filters.status = status;
@@ -33,7 +34,7 @@ module.exports = {
         limit: parsedLimit,
         order,
         distinct: true,
-        filters,
+        where: filters,
         include: [
           {
             model: ArticleImages,

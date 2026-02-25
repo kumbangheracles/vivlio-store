@@ -17,12 +17,14 @@ import { CategoryProps } from "../../types/category.types";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
 import DefaultImg from "../../assets/images/default-img.png";
+import { SortDateKey } from "../books";
+import AppSelect from "../../components/AppSelect";
 
 const Category = () => {
   const navigate = useNavigate();
@@ -36,13 +38,57 @@ const Category = () => {
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<CategoryProps[]>([]);
   const [currentPage, setCurrentPage] = useState<number | null>(1);
-  const fetchCategory = async (currentPage: number, limit: number) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState<SortDateKey | null>(null);
+  const [filterStatus, setFilterStatus] = useState<boolean>(true);
+  const [isSuggested, setIsSuggested] = useState<boolean>(false);
+  const updateParams = (
+    updates: Record<string, string | number | undefined | null | boolean>,
+  ) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.set(key, String(value));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      return params;
+    });
+  };
+  const fetchCategory = async (
+    currentPage: number,
+    limit: number,
+    title?: string,
+    status?: boolean,
+    isSuggested?: boolean,
+    sortDate?: SortDateKey | null,
+  ) => {
     try {
       setloading(true);
+
+      const params: Record<string, string | number | boolean | null> = {
+        page: currentPage,
+        limit,
+        name: title as string,
+        status: status as boolean,
+        sortDate: sortDate as SortDateKey,
+      };
+
+      if (isSuggested === true) {
+        params.isSuggested = isSuggested;
+      }
       const res = await myAxios.get("/book-category", {
-        params: { page: currentPage, limit },
+        params,
       });
-      console.log("data category: ", res.data);
+
+      setTimeout(() => {
+        setloading(false);
+      }, 1000);
+      console.log("data category: ", res);
       setDataCategory(res.data.results);
       setTotalItems(res.data.total);
       setCurrentPage(res.data.currentPage);
@@ -52,9 +98,36 @@ const Category = () => {
       setloading(false);
     }
   };
+
   useEffect(() => {
-    fetchCategory(currentPage as number, limit);
-  }, [currentPage, limit]);
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    fetchCategory(
+      currentPage as number,
+      limit,
+      debouncedSearch,
+      filterStatus,
+      isSuggested,
+      sort,
+    );
+    updateParams({
+      page: currentPage,
+      limit,
+      status: filterStatus,
+      sortDate: sort,
+      isSuggested: isSuggested,
+    });
+  }, [
+    currentPage,
+    limit,
+    debouncedSearch,
+    filterStatus,
+    sort,
+    isSuggested,
+    searchParams,
+  ]);
 
   const handleStatusChange = async (
     id: string,
@@ -253,12 +326,46 @@ const Category = () => {
         }
       />
 
-      <Row>
+      <Row justify={"space-between"}>
         <Col>
           <AppInput
             icon={<SearchOutlined />}
             placeholder="Search by category name"
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </Col>
+        <Col className="flex items-center gap-2">
+          <div className="flex gap-2 items-center rounded-md !px-3 !py-2  text-black border border-gray-200">
+            <h4>Suggested Only</h4>
+            <Switch
+              loading={loading}
+              value={isSuggested}
+              onChange={() => setIsSuggested((prev) => !prev)}
+              style={{
+                backgroundColor: isSuggested ? "lightgreen" : "gray",
+              }}
+            />
+          </div>
+          <div className="flex gap-2 items-center rounded-md !px-3 !py-2  text-black border border-gray-200">
+            <h4>Status</h4>
+            <Switch
+              loading={loading}
+              value={filterStatus}
+              onChange={() => setFilterStatus((prev) => !prev)}
+              style={{
+                backgroundColor: filterStatus ? "lightgreen" : "gray",
+              }}
+            />
+          </div>
+          <AppSelect
+            placeholder="Filter By Latest"
+            value={sort}
+            loading={loading}
+            options={[
+              { label: "Newest Saved", value: "newest_saved" },
+              { label: "Oldest Saved", value: "oldest_saved" },
+            ]}
+            onChange={(value) => setSort(value)}
           />
         </Col>
       </Row>

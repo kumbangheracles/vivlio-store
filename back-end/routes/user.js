@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const { User, UserImage } = require("../models/index");
+const { User, UserImage, Role } = require("../models/index");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const { sequelize } = require("../config/database");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
 const { encrypt } = require("../config/encryption");
+const { Op } = require("sequelize");
 router.get(
   "/public",
   authMiddleware,
@@ -50,22 +51,56 @@ router.get(
   authMiddleware,
   checkRole(["admin", "super_admin"]),
   async (req, res) => {
-    const { page = 1, limit = 10, id } = req.query;
-    const offset = (page - 1) * limit;
+    const {
+      page = 1,
+      limit = 10,
+      username,
+      sortDate,
+      roleName,
+      isActive,
+    } = req.query;
+    const parsedLimit = parseInt(limit);
+
+    const filters = {};
+
+    if (username) {
+      filters.username = { [Op.like]: `%${username}%` };
+    }
+    if (isActive === "true") {
+      filters.isActive = isActive === "true" || isActive === "1";
+    }
+    const offset = (page - 1) * parsedLimit;
+
+    console.log("Full Query Category =======: ", req.query);
     try {
+      let order = [];
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
       if (!req.id)
         return res.status(401).json({
           status: 401,
           message: "Unauthorized",
         });
       const { count, rows } = await User.findAndCountAll({
-        order: [["createdAt", "DESC"]],
-        limit: parseInt(limit),
+        order: order,
+        limit: parsedLimit,
+        where: filters,
         include: [
           {
             model: UserImage,
             as: "profileImage",
             attributes: ["id", "imageUrl", "public_id"],
+          },
+          {
+            model: Role,
+            attributes: ["id", "name"],
+            where: roleName ? { name: roleName.toLowerCase() } : undefined,
+            required: !!roleName,
           },
         ],
         offset,
@@ -82,7 +117,7 @@ router.get(
         results: rows,
         total: count,
         currentPage: parseInt(page, 10),
-        totalPages: Math.ceil(count / limit),
+        totalPages: Math.ceil(count / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({

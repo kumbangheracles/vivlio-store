@@ -6,13 +6,15 @@ import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
 import { useDebounce } from "../../hooks/useDebounce";
 import { GenreProperties, GenreStatusType } from "../../types/genre.type";
 import AppStatusSelect from "../../components/AppStatusSelect";
+import { SortDateKey } from "../books";
+import AppSelect from "../../components/AppSelect";
 
 const GenreIndex = () => {
   const navigate = useNavigate();
@@ -26,11 +28,38 @@ const GenreIndex = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<GenreProperties[]>([]);
-  const fetchGenre = async (page: number, limit: number) => {
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState<SortDateKey | null>(null);
+  const [sortStatus, setSortStatus] = useState<GenreStatusType | null>(null);
+  const updateParams = (
+    updates: Record<string, string | number | undefined | null | boolean>,
+  ) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.set(key, String(value));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      return params;
+    });
+  };
+  const fetchGenre = async (
+    page: number,
+    limit: number,
+    title?: string,
+    sortDate?: SortDateKey | null,
+    status?: GenreStatusType,
+  ) => {
     try {
       setloading(true);
       const res = await myAxios.get("/genres", {
-        params: { page, limit },
+        params: { page, limit, genre_title: title, sortDate, status },
       });
       setDataGenre(res.data.results);
       setTotalItems(res.data.total);
@@ -41,8 +70,16 @@ const GenreIndex = () => {
     }
   };
   useEffect(() => {
-    fetchGenre(page, limit);
-  }, [page, limit]);
+    fetchGenre(
+      page,
+      limit,
+      debouncedSearch,
+      sort,
+      sortStatus as GenreStatusType,
+    );
+
+    updateParams({ page, limit, debouncedSearch, sort, sortStatus });
+  }, [page, limit, debouncedSearch, sort, sortStatus, searchParams]);
   console.log(dataGenre);
   const handleStatusChange = async (id: string, status: string) => {
     try {
@@ -50,7 +87,7 @@ const GenreIndex = () => {
 
       const res = await myAxios.patch(`/genres/${id}`, { status });
       setDataGenre((prev) =>
-        prev.map((item) => (item?.genreId === id ? res.data.result : item))
+        prev.map((item) => (item?.genreId === id ? res.data.result : item)),
       );
 
       message.success("Success update status");
@@ -89,7 +126,7 @@ const GenreIndex = () => {
   useEffect(() => {
     if (debouncedSearch) {
       const filtered = dataGenre.filter((item: GenreProperties) =>
-        item.genre_title.toLowerCase().includes(debouncedSearch.toLowerCase())
+        item.genre_title.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setFilteredData(filtered);
     } else {
@@ -130,8 +167,8 @@ const GenreIndex = () => {
                 i === GenreStatusType.PUBLISH
                   ? "success"
                   : i === GenreStatusType.UNPUBLISH
-                  ? "normal"
-                  : "",
+                    ? "normal"
+                    : "",
             }))}
           />
         );
@@ -195,12 +232,34 @@ const GenreIndex = () => {
         }
       />
 
-      <Row>
+      <Row justify={"space-between"}>
         <Col>
           <AppInput
             icon={<SearchOutlined />}
             placeholder="Search by genre name"
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </Col>
+        <Col className="flex items-center gap-2">
+          <AppSelect
+            placeholder="Filter By Latest"
+            value={sort}
+            loading={loading}
+            options={[
+              { label: "Newest Saved", value: "newest_saved" },
+              { label: "Oldest Saved", value: "oldest_saved" },
+            ]}
+            onChange={(value) => setSort(value)}
+          />
+          <AppSelect
+            placeholder="Filter By Status"
+            value={sortStatus}
+            loading={loading}
+            options={[
+              { label: "Published", value: GenreStatusType.PUBLISH },
+              { label: "Unpublished", value: GenreStatusType.UNPUBLISH },
+            ]}
+            onChange={(value) => setSortStatus(value)}
           />
         </Col>
       </Row>

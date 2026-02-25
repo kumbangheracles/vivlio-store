@@ -28,7 +28,7 @@ import BookDefault from "../../assets/images/bookDefault.png";
 import AppStatusSelect from "../../components/AppStatusSelect";
 import AppSelect from "../../components/AppSelect";
 
-type SortDateKey = "newest_saved" | "oldest_saved";
+export type SortDateKey = "newest_saved" | "oldest_saved";
 
 const Books = () => {
   const navigate = useNavigate();

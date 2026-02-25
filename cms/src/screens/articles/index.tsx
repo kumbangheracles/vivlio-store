@@ -14,7 +14,7 @@ import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import AppTable from "../../components/AppTable";
 import HeaderPage from "../../components/HeaderPage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
@@ -24,6 +24,8 @@ import AppStatusSelect from "../../components/AppStatusSelect";
 import dayjs from "dayjs";
 import { UserProperties } from "../../types/user.type";
 import { useDebounce } from "../../hooks/useDebounce";
+import AppSelect from "../../components/AppSelect";
+import { SortDateKey } from "../books";
 
 const ArticleIndex = () => {
   const navigate = useNavigate();
@@ -38,25 +40,58 @@ const ArticleIndex = () => {
   const debouncedSearch = useDebounce(search, 500);
   const [selectedId, setSelectedId] = useState<string>("");
   const [filteredData, setFilteredData] = useState<UserProperties[]>([]);
-  const fetchArticles = async (page: number, limit: number) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState<SortDateKey | null>(null);
+  const [filterStatus, setFilterStatus] = useState<ArticleStatusType | null>(
+    null,
+  );
+  const updateParams = (
+    updates: Record<string, string | number | undefined | null | boolean>,
+  ) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.set(key, String(value));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      return params;
+    });
+  };
+  const fetchArticles = async (
+    page: number,
+    limit: number,
+    status?: ArticleStatusType | null,
+    title?: string,
+    sortDate?: SortDateKey | null,
+  ) => {
     try {
       setLoading(true);
       const res = await myAxios.get("/articles", {
-        params: { page, limit },
+        params: { page, limit, status, title, sortDate },
       });
 
       setDataArticle(res.data.results);
       setTotalItems(res.data.total);
-      console.log("Data articles: ", res.data);
     } catch (error) {
       ErrorHandler(error);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchArticles(page, limit);
-  }, [page, limit]);
+    setPage(1);
+  }, [debouncedSearch]);
+  useEffect(() => {
+    fetchArticles(page, limit, filterStatus, debouncedSearch, sort);
+
+    updateParams({ page, limit, filterStatus, debouncedSearch, sort });
+  }, [page, limit, filterStatus, debouncedSearch, sort, searchParams]);
 
   useEffect(() => {
     if (dataArticle.length > 0) {
@@ -74,7 +109,7 @@ const ArticleIndex = () => {
           const responses = await Promise.all(promises);
 
           const users = responses.map((res) => res.data.result);
-          setDataUser(users); // ubah jadi array kalau mau tampung banyak user
+          setDataUser(users);
 
           console.log("Fetched users:", users);
         } catch (error) {
@@ -295,12 +330,36 @@ const ArticleIndex = () => {
         }
       />
 
-      <Row>
+      <Row justify={"space-between"}>
         <Col>
           <AppInput
             icon={<SearchOutlined />}
             placeholder="Search by title"
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </Col>
+        <Col className="flex items-center gap-2">
+          <AppSelect
+            placeholder="Filter By Status"
+            value={filterStatus}
+            style={{ minWidth: 130 }}
+            loading={loading}
+            options={[
+              { label: "Published", value: ArticleStatusType.PUBLISH },
+              { label: "Unpublished", value: ArticleStatusType.UNPUBLISH },
+            ]}
+            onChange={(value) => setFilterStatus(value)}
+          />
+          <AppSelect
+            placeholder="Filter By Latest"
+            value={sort}
+            loading={loading}
+            options={[
+              { label: "Newest Saved", value: "newest_saved" },
+              { label: "Oldest Saved", value: "oldest_saved" },
+              { label: "All Filter", value: null },
+            ]}
+            onChange={(value) => setSort(value)}
           />
         </Col>
       </Row>

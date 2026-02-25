@@ -5,6 +5,7 @@ const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const uploadMiddleware = require("../middleware/uploadMiddleware");
 const { sequelize } = require("../config/database");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
+const { Op, or } = require("sequelize");
 router.get("/public", async (req, res) => {
   const { isPopular, title, isSuggested, sortDate } = req.query;
 
@@ -91,24 +92,50 @@ router.get(
   "/",
   [authMiddleware, checkRole(["admin", "super_admin"])],
   async (req, res) => {
-    const { isPopular, title, page = 1, limit = 10 } = req.query;
+    const {
+      isPopular,
+      name,
+      page = 1,
+      limit = 10,
+      isSuggested,
+      status,
+      sortDate,
+    } = req.query;
+
+    const parsedLimit = parseInt(limit);
 
     const filters = {};
     if (isPopular !== undefined) {
       filters.isPopular = isPopular === "true" || isPopular === "1";
     }
-    if (title) {
-      filters.title = { [Op.like]: `%${title}%` };
+    if (name) {
+      filters.name = { [Op.like]: `%${name}%` };
+    }
+    if (isSuggested !== undefined) {
+      filters.isSuggested = isSuggested === "true" || isSuggested === "1";
+    }
+    if (status !== undefined) {
+      filters.status = status === "true" || status === "1";
     }
     const whereCondition = req.id
       ? { ...filters, createdByAdminId: req.id }
       : filters;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const offset = (parseInt(page) - 1) * parsedLimit;
+
+    console.log("Full Query Category =======: ", req.query);
     try {
+      let order = [];
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
       const { count, rows } = await BookCategory.findAndCountAll({
         where: whereCondition,
-        order: [["createdAt", "DESC"]],
-        limit: parseInt(limit),
+        order: order,
+        limit: parsedLimit,
         distinct: true,
         include: [
           {
@@ -125,7 +152,7 @@ router.get(
         results: rows,
         total: count,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(count / limit),
+        totalPages: Math.ceil(count / parsedLimit),
       });
     } catch (error) {
       res.status(500).json({

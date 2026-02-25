@@ -1,5 +1,5 @@
 const Genre = require("../models/genre");
-
+const { Op, or } = require("sequelize");
 module.exports = {
   async getAllFull(req, res) {
     try {
@@ -43,29 +43,54 @@ module.exports = {
     }
   },
   async getAll(req, res) {
-    const { page = 1, limit = 10, genreId } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      genreId,
+      genre_title,
+      sortDate,
+      status,
+    } = req.query;
 
     const offset = (page - 1) * limit;
+    const filters = {};
     // const whereCondition = req.id
     //   ? { ...filters, createdByAdminId: req.id }
     //   : filters;
+
+    if (genre_title) {
+      filters.genre_title = { [Op.like]: `%${genre_title}%` };
+    }
+
+    if (status) {
+      filters.status = status;
+    }
     try {
+      let order = [];
+      if (sortDate === "newest_saved") {
+        order.push(["createdAt", "DESC"]);
+      }
+
+      if (sortDate === "oldest_saved") {
+        order.push(["createdAt", "ASC"]);
+      }
       const { count, rows } = await Genre.findAndCountAll({
-        order: [["createdAt", "DESC"]],
+        order,
+        where: filters,
         limit: parseInt(limit),
         distinct: true,
         offset,
       });
 
-      const rowsWithAdminId = rows.filter(
-        (item) => item.createdByAdminId === req.id,
-      );
+      // const rowsWithAdminId = rows.filter(
+      //   (item) => item.createdByAdminId === req.id,
+      // );
 
       res.status(200).json({
         where: req.id.length > 0,
         status: 200,
         message: "Success",
-        results: rowsWithAdminId,
+        results: rows,
         total: count,
         currentPage: parseInt(page),
         totalPages: Math.ceil(count / limit),

@@ -7,6 +7,7 @@ import {
   Modal,
   Row,
   Space,
+  Spin,
   Switch,
   Tag,
   Typography,
@@ -18,7 +19,7 @@ import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import AppTable from "../../components/AppTable";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import myAxios from "../../helper/myAxios";
 import { useEffect, useState } from "react";
 import { ErrorHandler } from "../../helper/handleError";
@@ -27,6 +28,9 @@ import { UserProperties } from "../../types/user.type";
 // import { useDebouncedFilter } from "../../hooks/useDebounceFiltered";
 import { RoleProperties } from "../../types/role.type";
 import { useDebounce } from "../../hooks/useDebounce";
+import { SortDateKey } from "../books";
+import AppSelect from "../../components/AppSelect";
+type SortRoleUser = "admin" | "super_admin" | "customer";
 const { Text } = Typography;
 const UserIndex = () => {
   const navigate = useNavigate();
@@ -38,22 +42,55 @@ const UserIndex = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>("");
   const [search, setSearch] = useState("");
-  // const [dataRole, setDataRole] = useState<RoleProperties[]>([]);
   const debouncedSearch = useDebounce(search, 500);
   const [filteredData, setFilteredData] = useState<UserProperties[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState<SortDateKey | null>(null);
+  const [sortRole, setSortRole] = useState<SortRoleUser | null>(null);
+  const [sortStatus, setSortStatus] = useState<boolean | null>(null);
+  const updateParams = (
+    updates: Record<string, string | number | undefined | null | boolean>,
+  ) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
 
-  const fetchUsers = async (page: number, limit: number) => {
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.set(key, String(value));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      return params;
+    });
+  };
+  const fetchUsers = async (
+    page: number,
+    limit: number,
+    search?: string,
+    status?: boolean,
+    sortDate?: SortDateKey | null,
+    roleName?: SortRoleUser | null,
+  ) => {
     try {
       setloading(true);
       const res = await myAxios.get("/users", {
-        params: { page, limit },
+        params: {
+          page,
+          limit,
+          username: search,
+          sortDate,
+          isActive: status,
+          roleName,
+        },
       });
       const resRole = await myAxios.get("/roles");
       const role = resRole.data.results;
       // setDataRole(role);
       const usersWithRoleName = res.data.results.map((user: UserProperties) => {
         const matchedRole = role.find(
-          (role: RoleProperties) => role.id === user.roleId
+          (role: RoleProperties) => role.id === user.roleId,
         );
         return {
           ...user,
@@ -70,14 +107,22 @@ const UserIndex = () => {
     }
   };
   useEffect(() => {
-    fetchUsers(page, limit);
-  }, [page, limit]);
+    fetchUsers(
+      page,
+      limit,
+      debouncedSearch,
+      sortStatus as boolean,
+      sort,
+      sortRole,
+    );
+
+    updateParams({ page, limit, debouncedSearch, sortStatus, sort, sortRole });
+  }, [page, limit, debouncedSearch, sortStatus, sort, searchParams, sortRole]);
 
   const handleStatusChange = async (
     id: string,
     isActive: boolean,
-    roleName: string,
-    username: string
+    username?: string,
   ) => {
     if (username === "herkalsuperadmin") {
       return message.info("this user cannot be inactivated");
@@ -86,11 +131,11 @@ const UserIndex = () => {
     try {
       setloading(true);
 
-      const res = await myAxios.patch(`/users/${id}`, { isActive });
+      await myAxios.patch(`/users/${id}`, { isActive });
       setdataUser((prev) =>
         prev.map((item) =>
-          item?.id === id ? { ...item, isActive: isActive } : item
-        )
+          item?.id === id ? { ...item, isActive: isActive } : item,
+        ),
       );
 
       message.success("Success update status");
@@ -140,9 +185,16 @@ const UserIndex = () => {
               border: "3px solid gray",
               borderRadius: "50%",
               overflow: "hidden",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Image src={`${src}?v=${Date.now()}`} alt={record.username} />
+            {loading ? (
+              <Spin />
+            ) : (
+              <Image src={`${src}?v=${Date.now()}`} alt={record.username} />
+            )}
           </div>
         );
       },
@@ -180,7 +232,6 @@ const UserIndex = () => {
                 record.id as string,
                 value as boolean,
                 record.roleName as string,
-                record.username as string
               );
             }}
             style={{
@@ -188,8 +239,8 @@ const UserIndex = () => {
                 record.roleName === "super_admin"
                   ? "#76b4e6"
                   : record.isActive
-                  ? "lightgreen"
-                  : "gray",
+                    ? "lightgreen"
+                    : "gray",
             }}
           />
         );
@@ -250,7 +301,7 @@ const UserIndex = () => {
   useEffect(() => {
     if (debouncedSearch) {
       const filtered = dataUser.filter((item: UserProperties) =>
-        item.username?.toLowerCase().includes(debouncedSearch.toLowerCase())
+        item.username?.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setFilteredData(filtered);
     } else {
@@ -275,12 +326,49 @@ const UserIndex = () => {
         }
       />
 
-      <Row>
+      <Row justify={"space-between"}>
         <Col>
           <AppInput
             icon={<SearchOutlined />}
             placeholder="Search by username"
             onChange={(e) => setSearch(e.target.value)}
+          />
+        </Col>
+        <Col className="flex items-center gap-2">
+          <div className="flex gap-2 items-center rounded-md !px-3 !py-2  text-black border border-gray-200">
+            <h4>Active Only</h4>
+            <Switch
+              loading={loading}
+              value={sortStatus as boolean}
+              onChange={() => setSortStatus((prev) => !prev)}
+              style={{
+                backgroundColor: sortStatus ? "lightgreen" : "gray",
+              }}
+            />
+          </div>
+
+          <AppSelect
+            placeholder="Filter By Latest"
+            value={sort}
+            loading={loading}
+            options={[
+              { label: "Newest Saved", value: "newest_saved" },
+              { label: "Oldest Saved", value: "oldest_saved" },
+            ]}
+            onChange={(value) => setSort(value)}
+          />
+          <AppSelect
+            placeholder="Filter By Role"
+            value={sortRole}
+            loading={loading}
+            style={{ minWidth: 130 }}
+            options={[
+              { label: "Admin", value: "admin" },
+              { label: "Super Admin", value: "super_admin" },
+              { label: "Customer", value: "customer" },
+              { label: "All Role", value: null },
+            ]}
+            onChange={(value) => setSortRole(value)}
           />
         </Col>
       </Row>
