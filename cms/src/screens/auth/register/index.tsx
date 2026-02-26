@@ -1,37 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../context/UserContext";
 import {
-  Row,
-  Col,
   Card,
-  Modal,
   Button,
   Form,
   Input,
   Divider,
-  Menu,
   Select,
   Flex,
   message,
-  InputNumber,
 } from "antd";
 import styled from "styled-components";
-import { InputOTP } from "antd-input-otp";
-import { initialUser, type UserProperties } from "../../../types/user.type";
+import { type UserProperties } from "../../../types/user.type";
 import { useNavigate } from "react-router-dom";
 import {
   FacebookFilled,
   GoogleCircleFilled,
-  InstagramFilled,
   LoadingOutlined,
   TwitterCircleFilled,
 } from "@ant-design/icons";
 import AOS from "aos";
 import myAxios from "../../../helper/myAxios";
-interface OptionProps {
-  id: number;
-  label: string;
-}
+
 import { EUserRole } from "../../../types/user.type";
 import { ErrorHandler } from "../../../helper/handleError";
 import { RoleProperties } from "../../../types/role.type";
@@ -87,7 +77,7 @@ const RegisterForm: React.FC = () => {
       // setUser(res.data);
 
       message.success(
-        "Success Registration! Please check your email for verification code."
+        "Success Registration! Please check your email for verification code.",
       );
     } catch (error: any) {
       console.log(error);
@@ -349,23 +339,10 @@ const TitleRegister = styled.h1`
   text-align: center;
 `;
 
-const FooterModalOtp = styled.div`
-  display: flex;
-  width: 100%;
-  gap: 10px;
-  letter-spacing: 1px;
-  justify-content: center;
-`;
-
 const ButtonIcon = styled(Button)`
   padding: 16px;
   width: 100%;
   color: grey;
-`;
-
-const ButtonModal = styled(Button)`
-  letter-spacing: 1px;
-  width: 100%;
 `;
 
 const ListIcon = styled.div`

@@ -206,7 +206,10 @@ const UserEdit = () => {
       ];
 
       setPreviewImage(data.secure_url);
-      setUser((prev) => ({ ...prev, profileImage: mappedImage }));
+      setUser((prev) => ({
+        ...prev,
+        profileImage: mappedImage as unknown as UserProperties["profileImage"],
+      }));
       setFileList([
         {
           uid: uuidv4(),
@@ -240,7 +243,7 @@ const UserEdit = () => {
       setSelectedImage(imageUrl);
       setUser((prev) => ({
         ...prev,
-        profileImage: mappedImages,
+        profileImage: mappedImages as unknown as UserProperties["profileImage"],
       }));
     }
   };

@@ -1,4 +1,4 @@
-import { Space, Form, Input, Radio, message, Select } from "antd";
+import { Space, Form, Input, message, Select } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 
@@ -7,7 +7,7 @@ import HeaderSection from "../../components/HeaderSection";
 import AppInput from "../../components/AppInput";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
-import { isEmpty, isBooleanUndefined } from "../../helper/validation";
+import { isEmpty } from "../../helper/validation";
 import { ErrorHandler } from "../../helper/handleError";
 import {
   genreInitialValue,

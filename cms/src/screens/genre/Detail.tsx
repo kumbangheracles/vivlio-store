@@ -1,12 +1,10 @@
-import { Card, Space, Tag } from "antd";
-import category from ".";
+import { Space, Tag } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 import { useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../../components/HeaderSection";
 import DetailItem from "../../components/DetailItem";
 import { useEffect, useState } from "react";
-import { CategoryProps } from "../../types/category.types";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { GenreProperties } from "../../types/genre.type";
@@ -15,7 +13,7 @@ const GenreDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [dataGenre, setDataGenre] = useState<GenreProperties | undefined>(
-    undefined
+    undefined,
   );
 
   const fetchGenre = async () => {

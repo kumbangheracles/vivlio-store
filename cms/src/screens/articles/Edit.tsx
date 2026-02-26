@@ -1,13 +1,4 @@
-import {
-  Space,
-  message,
-  Form,
-  Upload,
-  Input,
-  Modal,
-  Image,
-  UploadFile,
-} from "antd";
+import { Space, message, Form, Upload, Input, Image, UploadFile } from "antd";
 import AppButton from "../../components/AppButton";
 import AppInput from "../../components/AppInput";
 import HeaderPage from "../../components/HeaderPage";
@@ -43,7 +34,7 @@ const ArticleEdit = () => {
 
   const handleSubmit = async (
     data: ArticleProperties,
-    status: ArticleProperties["status"]
+    status: ArticleProperties["status"],
   ) => {
     form.validateFields();
 
@@ -114,7 +105,7 @@ const ArticleEdit = () => {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const data = await res.json();

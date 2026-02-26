@@ -10,7 +10,7 @@ export type UserProperties = {
   verificationCode?: string;
   token?: string;
   isActive?: boolean;
-  profileImage?: any;
+  profileImage?: { imageUrl?: string; public_id?: string; id?: string };
   role?: string;
 };
 

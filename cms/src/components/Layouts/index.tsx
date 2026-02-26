@@ -1,4 +1,4 @@
-import { Card, Dropdown, Layout, Menu, message, Modal } from "antd";
+import { Card, Dropdown, Layout, Menu, message, Modal, Spin } from "antd";
 import {
   TbLayoutSidebarLeftCollapse,
   TbLayoutSidebarRightCollapse,
@@ -27,12 +27,12 @@ const AppLayout = ({ children }: PropTypes) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const auth = useAuthUser<UserProperties>();
-  // console.log("Auth: ", auth);
+  const [dataUser, setDataUser] = useState<UserProperties | null>(null);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const isAuthenticated = useIsAuthenticated();
   const signOut = useSignOut();
+  const [loading, setLoading] = useState<boolean>(false);
   const [isHover, setIshover] = useState<boolean>(false);
-  // console.log("isAuth: ", isAuthenticated);
   const handleLogout = async () => {
     try {
       await myAxios.post("/auth/logout");
@@ -70,6 +70,22 @@ const AppLayout = ({ children }: PropTypes) => {
 
     return matched.length ? [matched[0]] : [];
   };
+
+  const fetchUser = async (id: string) => {
+    try {
+      setLoading(true);
+      const res = await myAxios.get(`/users/${id}`);
+      console.log("Datauser: ", res.data);
+      setDataUser(res?.data?.result);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUser(auth?.id as string);
+  }, [auth?.id]);
 
   const selectedKeys = useMemo(
     () => getMatchingSidebarKey(location.pathname, sidebarItems),
@@ -168,23 +184,22 @@ const AppLayout = ({ children }: PropTypes) => {
                   items: items,
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-
-                    height: 50,
-                    gap: 10,
-                  }}
-                >
-                  <AccountIcon isTriggered={isHover}>
-                    <img
-                      style={{ objectFit: "contain", cursor: "pointer" }}
-                      src="/icons/account.svg"
-                      alt="account-icon"
-                    />
-                  </AccountIcon>
-                </div>
+                <AccountIcon isTriggered={isHover}>
+                  <div className="w-full h-full overflow-hidden rounded-full">
+                    {loading ? (
+                      <Spin />
+                    ) : (
+                      <img
+                        className="w-full h-full object-cover"
+                        src={
+                          dataUser?.profileImage?.imageUrl ||
+                          "/icons/account.svg"
+                        }
+                        alt="account-icon"
+                      />
+                    )}
+                  </div>
+                </AccountIcon>
               </Dropdown>
               <Username>{auth?.username}</Username>
             </div>
@@ -301,7 +316,6 @@ const AccountIcon = styled.div<IconProps>`
   background-color: white;
   border-color: ${({ isTriggered }) => (isTriggered ? "white" : "#76b4e6")};
   border-radius: 50%;
-  padding: 5px;
   display: flex;
   margin-top: 10px;
   align-items: center;

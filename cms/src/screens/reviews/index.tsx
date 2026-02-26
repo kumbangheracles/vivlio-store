@@ -8,19 +8,17 @@ import {
   Menu,
   Tabs,
   message,
-  Badge,
   Tag,
 } from "antd";
 import AppInput from "../../components/AppInput";
 import AppTable from "../../components/AppTable";
 import HeaderPage from "../../components/HeaderPage";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import BookDefaultImg from "../../assets/images/bookDefault.png";
 import AppStatusSelect, {
-  getStatusStyle,
   getStatusStyleByStatus,
 } from "../../components/AppStatusSelect";
 import dayjs from "dayjs";
@@ -32,12 +30,11 @@ import {
   initialBookReview,
 } from "../../types/bookReview.type";
 import AppSelect from "../../components/AppSelect";
-import DetailItem, { Label } from "../../components/DetailItem";
+import DetailItem from "../../components/DetailItem";
 import StarLabel from "../../components/StarLabel";
 type OptionType = "newest" | "oldest";
 
 const ReviewsIndex = () => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -126,7 +123,7 @@ const ReviewsIndex = () => {
       status: activeKey,
       sort: filterValue,
     });
-  }, [page, limit, activeKey, filterValue]);
+  }, [page, limit, activeKey, filterValue, searchParams]);
 
   const handleStatusChange = async (id: string, status: BookReviewStatus) => {
     try {

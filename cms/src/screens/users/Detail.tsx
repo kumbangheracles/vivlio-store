@@ -1,5 +1,4 @@
-import { Card, Row, Space, Tag, Image } from "antd";
-import category from ".";
+import { Row, Space, Tag, Image } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,7 +6,6 @@ import HeaderSection from "../../components/HeaderSection";
 import DetailItem from "../../components/DetailItem";
 import { useEffect, useState } from "react";
 import DefaultImg from "../../assets/images/default-img.png";
-import { CategoryProps } from "../../types/category.types";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
 import { UserProperties } from "../../types/user.type";
@@ -18,9 +16,8 @@ const UserDetail = () => {
   const { id } = useParams();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [dataUser, setDataUser] = useState<UserProperties | undefined>(
-    undefined
+    undefined,
   );
-  const [role, setRole] = useState("");
 
   const fetchGenre = async () => {
     if (!id) return;

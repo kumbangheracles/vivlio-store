@@ -803,7 +803,7 @@ module.exports = {
         where: whereCondition,
         distinct: true,
         order: orderCondition,
-        limit: parseInt(limit),
+        limit: 15,
         subQuery: false,
         include: [
           {

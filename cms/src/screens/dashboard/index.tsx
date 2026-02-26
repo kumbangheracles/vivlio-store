@@ -1,7 +1,7 @@
 import AppTable from "../../components/AppTable";
 import HeaderPage from "../../components/HeaderPage";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, Image, Menu } from "antd";
+import { DatePicker, Dropdown, Image, Menu, Spin } from "antd";
 import { BookProps } from "../../types/books.type";
 import BookDefault from "../../assets/images/bookDefault.png";
 import { MoreOutlined } from "@ant-design/icons";
@@ -9,24 +9,22 @@ import dayjs from "dayjs";
 import { useState, useEffect } from "react";
 import myAxios from "../../helper/myAxios";
 import { ErrorHandler } from "../../helper/handleError";
+import { Bar } from "react-chartjs-2";
+import type { ChartData } from "chart.js";
 import {
-  Tooltip,
   Chart as ChartJS,
+  Tooltip,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
 } from "chart.js";
+
+ChartJS.register(Tooltip, CategoryScale, LinearScale, BarElement, Title);
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setloading] = useState<boolean>(false);
-  const [pageWishes, setPageWishes] = useState(1);
-  const [limitWishes, setLimitWishes] = useState(15);
-  const [pagePurchased, setPagePurchased] = useState(1);
-  const [limitPurchased, setLimitPurchased] = useState(15);
-  const [totalItemsWishes, setTotalItemsWishes] = useState(0);
-  const [totalItemsPurchased, setTotalItemsPurchased] = useState(0);
 
   const [dataMostWishesBooks, setDataMostWishesBooks] = useState<BookProps[]>(
     [],
@@ -34,32 +32,30 @@ const Dashboard = () => {
   const [dataMostPurchasedBooks, setDataMostPurchasedBooks] = useState<
     BookProps[]
   >([]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<string>("");
 
-  const fetchBooks = async (
-    page: number,
-    limit: number,
-
-    type?: "wishes" | "purchase",
-  ) => {
+  const fetchBooks = async (type?: "wishes" | "purchase") => {
     try {
       setloading(true);
 
       if (type === "wishes") {
         const res = await myAxios.get("/books/admin-dashboard", {
-          params: { page, limit, mostWishes: "true" },
+          params: {
+            page: "1",
+            limit: "15",
+            mostWishes: "true",
+          },
         });
 
         setDataMostWishesBooks(res.data.results);
-        setTotalItemsWishes(res.data.total);
       } else if (type === "purchase") {
         const res = await myAxios.get("/books/admin-dashboard", {
-          params: { page, limit, mostPurchased: "true" },
+          params: {
+            page: "1",
+            limit: "15",
+            mostPurchased: "true",
+          },
         });
-
         setDataMostPurchasedBooks(res.data.results);
-        setTotalItemsPurchased(res.data.total);
       }
     } catch (error) {
       console.log(error);
@@ -71,15 +67,14 @@ const Dashboard = () => {
 
   // Wish
   useEffect(() => {
-    fetchBooks(pageWishes, limitWishes, "wishes");
-    // console.log("Data books: ", dataBooks);
-  }, [pageWishes, limitWishes]);
+    fetchBooks("wishes");
+  }, []);
 
   // Purchase
   useEffect(() => {
-    fetchBooks(pagePurchased, limitPurchased, "purchase");
-    // console.log("Data books: ", dataBooks);
-  }, [pagePurchased, limitPurchased]);
+    fetchBooks("purchase");
+  }, []);
+
   const bookColumns = [
     {
       title: "Image",
@@ -146,7 +141,7 @@ const Dashboard = () => {
               {
                 key: "detail",
                 label: "Detail",
-                onClick: () => navigate(`${record.id}/detail`),
+                onClick: () => navigate(`/book/${record.id}/detail`),
               },
             ]}
           />
@@ -159,15 +154,138 @@ const Dashboard = () => {
       },
     },
   ];
+
+  // ChartJs code ====================================
+
+  const [weeklyIncome, setWeeklyIncome] = useState<number[]>([]);
+  const [monthlyIncome, setMonthlyIncome] = useState(0);
+
+  const fetchMonthlyIncome = async (month: string) => {
+    try {
+      setloading(true);
+      const res = await myAxios.get(
+        `/transactions/admin/income?type=monthly&date=${month}`,
+      );
+
+      console.log("Raes:", res.data);
+
+      setMonthlyIncome(Number(res.data.totalIncome) || 0);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setloading(false);
+    }
+  };
+  const fetchWeeklyIncome = async (selectedDate: string) => {
+    try {
+      setloading(true);
+      const res = await myAxios.get(`/transactions/admin/income`, {
+        params: {
+          type: "weekly",
+          date: selectedDate,
+        },
+      });
+
+      const result = res.data;
+
+      console.log("Data result income weekly: ", result);
+      // const days = [
+      //   "Monday",
+      //   "Tuesday",
+      //   "Wednesday",
+      //   "Thursday",
+      //   "Friday",
+      //   "Saturday",
+      //   "Sunday",
+      // ];
+
+      const incomePerDay = new Array(7).fill(0);
+
+      result.forEach((item: any) => {
+        const dayIndex = new Date(item.date).getDay();
+        incomePerDay[dayIndex === 0 ? 6 : dayIndex - 1] = Number(
+          item.totalIncome,
+        );
+      });
+
+      setWeeklyIncome(incomePerDay);
+    } catch (error) {
+      ErrorHandler(error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const lineChartData: ChartData<"bar"> = {
+    labels: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ] as string[],
+
+    datasets: [
+      {
+        label: "Income in this day",
+        data: weeklyIncome,
+        borderColor: "rgb(0, 4, 4)",
+        backgroundColor: "lightblue",
+      },
+    ],
+  };
+
   return (
     <>
       <HeaderPage title="Dashboard" breadcrumb="Home / Dashboard" />
 
-      <div>
-        <h4 className="text-[18px] font-semibold tracking-wide !mb-2">
-          Total Income
-        </h4>
+      <div className="!mb-10">
+        <div className="flex justify-between !p-4">
+          <h4 className="text-[18px] font-semibold tracking-wide !mb-2">
+            Weekly Income
+          </h4>
+
+          <DatePicker
+            picker="week"
+            onChange={(value) => {
+              const formatted = value?.format("YYYY-MM-DD");
+              if (formatted) {
+                fetchWeeklyIncome(formatted);
+              }
+            }}
+            allowClear
+          />
+        </div>
+        <div>
+          <Bar data={lineChartData} />
+        </div>
       </div>
+      <div className="!mb-10">
+        <div className="flex justify-end">
+          <DatePicker
+            picker="month"
+            onChange={(value) => {
+              const formatted = value?.format("YYYY-MM");
+              if (formatted) {
+                fetchMonthlyIncome(formatted);
+              }
+            }}
+            allowClear
+          />
+        </div>
+        <div className="!p-4 flex justify-center items-center w-full">
+          <h4 className="text-3xl bg-sky-200 rounded-2xl !p-6 w-[50%] text-center font-semibold tracking-wide !mb-2">
+            {loading ? (
+              <Spin />
+            ) : (
+              <>Total in Month Rp{monthlyIncome?.toLocaleString("id-ID")}</>
+            )}
+          </h4>
+        </div>
+      </div>
+
       <div className="flex gap-3 w-full flex-col">
         <div className="w-full">
           <h4 className="text-[18px] font-semibold tracking-wide !mb-2">
@@ -179,18 +297,6 @@ const Dashboard = () => {
             dataSource={dataMostWishesBooks}
             loading={loading}
             rowKey={"id"}
-            pagination={{
-              current: pageWishes,
-              pageSize: limitWishes,
-              total: totalItemsWishes,
-              onChange: (newPage, newPageSize) => {
-                setPageWishes(newPage);
-                setLimitWishes(newPageSize);
-              },
-              showSizeChanger: true,
-              position: ["bottomLeft"],
-              style: {},
-            }}
           />
         </div>
         <div className="w-full">
@@ -203,18 +309,6 @@ const Dashboard = () => {
             dataSource={dataMostPurchasedBooks}
             loading={loading}
             rowKey={"id"}
-            pagination={{
-              current: pagePurchased,
-              pageSize: limitPurchased,
-              total: totalItemsPurchased,
-              onChange: (newPage, newPageSize) => {
-                setPagePurchased(newPage);
-                setLimitPurchased(newPageSize);
-              },
-              showSizeChanger: true,
-              position: ["bottomLeft"],
-              style: {},
-            }}
           />
         </div>
       </div>

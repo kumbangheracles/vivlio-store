@@ -13,7 +13,6 @@ import AppInput from "../../components/AppInput";
 import { useEffect, useState } from "react";
 import myAxios from "../../helper/myAxios";
 import { isEmpty, isBooleanUndefined } from "../../helper/validation";
-import { ErrorHandler } from "../../helper/handleError";
 import { PlusOutlined } from "@ant-design/icons";
 import { RcFile, UploadChangeParam, UploadFile } from "antd/es/upload";
 import { v4 as uuidv4 } from "uuid";
@@ -23,9 +22,7 @@ const CategoryEdit = () => {
   const [category, setCategory] = useState<CategoryProps>(initialCategoryValue);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [image, setImage] = useState<CategoryImage | null>(null);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string>("");
   const { id } = useParams();
@@ -144,7 +141,7 @@ const CategoryEdit = () => {
       setSelectedImage(imageUrl);
       setCategory((prev) => ({
         ...prev,
-        categoryImage: mappedImages,
+        categoryImage: mappedImages as unknown as CategoryImage,
       }));
     }
 
@@ -157,7 +154,7 @@ const CategoryEdit = () => {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const data = await res.json();
@@ -171,7 +168,10 @@ const CategoryEdit = () => {
     ];
 
     setPreviewImage(data.secure_url);
-    setCategory((prev) => ({ ...prev, categoryImage: mappedImage }));
+    setCategory((prev) => ({
+      ...prev,
+      categoryImage: mappedImage as unknown as CategoryImage,
+    }));
     setFileList([
       {
         uid: uuidv4(),
@@ -238,8 +238,13 @@ const CategoryEdit = () => {
         rightAction={
           <>
             <Space>
-              <AppButton label="Cancel" onClick={() => navigate(-1)} />
               <AppButton
+                label="Cancel"
+                loading={isLoading}
+                onClick={() => navigate(-1)}
+              />
+              <AppButton
+                loading={isLoading}
                 customColor="primary"
                 label="Save"
                 onClick={() => handleSubmit(category)}

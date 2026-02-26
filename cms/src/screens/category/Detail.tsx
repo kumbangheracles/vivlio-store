@@ -1,5 +1,4 @@
-import { Card, Space, Tag, Image } from "antd";
-import category from ".";
+import { Space, Tag, Image } from "antd";
 import AppButton from "../../components/AppButton";
 import HeaderPage from "../../components/HeaderPage";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,7 +14,7 @@ const CategoryDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [dataCategory, setDataCategory] = useState<CategoryProps | undefined>(
-    undefined
+    undefined,
   );
 
   const fetchCategory = async () => {

@@ -4,17 +4,7 @@ import {
   GoogleCircleFilled,
   TwitterCircleFilled,
 } from "@ant-design/icons";
-import {
-  Divider,
-  Input,
-  Flex,
-  Select,
-  Button,
-  Form,
-  Card,
-  message,
-  Modal,
-} from "antd";
+import { Divider, Input, Button, Form, Card, message } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
@@ -30,7 +20,6 @@ const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<Boolean>(false);
   const [dataLogin, setDataLogin] = useState<LoginProps>(initialLogin);
-  const [dataRole, setDataRole] = useState();
   const signIn = useSignIn();
 
   const handleSubmit = async (data: LoginProps) => {
@@ -286,5 +275,4 @@ const WrapperSignIn = styled.div`
   gap: 10px;
 `;
 
-const WrapperContent = styled.div``;
 const WrapperHeader = styled.div``;

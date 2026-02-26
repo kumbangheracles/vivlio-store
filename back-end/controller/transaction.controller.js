@@ -1,8 +1,5 @@
-const { sequelize } = require("../config/database");
 const { Book, UserPurchases, BookImage } = require("../models/index");
-const { generateId } = require("../utils/generateId");
-const { Op } = require("sequelize");
-
+const { Op, fn, col, literal } = require("sequelize");
 module.exports = {
   async getAll(req, res) {
     const {
@@ -101,6 +98,55 @@ module.exports = {
         message: error.message || "Internal server error",
         data: [],
       });
+    }
+  },
+
+  async getIncome(req, res) {
+    const { type, date } = req.query;
+
+    try {
+      if (type === "weekly") {
+        const startOfWeek = new Date(date);
+        const endOfWeek = new Date(date);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+        const data = await UserPurchases.findAll({
+          attributes: [
+            [fn("DATE", col("purchaseDate")), "date"],
+            [fn("SUM", col("priceAtPurchases")), "totalIncome"],
+          ],
+          where: {
+            paymentStatus: "PAID",
+            purchaseDate: {
+              [Op.between]: [startOfWeek, endOfWeek],
+            },
+          },
+          group: [literal("DATE(purchaseDate)")],
+          order: [[literal("DATE(purchaseDate)"), "ASC"]],
+        });
+
+        return res.json(data);
+      }
+
+      if (type === "monthly") {
+        const startOfMonth = new Date(`${date}-01`);
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(startOfMonth.getMonth() + 1);
+
+        const total = await UserPurchases.findOne({
+          attributes: [[fn("SUM", col("priceAtPurchases")), "totalIncome"]],
+          where: {
+            paymentStatus: "PAID",
+            purchaseDate: {
+              [Op.between]: [startOfMonth, endOfMonth],
+            },
+          },
+        });
+
+        return res.json(total);
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   },
 };
