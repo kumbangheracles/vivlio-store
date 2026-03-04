@@ -1,5 +1,5 @@
 import { Button, Row, Space, Typography } from "antd";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {

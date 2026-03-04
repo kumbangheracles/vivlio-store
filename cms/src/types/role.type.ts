@@ -5,7 +5,7 @@ export type RoleProperties = {
   createdAt: string; // ISO timestamp
   updatedAt: string;
 };
-const initialRole: RoleProperties = {
+export const initialRole: RoleProperties = {
   id: "",
   name: "",
   description: null,

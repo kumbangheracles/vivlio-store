@@ -2,13 +2,8 @@
 import React, { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Form, Input, Divider, message, Button, Card } from "antd";
-import {
-  LoadingOutlined,
-  FacebookFilled,
-  GoogleCircleFilled,
-  TwitterCircleFilled,
-} from "@ant-design/icons";
+import { Form, Input, Divider, message, Card } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
 
@@ -191,12 +186,10 @@ const LoginForm: React.FC = () => {
 
           <div>
             <WrapperDeviderBot>
-              <Divider
-                style={{ marginBlock: "1rem", border: "1px solid gray" }}
-              />
-              <p>OR</p>
+              <Divider style={{ marginTop: "0px", border: "1px solid gray" }} />
+              <p className="mb-2">OR</p>
             </WrapperDeviderBot>
-            <ListIcon>
+            {/* <ListIcon>
               <ButtonIcon>
                 <FacebookFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
@@ -206,7 +199,7 @@ const LoginForm: React.FC = () => {
               <ButtonIcon>
                 <TwitterCircleFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
-            </ListIcon>
+            </ListIcon> */}
           </div>
 
           <WrapperSignIn>
@@ -236,19 +229,19 @@ const TitleRegister = styled.h1`
   }
 `;
 
-const ButtonIcon = styled(Button)`
-  padding: 16px;
-  width: 100%;
-  color: grey;
-`;
+// const ButtonIcon = styled(Button)`
+//   padding: 16px;
+//   width: 100%;
+//   color: grey;
+// `;
 
-const ListIcon = styled.div`
-  margin-top: 10px;
-  display: flex;
-  gap: 5px;
+// const ListIcon = styled.div`
+//   margin-top: 10px;
+//   display: flex;
+//   gap: 5px;
 
-  justify-content: center;
-`;
+//   justify-content: center;
+// `;
 const CardRegister = styled(Card)`
   width: 450px;
   margin: 1rem;

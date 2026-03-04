@@ -13,12 +13,7 @@ import {
 import styled from "styled-components";
 import { type UserProperties } from "../../../types/user.type";
 import { useNavigate } from "react-router-dom";
-import {
-  FacebookFilled,
-  GoogleCircleFilled,
-  LoadingOutlined,
-  TwitterCircleFilled,
-} from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import AOS from "aos";
 import myAxios from "../../../helper/myAxios";
 
@@ -302,7 +297,7 @@ const RegisterForm: React.FC = () => {
               />
               <p>OR</p>
             </WrapperDeviderBot>
-            <ListIcon>
+            {/* <ListIcon>
               <ButtonIcon>
                 <FacebookFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
@@ -312,7 +307,7 @@ const RegisterForm: React.FC = () => {
               <ButtonIcon>
                 <TwitterCircleFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
-            </ListIcon>
+            </ListIcon> */}
           </div>
 
           <WrapperSignIn>
@@ -339,19 +334,19 @@ const TitleRegister = styled.h1`
   text-align: center;
 `;
 
-const ButtonIcon = styled(Button)`
-  padding: 16px;
-  width: 100%;
-  color: grey;
-`;
+// const ButtonIcon = styled(Button)`
+//   padding: 16px;
+//   width: 100%;
+//   color: grey;
+// `;
 
-const ListIcon = styled.div`
-  margin-top: 10px;
-  display: flex;
-  gap: 5px;
+// const ListIcon = styled.div`
+//   margin-top: 10px;
+//   display: flex;
+//   gap: 5px;
 
-  justify-content: center;
-`;
+//   justify-content: center;
+// `;
 const CardRegister = styled(Card)`
   width: 450px;
   margin: 1rem;

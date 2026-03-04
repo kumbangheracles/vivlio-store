@@ -11,7 +11,7 @@ type UserContextType = {
 };
 
 export const UserContext = createContext<UserContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -26,14 +26,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     return () => {
       myAxios.interceptors.request.eject(interceptor);
     };
   }, []);
-  const { ModalComponent } = useSessionManager(auth!, setUser);
+  const { ModalComponent } = useSessionManager(auth as UserProperties);
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

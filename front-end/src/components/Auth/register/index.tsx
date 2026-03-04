@@ -12,18 +12,12 @@ import {
 } from "antd";
 import styled from "styled-components";
 import { initialUser, type UserProperties } from "../../../types/user.type";
-import {
-  FacebookFilled,
-  GoogleCircleFilled,
-  LoadingOutlined,
-  TwitterCircleFilled,
-} from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import AOS from "aos";
 
 import { EUserRole } from "../../../types/user.type";
 
 import { RoleProperties } from "../../../types/role.type";
-import { useRouter } from "next/navigation";
 import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
@@ -320,7 +314,7 @@ const RegisterForm: React.FC = () => {
               />
               <p>OR</p>
             </WrapperDeviderBot>
-            <ListIcon>
+            {/* <ListIcon>
               <ButtonIcon>
                 <FacebookFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
@@ -330,7 +324,7 @@ const RegisterForm: React.FC = () => {
               <ButtonIcon>
                 <TwitterCircleFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
-            </ListIcon>
+            </ListIcon> */}
           </div>
 
           <WrapperSignIn>

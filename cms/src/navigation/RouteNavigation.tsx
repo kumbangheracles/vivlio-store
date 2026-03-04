@@ -40,6 +40,11 @@ const RouteNavigation = () => {
 
   // Book Reviews
   const BookReviewsIndex = React.lazy(() => import("../screens/reviews/index"));
+
+  // Forget Password
+  // const ForgetPasswordIndex = React.lazy(
+  //   () => import("../screens/auth/forget-password/index"),
+  // );
   return (
     <>
       <Suspense fallback={<GlobalLoading />}>
@@ -320,6 +325,14 @@ const RouteNavigation = () => {
               </ProtectedRoute>
             }
           />
+          {/* <Route
+            path="/auth/forget-password"
+            element={
+              <GuestRoute>
+                <ForgetPasswordIndex />
+              </GuestRoute>
+            }
+          /> */}
 
           {/* Ini route wildcard untuk semua path yang tidak ditemukan */}
           <Route path="*" element={<NotFound />} />

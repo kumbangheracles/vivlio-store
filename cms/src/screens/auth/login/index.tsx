@@ -155,11 +155,11 @@ const LoginForm: React.FC = () => {
             </Button>
           </Form>
 
-          <div className="flex justify-center !mt-3 font-semibold">
+          {/* <div className="flex justify-center !mt-3 font-semibold">
             <a className="!text-center hover:!text-blue-400 !text-black cursor-pointer">
               Forgot Password?
             </a>
-          </div>
+          </div> */}
           {/* <div>
             <WrapperDeviderBot>
               <Divider
