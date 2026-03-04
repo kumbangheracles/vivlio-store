@@ -51,10 +51,24 @@ export default tseslint.config({
 
 ## RUN WITH CONTAINER
 
+<!-- Build first then run -->
+
 <!-- Build -->
 
 docker build -t reactjs/cms-vivibook:1.0.0 .
 
+<!-- Build in specific dockerfile -->
+
+<!-- example for stg -->
+
+docker build -t reactjs-stg/cms-vivibook:1.0.0 -f Dockerfile.stg .
+
 <!-- Run -->
 
+<!-- dev -->
+
 docker run -d -p 3001:3001 reactjs/cms-vivibook:1.0.0
+
+<!-- stg -->
+
+docker run -d -p 3001:3001 reactjs-stg/cms-vivibook:1.0.0

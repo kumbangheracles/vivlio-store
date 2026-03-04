@@ -22,10 +22,15 @@ const countdownInterval = setInterval(() => {
 export const useSessionManager = (user: UserProperties | undefined) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(30); // default 30 detik sebelum logout
-  const [logoutTimer, setLogoutTimer] = useState<NodeJS.Timeout | null>(null);
-  const [modalTimer, setModalTimer] = useState<NodeJS.Timeout | null>(null);
-  const [countdownInterval, setCountdownInterval] =
-    useState<NodeJS.Timeout | null>(null);
+  const [logoutTimer, setLogoutTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [modalTimer, setModalTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const [countdownInterval, setCountdownInterval] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
