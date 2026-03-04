@@ -36,7 +36,6 @@ const RegisterForm: React.FC = () => {
   const isEmpty = (val?: string) =>
     !val || val.trim() === "" || val === undefined;
   const isEmptyRole = (val: number | string) => !val;
-  const navigate = useRouter();
 
   const fetchRole = async () => {
     try {
@@ -84,7 +83,6 @@ const RegisterForm: React.FC = () => {
         confirmPassword: userData.confirmPassword,
         roleId: userData.roleId,
       };
-      console.log("BOdy:", body);
       localStorage.setItem("email", body.email!);
       const res = await myAxios.post("/auth/register", body);
       if (res) {
@@ -118,14 +116,16 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    if (data.password!.length < 6) {
+    if ((data?.password?.length as number) < 6) {
       message.error("Password must be at least 6 characters");
       return;
     }
 
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
-    if (!regex.test(data.password!)) {
-      message.error("Password must include alphabet and numeric");
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+    if (!regex.test(data.password as string)) {
+      message.error(
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+      );
       return;
     }
 

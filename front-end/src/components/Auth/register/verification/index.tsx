@@ -22,6 +22,7 @@ const Verification: React.FC = () => {
       setLoading(true);
       await myAxios.post("/auth/resend-code-verification", {
         email: email,
+        type: "verifiedUser",
       });
       message.success("Resend code success");
       const countdownTime = Date.now() + 60 * 1000;
@@ -59,12 +60,13 @@ const Verification: React.FC = () => {
       const res = await myAxios.post("/auth/verify-email", {
         email: email,
         verificationCode: verificationCode,
+        type: "verifiedUser",
       });
       console.log("Code sended:", res.data);
       message.success("Verification Success!!");
       if (res) {
         setTimeout(() => {
-          navigate.push("/login");
+          navigate.push("/auth/login");
         }, 1000);
       }
       localStorage.removeItem("email");
@@ -139,71 +141,72 @@ const Verification: React.FC = () => {
           </MobileFormItem>
         </div>
       ) : (
-        <CardVerification
-          className="shadow-md"
-          data-aos="fade-up"
-          style={{ cursor: loading ? "wait" : "default" }}
-        >
-          <Form.Item>
-            <h1
-              style={{
-                fontWeight: "600",
-                textAlign: "center",
-                padding: "12px",
-                fontSize: "20px",
-                letterSpacing: "1px",
-              }}
-            >
-              Input verification code
-            </h1>
-            <InputOTP
-              inputType="numeric"
-              wrapperStyle={{}}
-              value={verifCode}
-              inputStyle={{ padding: "1rem" }}
-              onChange={(value) => {
-                setVerifCode(value);
-              }}
-            />
-
-            <FooterModalOtp>
-              <ButtonModal
-                disabled={cooldown}
-                style={{ cursor: cooldown ? "not-allowed" : "pointer" }}
-                onClick={handleResendOtp}
+        <div className="flex w-full min-h-screen justify-center items-center">
+          <CardVerification
+            className="shadow-md"
+            style={{ cursor: loading ? "wait" : "default" }}
+          >
+            <Form.Item>
+              <h1
+                style={{
+                  fontWeight: "600",
+                  textAlign: "center",
+                  padding: "12px",
+                  fontSize: "20px",
+                  letterSpacing: "1px",
+                }}
               >
-                {cooldown && deadline ? (
-                  <div
-                    className="flex gap-[10px]"
-                    style={{ fontSize: "20px", color: "gray" }}
-                  >
-                    <LoadingOutlined />
-                    <Statistic.Countdown
-                      value={deadline}
-                      format="mm:ss"
-                      onFinish={() => {
-                        setCooldown(false);
-                        setDeadline(null);
-                      }}
-                    />
-                  </div>
-                ) : loading ? (
-                  "Sending..."
-                ) : (
-                  "Resend code"
-                )}
-              </ButtonModal>
+                Input verification code
+              </h1>
+              <InputOTP
+                inputType="numeric"
+                wrapperStyle={{}}
+                value={verifCode}
+                inputStyle={{ padding: "1rem" }}
+                onChange={(value) => {
+                  setVerifCode(value);
+                }}
+              />
 
-              <ButtonModal
-                type="primary"
-                onClick={() => handleSubmitOtp(verifCode!)}
-              >
-                Ok
-              </ButtonModal>
-            </FooterModalOtp>
-          </Form.Item>
-          {/* </Modal> */}
-        </CardVerification>
+              <FooterModalOtp>
+                <ButtonModal
+                  disabled={cooldown}
+                  style={{ cursor: cooldown ? "not-allowed" : "pointer" }}
+                  onClick={handleResendOtp}
+                >
+                  {cooldown && deadline ? (
+                    <div
+                      className="flex gap-[10px]"
+                      style={{ fontSize: "20px", color: "gray" }}
+                    >
+                      <LoadingOutlined />
+                      <Statistic.Countdown
+                        value={deadline}
+                        format="mm:ss"
+                        onFinish={() => {
+                          setCooldown(false);
+                          setDeadline(null);
+                        }}
+                      />
+                    </div>
+                  ) : loading ? (
+                    "Sending..."
+                  ) : (
+                    "Resend code"
+                  )}
+                </ButtonModal>
+
+                <ButtonModal
+                  type="primary"
+                  onClick={() => handleSubmitOtp(verifCode!)}
+                >
+                  Ok
+                </ButtonModal>
+              </FooterModalOtp>
+            </Form.Item>
+            {/* </Modal> */}
+          </CardVerification>
+        </div>
       )}
     </>
   );
@@ -240,6 +243,7 @@ const MobileFormItem = styled(Form.Item)`
   }
   background-color: white;
   --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
-  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
     var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
 `;

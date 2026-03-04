@@ -1,9 +1,4 @@
-import {
-  LoadingOutlined,
-  FacebookFilled,
-  GoogleCircleFilled,
-  TwitterCircleFilled,
-} from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import { Divider, Input, Button, Form, Card, message } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -159,7 +154,13 @@ const LoginForm: React.FC = () => {
               )}
             </Button>
           </Form>
-          <div>
+
+          <div className="flex justify-center !mt-3 font-semibold">
+            <a className="!text-center hover:!text-blue-400 !text-black cursor-pointer">
+              Forgot Password?
+            </a>
+          </div>
+          {/* <div>
             <WrapperDeviderBot>
               <Divider
                 style={{ marginBlock: "1rem", border: "1px solid gray" }}
@@ -177,9 +178,9 @@ const LoginForm: React.FC = () => {
                 <TwitterCircleFilled style={{ fontSize: "25px" }} />
               </ButtonIcon>
             </ListIcon>
-          </div>
+          </div> */}
 
-          <WrapperSignIn>
+          {/* <WrapperSignIn>
             <p>Don't have account?</p>
             <p
               style={{ color: "#7badff", cursor: "pointer" }}
@@ -187,7 +188,7 @@ const LoginForm: React.FC = () => {
             >
               Sign Up
             </p>
-          </WrapperSignIn>
+          </WrapperSignIn> */}
         </CardRegister>
       </Container>
     </>
@@ -203,19 +204,19 @@ const TitleRegister = styled.h1`
   text-align: center;
 `;
 
-const ButtonIcon = styled(Button)`
-  padding: 16px;
-  width: 100%;
-  color: grey;
-`;
+// const ButtonIcon = styled(Button)`
+//   padding: 16px;
+//   width: 100%;
+//   color: grey;
+// `;
 
-const ListIcon = styled.div`
-  margin-top: 10px;
-  display: flex;
-  gap: 5px;
+// const ListIcon = styled.div`
+//   margin-top: 10px;
+//   display: flex;
+//   gap: 5px;
 
-  justify-content: center;
-`;
+//   justify-content: center;
+// `;
 const CardRegister = styled(Card)`
   width: 450px;
   margin: 1rem;
@@ -247,32 +248,32 @@ const WrapperDeviderTop = styled.div`
     background-color: white;
   }
 `;
-const WrapperDeviderBot = styled.div`
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  width: 100%;
-  margin-top: 10px;
+// const WrapperDeviderBot = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   position: relative;
+//   width: 100%;
+//   margin-top: 10px;
 
-  p {
-    letter-spacing: 1px;
-    font-weight: 700;
-    font-size: 12px;
-    color: grey;
-    position: absolute;
-    left: 45%;
-    padding: 10px;
-    bottom: -2px;
-    background-color: white;
-  }
-`;
+//   p {
+//     letter-spacing: 1px;
+//     font-weight: 700;
+//     font-size: 12px;
+//     color: grey;
+//     position: absolute;
+//     left: 45%;
+//     padding: 10px;
+//     bottom: -2px;
+//     background-color: white;
+//   }
+// `;
 
-const WrapperSignIn = styled.div`
-  display: flex;
-  letter-spacing: 1px;
-  padding: 10px;
-  justify-content: center;
-  gap: 10px;
-`;
+// const WrapperSignIn = styled.div`
+//   display: flex;
+//   letter-spacing: 1px;
+//   padding: 10px;
+//   justify-content: center;
+//   gap: 10px;
+// `;
 
 const WrapperHeader = styled.div``;

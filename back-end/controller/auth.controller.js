@@ -103,24 +103,63 @@ module.exports = {
      *           example: user@example.com
      */
     try {
-      const { email } = req.body;
+      const { email, type } = req.body;
+
       const user = await User.findOne({ where: { email } });
-
       if (!user) return res.status(404).json({ message: "User not found" });
-      if (user.isVerified)
-        return res.status(400).json({ message: "User already verified" });
+      if (type === "verifiedUser") {
+        if (user.isVerified)
+          return res.status(400).json({ message: "User already verified" });
 
-      const code = generateVerificationCode();
-      const createdAt = new Date();
+        const now = new Date();
+        const diffInMs =
+          now.getTime() - user.verificationCodeCreatedAt.getTime();
+        const diffInMinutes = diffInMs / (1000 * 60);
 
-      await user.update({
-        verificationCode: code,
-        verificationCodeCreatedAt: createdAt,
-      });
+        if (user.verificationCodeCreatedAt && diffInMinutes < 2) {
+          const remainingSeconds = Math.ceil((2 - diffInMinutes) * 60);
+          return res.status(429).json({
+            message: `Please wait ${remainingSeconds} seconds before resending the code.`,
+          });
+        }
 
-      await sendEmailVerification(email, code);
+        const code = generateVerificationCode();
+        const createdAt = new Date();
 
-      res.status(200).json({ message: "Verification code resent!" });
+        await user.update({
+          verificationCode: code,
+          verificationCodeCreatedAt: createdAt,
+        });
+
+        await sendEmailVerification(email, code);
+
+        res.status(200).json({ message: "Verification code resent!" });
+      } else if (type === "forgotPassword") {
+        const now = new Date();
+        const diffInMs =
+          now.getTime() - user.verificationCodeCreatedAt.getTime();
+        const diffInMinutes = diffInMs / (1000 * 60);
+
+        if (user.verificationCodeCreatedAt && diffInMinutes < 2) {
+          const remainingSeconds = Math.ceil((2 - diffInMinutes) * 60);
+          return res.status(429).json({
+            message: `Please wait ${remainingSeconds} seconds before resending the code.`,
+          });
+        }
+
+        const code = generateVerificationCode();
+        const createdAt = new Date();
+
+        await user.update({
+          verificationCode: code,
+          verificationCodeCreatedAt: createdAt,
+        });
+
+        await sendEmailVerification(email, code);
+        res
+          .status(200)
+          .json({ message: "Verification code for forget password resent!" });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -146,8 +185,9 @@ module.exports = {
      *           example: "123456"
      */
     try {
-      const { email, verificationCode } = req.body;
+      const { email, verificationCode, type } = req.body;
       const user = await User.findOne({ where: { email } });
+
       if (!user) {
         return res.status(404).json({ message: "User not found", data: user });
       }
@@ -170,7 +210,19 @@ module.exports = {
       user.isVerified = true;
       user.verificationCode = null; // hapus code biar tidak bisa dipakai ulang
       await user.save();
-      res.status(200).json({ message: "Email successfully verified!" });
+
+      if (type === "verifiedUser") {
+        res.status(200).json({ message: "Email successfully verified!" });
+      } else if (type === "forgotPassword") {
+        res.status(200).json({
+          message: "Email for forget password successfully verified!",
+          result: {
+            id: user?.id,
+            fullName: user?.fullName,
+            email: user?.email,
+          },
+        });
+      }
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -436,6 +488,43 @@ module.exports = {
     } catch (error) {
       res.status(400).json({
         message: error.message,
+      });
+    }
+  },
+
+  async forgotPassword(req, res) {
+    const { id } = req.params;
+    const { password, confirmPassword } = req.body;
+    try {
+      const user = await User.findOne({ where: { id } });
+
+      if (!user)
+        return res.status(404).json({
+          message: "Not Found",
+        });
+
+      if (password !== confirmPassword)
+        return res.status(400).json({
+          message: "Password not match!.",
+        });
+
+      const hashedPassword = await encrypt(password, 10);
+      await User.update({ password: hashedPassword }, { where: { id } });
+
+      res.status(200).json({
+        message: "Success Update Password!.",
+        data: {
+          fullName: user?.fullName,
+          username: user?.username,
+          email: user?.email,
+          roleId: user?.roleId,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message || "Internal server error",
+        data: [],
       });
     }
   },

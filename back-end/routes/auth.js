@@ -205,4 +205,6 @@ router.get("/refresh", authMiddleware, authController.refresh);
 
 router.post("/logout", authController.logout);
 
+router.patch("/forgot-password/:id", authController.forgotPassword);
+
 module.exports = router;

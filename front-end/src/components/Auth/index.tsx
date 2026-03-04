@@ -151,7 +151,14 @@ const LoginForm: React.FC = () => {
                 disabled={loading}
               />
             </Form.Item>
-
+            <div className="flex justify-end !mt-0 font-semibold">
+              <a
+                onClick={() => navigate.push("/auth/forgot-password")}
+                className="!text-center hover:!text-blue-400 !text-black cursor-pointer"
+              >
+                Forgot Password?
+              </a>
+            </div>
             <Form.Item style={{ marginTop: "10px" }}>
               <button
                 type="submit"
