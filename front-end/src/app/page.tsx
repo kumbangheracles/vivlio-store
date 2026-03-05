@@ -11,19 +11,10 @@ export const metadata = {
   description: "Home page",
 };
 
-interface PageProps {
-  searchParams?: {
-    key?: string;
-    sortDate?: string;
-    sortPrice?: number;
-    onlyAvailable?: boolean;
-    limit?: number;
-  };
-}
-
 export const revalidate = 60;
-export default async function Home({ searchParams }: PageProps) {
+export default async function Home() {
   // const params = await searchParams;
+
   const books = await fetchBooksHome();
   const dataUser: UserProperties = await fetchUser();
   const categoryIds = dataUser?.category_preference?.length

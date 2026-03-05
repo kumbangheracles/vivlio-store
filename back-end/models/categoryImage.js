@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const CategoryImage = sequelize.define(
-  "CategoryImage",
+  "categoryimages",
   {
     id: {
       type: DataTypes.UUID,
@@ -28,9 +28,9 @@ const CategoryImage = sequelize.define(
     },
   },
   {
-    tableName: "CategoryImages",
+    tableName: "categoryimages",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = CategoryImage;

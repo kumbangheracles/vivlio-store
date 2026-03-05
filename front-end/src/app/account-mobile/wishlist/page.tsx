@@ -1,7 +1,7 @@
 import fetchWishlist from "@/components/Account/fetchWishlist";
 import WishlistMobile from "@/components/Account/mobile/WishlistMobile";
 interface Params {
-  searchParams?: {
+  searchParams?: Promise<{
     status?: string;
     page?: string;
     limit?: string;
@@ -9,7 +9,7 @@ interface Params {
     sortDate?: "newest_saved" | "oldest_saved";
     pageWish?: string;
     limitWish?: string;
-  };
+  }>;
 }
 const WishlistMobilePage = async ({ searchParams }: Params) => {
   const params = await searchParams;

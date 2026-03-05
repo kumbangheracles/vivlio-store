@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { API_URL } from "@/libs/myAxios";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { BaseResponBook } from "@/types/base.type";
 import { TransactionParams, TransactionProps } from "@/types/transaction.type";
+import { authOptions } from "@/libs/authOptions";
 
 async function fetchTransactions({
   limitOrders = "0",
@@ -10,7 +10,6 @@ async function fetchTransactions({
   page = 1,
   title = "",
   sortDateOrders = "",
-  sortOrder = "",
 }: TransactionParams = {}): Promise<BaseResponBook<TransactionProps>> {
   const session = await getServerSession(authOptions);
 

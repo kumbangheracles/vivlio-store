@@ -6,8 +6,6 @@ import {
   ArrowLeftOutlined,
   ClearOutlined,
   SearchOutlined,
-  UpCircleFilled,
-  UpCircleOutlined,
   UpOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
@@ -15,7 +13,6 @@ import { Button, DatePicker, Input, Result, Select } from "antd";
 import useTransaction from "@/hooks/useTransactions";
 import { TransactionProps } from "@/types/transaction.type";
 import TransactionItem from "../TransactionItem";
-import { cn } from "@/libs/cn";
 import { useMounted } from "@/hooks/useMounted";
 import GlobalLoading from "@/components/GlobalLoading";
 import { useRef } from "react";

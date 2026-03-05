@@ -12,7 +12,7 @@ import { truncateText } from "@/helpers/truncateText";
 
 import dayjs from "dayjs";
 import { Button, Modal, Result, Select, Spin, Tag } from "antd";
-import { startTransition, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/libs/cn";
 import ModalReview from "../ModalReview";
 import useBookReviews from "@/hooks/useBookReviews";

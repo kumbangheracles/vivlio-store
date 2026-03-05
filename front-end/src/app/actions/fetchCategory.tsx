@@ -31,8 +31,8 @@ async function fetchCategory({
 
     console.log("response cat: ", response);
     return response?.data?.results;
-  } catch (err: any) {
-    console.log("fetchBooks error:", err.message || err);
+  } catch (err) {
+    console.log("fetchBooks error:", err);
     return [];
   }
 }

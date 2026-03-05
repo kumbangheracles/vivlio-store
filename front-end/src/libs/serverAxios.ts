@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "./myAxios";
 
 interface PropTypesAxios {
   token?: string;
@@ -9,7 +10,7 @@ export const createServerAxios = ({
   isConsole = false,
 }: PropTypesAxios) => {
   const instance = axios.create({
-    baseURL: process.env.API_BASE_URL || "http://localhost:3000",
+    baseURL: API_URL || "http://localhost:3000",
     headers: {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),

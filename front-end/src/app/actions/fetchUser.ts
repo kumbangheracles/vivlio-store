@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import myAxios from "@/libs/myAxios";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/libs/authOptions";
 
 async function fetchUser() {
   const session = await getServerSession(authOptions);

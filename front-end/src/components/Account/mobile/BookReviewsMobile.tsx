@@ -3,7 +3,7 @@
 import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Modal, Result, Select, Tag } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import BookDefaultImg from "../../../assets/images/default-img.png";
 import StarLabel from "@/components/BookDetail/StarLabel";

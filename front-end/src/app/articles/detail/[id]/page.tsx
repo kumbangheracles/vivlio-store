@@ -5,7 +5,7 @@ import myAxios from "@/libs/myAxios";
 import { ArticleProperties } from "@/types/article.type";
 import { Metadata } from "next";
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 export const metadata: Metadata = {
   title: "ViviBook - Article Detail",
@@ -27,7 +27,8 @@ export async function generateStaticParams() {
 }
 export const revalidate = 60;
 const ArticleDetailPage = async ({ params }: PageProps) => {
-  const dataArticle = await fetchArticleDetail(params.id);
+  const rams = await params;
+  const dataArticle = await fetchArticleDetail(rams?.id);
   // console.log("Data Article: ", dataArticle);
   return (
     <div className="w-full min-h-screen">

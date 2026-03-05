@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const UserCart = sequelize.define(
-  "UserCart",
+  "usercart",
   {
     id: {
       type: DataTypes.UUID,
@@ -27,9 +27,9 @@ const UserCart = sequelize.define(
     },
   },
   {
-    tableName: "UserCart",
+    tableName: "usercart",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = UserCart;

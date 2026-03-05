@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const User = sequelize.define(
-  "Users",
+  "users",
   {
     id: {
       type: DataTypes.STRING,
@@ -22,7 +22,7 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: "Roles",
+        model: "roles",
         key: "id",
       },
     },
@@ -64,7 +64,7 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "Users",
+    tableName: "users",
     timestamps: true,
   },
 );

@@ -8,7 +8,7 @@ module.exports = {
     const customerRoleId = uuidv4();
     const superAdminRoleId = uuidv4();
 
-    await queryInterface.bulkInsert("Roles", [
+    await queryInterface.bulkInsert("roles", [
       {
         id: superAdminRoleId,
         name: "super_admin",
@@ -29,7 +29,7 @@ module.exports = {
       },
     ]);
 
-    await queryInterface.bulkInsert("Users", [
+    await queryInterface.bulkInsert("users", [
       {
         id: uuidv4(),
         username: "herkalsuperadmin",
@@ -82,10 +82,10 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete("Users", {
+    await queryInterface.bulkDelete("users", {
       email: ["admin@example.com", "customer@example.com", "herkal@gmail.com"],
     });
-    await queryInterface.bulkDelete("Roles", {
+    await queryInterface.bulkDelete("roles", {
       name: ["admin", "customer"],
     });
   },

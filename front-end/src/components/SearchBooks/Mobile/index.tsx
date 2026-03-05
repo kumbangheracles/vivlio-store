@@ -28,12 +28,11 @@ interface PropTypes {
 }
 const SearchBookMobileIndex = ({ dataBooks }: PropTypes) => {
   const [results, setResults] = useState<BookProps[]>([]);
-  const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
-  const { keyword, setKeyword } = useOverlayStore();
+  const { keyword } = useOverlayStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<SearchHistory[]>([]);
   const [suggestions, setSuggestions] = useState<BookProps[]>([]);
-  const { handlePushRoute, handleReplaceRoute } = useGlobalLoadingBar();
+  const { handleReplaceRoute } = useGlobalLoadingBar();
   const [isDisplayRecom, setIsDisplayRecom] = useState(false);
   const params = new URLSearchParams();
   const auth = useAuth();

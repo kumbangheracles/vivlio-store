@@ -1,8 +1,8 @@
 "use server";
+import { authOptions } from "@/libs/authOptions";
 import { createServerAxios } from "@/libs/serverAxios";
 import { BookReviewsProps } from "@/types/bookreview.type";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 
 interface PropTypesFetch {
   page: number;
@@ -45,7 +45,7 @@ async function fetchBookReviews(
 
     // console.log("Respons: ", response.data);
     return filteredReviews;
-  } catch (err: any) {
+  } catch (err) {
     console.log("fetch book reviews error:", err || err);
     return [];
   }

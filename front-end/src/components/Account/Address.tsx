@@ -6,7 +6,7 @@ interface PropTypes {
 }
 
 const Address = ({ address }: PropTypes) => {
-  return <div></div>;
+  return <div>{address}</div>;
 };
 
 export default Address;

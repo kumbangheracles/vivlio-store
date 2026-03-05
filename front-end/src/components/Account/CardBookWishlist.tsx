@@ -12,7 +12,6 @@ import myAxios from "@/libs/myAxios";
 import { ErrorHandler } from "@/helpers/handleError";
 import { useIsWishlistStore } from "@/zustand/isWishlist.store";
 import useDeviceType from "@/hooks/useDeviceType";
-import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { truncateText } from "@/helpers/truncateText";
 import { useRouter } from "next/navigation";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";

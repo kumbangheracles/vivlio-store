@@ -1,13 +1,13 @@
 import SearchBookIndex from "@/components/SearchBooks";
 import fetchBooksHome from "../actions/fetchBooksHome";
 interface PageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     key?: string;
     sortDate?: string;
     sortPrice?: number;
     onlyAvailable?: boolean;
     limit?: number;
-  };
+  }>;
 }
 const SearchBookPage = async ({ searchParams }: PageProps) => {
   const params = await searchParams;

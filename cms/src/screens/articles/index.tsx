@@ -126,8 +126,7 @@ const ArticleIndex = () => {
   const handleStatusChange = async (id: string, status: ArticleStatusType) => {
     try {
       setLoading(true);
-
-      const res = await myAxios.patch(`/articles/${id}`, { status });
+      await myAxios.patch(`/articles/${id}`, { status });
       // setDataArticle((prev) =>
       //   prev.map((item) => (item?.id === id ? res.data : item))
       // );

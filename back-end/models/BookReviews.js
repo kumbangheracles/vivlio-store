@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const BookReview = sequelize.define(
-  "BookReviews",
+  "bookreviews",
   {
     id: {
       type: DataTypes.UUID,
@@ -31,7 +31,7 @@ const BookReview = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: "Books",
+        model: "books",
         key: "id",
       },
       onDelete: "CASCADE",
@@ -49,7 +49,7 @@ const BookReview = sequelize.define(
     },
   },
   {
-    tableName: "BookReviews",
+    tableName: "bookreviews",
     timestamps: true,
   },
 );

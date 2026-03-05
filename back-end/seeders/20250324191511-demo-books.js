@@ -3,7 +3,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     const categories = await queryInterface.sequelize.query(
-      `SELECT categoryId FROM book_category LIMIT 1;`
+      `SELECT categoryId FROM book_category LIMIT 1;`,
     );
 
     // const categoryId = categories[0][0]?.categoryId;
@@ -38,6 +38,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("Books", null, {});
+    return queryInterface.bulkDelete("books", null, {});
   },
 };

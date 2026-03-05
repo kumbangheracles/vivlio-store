@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const UserWishlist = sequelize.define(
-  "UserWishlist",
+  "userwishlist",
   {
     id: {
       type: DataTypes.UUID,
@@ -18,9 +18,9 @@ const UserWishlist = sequelize.define(
     },
   },
   {
-    tableName: "UserWishlist",
+    tableName: "userwishlist",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = UserWishlist;

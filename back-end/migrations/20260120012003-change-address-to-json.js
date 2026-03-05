@@ -3,12 +3,12 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.query(`
-      UPDATE Users
+      UPDATE users
       SET address = '{}'
       WHERE address IS NULL OR address = '';
     `);
 
-    await queryInterface.changeColumn("Users", "address", {
+    await queryInterface.changeColumn("users", "address", {
       type: Sequelize.JSON,
       allowNull: true,
       defaultValue: {},
@@ -16,7 +16,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.changeColumn("Users", "address", {
+    await queryInterface.changeColumn("users", "address", {
       type: Sequelize.STRING,
       allowNull: true,
     });

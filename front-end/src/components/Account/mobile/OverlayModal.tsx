@@ -12,7 +12,6 @@ import { Button, Form, Input, message } from "antd";
 import AppInput from "@/components/AppInput";
 import { UserProperties } from "@/types/user.type";
 import PasswordCheck from "./PasswordCheck";
-import { cn } from "@/libs/cn";
 import myAxios from "@/libs/myAxios";
 import { useAuth } from "@/hooks/useAuth";
 import { ErrorHandler } from "@/helpers/handleError";

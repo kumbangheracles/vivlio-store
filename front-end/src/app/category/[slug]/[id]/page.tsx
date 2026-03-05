@@ -3,8 +3,8 @@ import ListBook from "@/components/Home/components/ListBook";
 import deslugify from "@/libs/deslugyfy";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 interface PageProps {
-  params: { id: string; slug: string };
-  searchParams: {
+  params: Promise<{ id: string; slug: string }>;
+  searchParams: Promise<{
     search?: string;
     sortBy?: string;
     minPrice?: string;
@@ -15,35 +15,36 @@ interface PageProps {
     sortPrice?: number;
     onlyAvailable?: boolean;
     limit?: number;
-  };
+  }>;
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const titleList = deslugify(params.slug);
+  const titleList = deslugify((await params).slug);
   return {
     title: `ViviBook - ${titleList}`,
     description: `Browse ${titleList} books`,
   };
 }
 
-const CategoryPage = async ({ params, searchParams }: PageProps) => {
-  const sortDate = searchParams?.sortDate;
-  const sortPrice = searchParams?.sortPrice;
+const CategoryPage = async (props: PageProps) => {
+  const { params, searchParams } = await props;
+  const sortDate = (await searchParams)?.sortDate;
+  const sortPrice = (await searchParams)?.sortPrice;
 
   const dataBooks = await fetchBooksHome({
-    limit: searchParams?.limit ?? 12,
+    limit: (await searchParams)?.limit ?? 12,
     sortPrice: sortPrice,
     sortDate: sortDate,
-    categoryId: params.id,
-    onlyAvailable: searchParams.onlyAvailable,
+    categoryId: (await params).id,
+    onlyAvailable: (await searchParams).onlyAvailable,
   });
 
   const total = dataBooks.total;
   const shown = dataBooks.results?.length;
 
-  const titleList = deslugify(params.slug);
+  const titleList = deslugify((await params).slug);
 
   return (
     <div className="w-full p-4 mt-[-20px]">

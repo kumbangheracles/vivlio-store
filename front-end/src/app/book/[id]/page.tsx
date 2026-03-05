@@ -1,5 +1,4 @@
 import BookDetailPage from "@/components/BookDetail";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import myAxios from "@/libs/myAxios";
 import { BookProps } from "@/types/books.type";
 import { getServerSession } from "next-auth";
@@ -8,8 +7,9 @@ import { Empty } from "antd";
 import fetchBooksHome from "@/app/actions/fetchBooksHome";
 import { Metadata } from "next";
 import fetchCategory from "@/app/actions/fetchCategory";
+import { authOptions } from "@/libs/authOptions";
 interface BookDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export async function generateStaticParams() {
 
 export const revalidate = 60;
 export default async function BookDetail({ params }: BookDetailPageProps) {
-  const { id } = params;
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   const dataCategory = await fetchCategory();
   const accessToken = session?.accessToken;

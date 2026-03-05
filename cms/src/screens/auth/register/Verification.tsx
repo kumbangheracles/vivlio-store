@@ -17,7 +17,7 @@ const Verification: React.FC = () => {
   const handleResendOtp = async () => {
     try {
       setLoading(true);
-      const res = await myAxios.post("/auth/resend-code-verification", {
+      await myAxios.post("/auth/resend-code-verification", {
         email: email,
       });
       message.success("Resend code success");

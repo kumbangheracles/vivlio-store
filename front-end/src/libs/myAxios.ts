@@ -1,8 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getSession } from "next-auth/react";
-export const API_URL = process.env.API_BASE_URL || "http://localhost:3000";
+export const API_URL =
+  typeof window === "undefined"
+    ? process.env.API_BASE_URL
+    : process.env.NEXT_PUBLIC_API_BASE_URL;
 const myAxios = axios.create({
-  baseURL: process.env.API_BASE_URL || "http://localhost:3000",
+  baseURL: API_URL || "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },

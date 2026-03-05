@@ -1,0 +1,60 @@
+services:
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: vivibook-be
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - ./back-end/.env.stg
+    volumes:
+      - ./back-end:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: vivibook-fe
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./front-end/.env.local
+    depends_on:
+      - backend
+
+  cms:
+    build:
+      context: ./cms
+      dockerfile: Dockerfile.stg
+    container_name: vivibook-cms
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./front-end/.env.local
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    env_file:
+      - ./back-end/.env.stg
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

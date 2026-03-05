@@ -1,11 +1,11 @@
 import myAxios from "@/libs/myAxios";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import {
   ArticleParams,
   ArticleProperties,
   ArticleStatusType,
 } from "@/types/article.type";
+import { authOptions } from "@/libs/authOptions";
 
 async function fetchArticles({
   limit = 0,
@@ -39,8 +39,8 @@ async function fetchArticles({
     );
 
     return filteredArticles;
-  } catch (err: any) {
-    // console.log("Error fetch articles:", err || err);
+  } catch (err) {
+    console.log("Error fetch articles:", err || err);
     return [];
   }
 }

@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const UserImage = sequelize.define(
-  "UserImage",
+  "userimages",
   {
     id: {
       type: DataTypes.UUID,
@@ -13,7 +13,7 @@ const UserImage = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: "Users",
+        model: "users",
         key: "id",
       },
       onDelete: "CASCADE",
@@ -28,9 +28,9 @@ const UserImage = sequelize.define(
     },
   },
   {
-    tableName: "UserImages",
+    tableName: "userimages",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = UserImage;

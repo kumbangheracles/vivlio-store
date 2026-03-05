@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("BookReviews", {
+    await queryInterface.createTable("bookreviews", {
       id: {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
         references: {
-          model: "Books",
+          model: "books",
           key: "id",
         },
         onDelete: "CASCADE",
@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
         references: {
-          model: "Users",
+          model: "users",
           key: "id",
         },
         onDelete: "CASCADE",
@@ -60,6 +60,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("BookReviews");
+    await queryInterface.dropTable("bookreviews");
   },
 };

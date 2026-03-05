@@ -57,8 +57,7 @@ export default function Navbar({
   const auth = useAuth();
   const router = useRouter();
   const isMobile = useDeviceType();
-  const { isOverlay, setIsOverlay, toggleOverlay, keyword, setKeyword } =
-    useOverlayStore();
+  const { isOverlay, setIsOverlay, keyword, setKeyword } = useOverlayStore();
   const [results, setResults] = useState<BookProps[]>([]);
   const [resultDisplay, setResultDispay] = useState<ReactNode | null>(null);
   const [history, setHistory] = useState<SearchHistory[]>([]);
@@ -309,6 +308,8 @@ export default function Navbar({
     if (results.length > 0) {
       setResultDispay(<></>);
     }
+
+    console.log("Result display: ", resultDisplay);
   }, [results]);
 
   useEffect(() => {
@@ -738,39 +739,6 @@ export default function Navbar({
 interface linkProps {
   isBlue?: boolean;
 }
-
-const StyledLink = styled(Link)<linkProps>`
-  &:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 2px;
-    width: 0;
-    background-color: black;
-    transition: all 0.3s ease;
-  }
-
-  &:hover&:after {
-    width: 100%;
-  }
-
-  @media (max-width: 768px) {
-    background-color: ${({ isBlue }) => (isBlue ? "#d9eafd" : "white")};
-    font-size: small;
-    width: 100%;
-    text-align: center;
-    padding: 7px;
-    transition: all 0.3s ease;
-    &:hover&:after {
-      width: 0;
-    }
-
-    &:hover {
-      background-color: #d9eafd;
-    }
-  }
-`;
 
 interface IconProps {
   isTriggered?: boolean;

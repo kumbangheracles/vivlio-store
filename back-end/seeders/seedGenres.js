@@ -8,7 +8,7 @@ async function seedGenres() {
 
   try {
     const [admins] = await sequelize.query(
-      `SELECT id FROM Users WHERE username = 'herkalsuperadmin' LIMIT 1;`,
+      `SELECT id FROM users WHERE username = 'herkalsuperadmin' LIMIT 1;`,
     );
     if (admins.length === 0) {
       throw new Error("No admin found. Please seed admin user first.");

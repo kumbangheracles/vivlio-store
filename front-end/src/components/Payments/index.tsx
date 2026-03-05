@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import useGlobalLoadingBar from "@/hooks/useGlobalLoadingBar";
-import { Button, message, Result, Spin } from "antd";
+import { Button, message, Result } from "antd";
 import { useSearchParams } from "next/navigation";
 import Unauthorized from "../Unoutherized";
 import { useMounted } from "@/hooks/useMounted";

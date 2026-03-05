@@ -14,7 +14,6 @@ import { message, Modal } from "antd";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
-import { FaRegMap } from "react-icons/fa";
 import { MdOutlineRateReview } from "react-icons/md";
 import NotFoundPage from "@/components/NotFoundPage";
 import { useMounted } from "@/hooks/useMounted";

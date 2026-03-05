@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 const UserPurchases = sequelize.define(
-  "UserPurchases",
+  "userpurchases",
   {
     id: {
       type: DataTypes.STRING,
@@ -123,7 +123,7 @@ const UserPurchases = sequelize.define(
     },
   },
   {
-    tableName: "UserPurchases",
+    tableName: "userpurchases",
     timestamps: false,
   },
 );

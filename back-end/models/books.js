@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const Book = sequelize.define(
-  "Books",
+  "books",
   {
     id: {
       type: DataTypes.STRING,
@@ -63,7 +63,7 @@ const Book = sequelize.define(
     },
   },
   {
-    tableName: "Books",
+    tableName: "books",
     timestamps: true,
   },
 );

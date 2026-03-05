@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const data = await fetchBookReviews({ page: page, status: status });
     return NextResponse.json(data);
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }

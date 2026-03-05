@@ -11,7 +11,7 @@ const BookGenres = sequelize.define("book_genres", {
     allowNull: false,
     onDelete: "CASCADE",
     references: {
-      model: "Books",
+      model: "books",
       key: "id",
     },
   },

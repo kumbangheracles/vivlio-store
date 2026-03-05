@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const Role = sequelize.define(
-  "Roles",
+  "roles",
   {
     id: {
       type: DataTypes.STRING,
@@ -21,9 +21,9 @@ const Role = sequelize.define(
     },
   },
   {
-    tableName: "Roles",
+    tableName: "roles",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = Role;

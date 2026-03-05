@@ -30,7 +30,7 @@ export const useWishlistStore = create<WishlistState>((set) => ({
   fetchBooks: async () => {
     try {
       set({ loading: true, error: null });
-      const data = await fetchWishlist();
+      const data = await fetchWishlist({ pageWish: 1 });
       set({ books: data, loading: false });
     } catch (error) {
       set({ error: "Failed to fetch wishlist", loading: false });

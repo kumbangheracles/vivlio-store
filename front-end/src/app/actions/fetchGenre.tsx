@@ -9,8 +9,8 @@ async function fetchGenres(): Promise<GenreProperties[]> {
       (item: GenreProperties) => item.status === "PUBLISHED",
     );
     return filteredGenres;
-  } catch (err: any) {
-    console.log("fetchBooks error:", err.message || err);
+  } catch (err) {
+    console.log("fetchBooks error:", err);
     return [];
   }
 }

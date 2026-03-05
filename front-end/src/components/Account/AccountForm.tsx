@@ -6,7 +6,7 @@ type FieldKey = "fullName" | "username" | "email" | "password" | null;
 type AccountFormProps = {
   activeKey: Exclude<FieldKey, null>;
   loading: boolean;
-  onSubmit: (values: any) => void;
+  onSubmit: (values: UserProperties) => void;
   dataUser?: UserProperties;
 };
 

@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const BookImage = sequelize.define(
-  "BookImages",
+  "bookimages",
   {
     id: {
       type: DataTypes.STRING,
@@ -14,7 +14,7 @@ const BookImage = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: "Books",
+        model: "books",
         key: "id",
       },
       onDelete: "CASCADE",
@@ -29,9 +29,9 @@ const BookImage = sequelize.define(
     },
   },
   {
-    tableName: "BookImages",
+    tableName: "bookimages",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = BookImage;

@@ -1,9 +1,8 @@
 "use server";
-import myAxios from "@/libs/myAxios";
 import { BookWithWishlist } from "@/types/wishlist.type";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../app/api/auth/[...nextauth]/route";
 import { createServerAxios } from "@/libs/serverAxios";
+import { authOptions } from "@/libs/authOptions";
 interface PropTypesFetch {
   pageWish: number;
   limitWish?: string;

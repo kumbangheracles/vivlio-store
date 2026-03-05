@@ -7,13 +7,13 @@ export const metadata = {
   description: "Blog Page",
 };
 interface PageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     key?: string;
     sortDate?: string;
     sortPrice?: number;
     onlyAvailable?: boolean;
     limit?: number;
-  };
+  }>;
 }
 
 const ArticlePage = async ({ searchParams }: PageProps) => {

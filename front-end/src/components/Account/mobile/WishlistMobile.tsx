@@ -2,7 +2,7 @@
 import { BookWithWishlist } from "@/types/wishlist.type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, message, Result, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import CardBookWishlist from "../CardBookWishlist";
 import { useWishlistStore } from "@/zustand/wishlist.store";
 import { useRouter } from "next/navigation";
@@ -17,12 +17,6 @@ import FadeUpWrapper from "@/components/Home/FadeUpWrapper";
 interface PropTypes {
   dataWishlists?: BookWithWishlist[];
 }
-
-type OptionType =
-  | "newest_saved"
-  | "oldest_saved"
-  | "highest_price"
-  | "lowest_price";
 
 const WishlistMobile = ({ dataWishlists }: PropTypes) => {
   const auth = useAuth();

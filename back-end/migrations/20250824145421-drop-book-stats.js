@@ -3,13 +3,13 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Drop table BookStats
-    await queryInterface.dropTable("BookStats");
+    // Drop table bookstats
+    await queryInterface.dropTable("bookstats");
   },
 
   async down(queryInterface, Sequelize) {
-    // Kalau mau rollback, buat lagi table BookStats
-    await queryInterface.createTable("BookStats", {
+    // Kalau mau rollback, buat lagi table bookstats
+    await queryInterface.createTable("bookstats", {
       id: {
         allowNull: false,
         autoIncrement: true,

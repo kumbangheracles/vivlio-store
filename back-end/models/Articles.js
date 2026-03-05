@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
 const Articles = sequelize.define(
-  "Articles",
+  "articles",
   {
     id: {
       type: DataTypes.UUID,
@@ -33,9 +33,9 @@ const Articles = sequelize.define(
     },
   },
   {
-    tableName: "Articles",
+    tableName: "articles",
     timestamps: true,
-  }
+  },
 );
 
 module.exports = Articles;

@@ -13,7 +13,7 @@ async function fetchArticleDetail(id: string): Promise<ArticleProperties> {
     const response = await myAxios.get(url);
 
     return response.data.result;
-  } catch (err: any) {
+  } catch (err) {
     console.log("Error fetch article detail:", err || err);
     return {};
   }

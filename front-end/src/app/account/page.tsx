@@ -13,7 +13,7 @@ export const metadata = {
 };
 
 interface Params {
-  searchParams?: {
+  searchParams?: Promise<{
     status?: string;
     page?: string;
     limit?: string;
@@ -30,7 +30,7 @@ interface Params {
     sortDateOrders?: string;
     sortPriceOrders?: string;
     titleOrders?: string;
-  };
+  }>;
 }
 
 const AccountPage = async ({ searchParams }: Params) => {

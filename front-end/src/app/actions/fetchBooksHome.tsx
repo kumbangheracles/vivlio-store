@@ -1,8 +1,8 @@
 import { API_URL } from "@/libs/myAxios";
 import { BookParams, BookProps, BookStatusType } from "@/types/books.type";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { BaseResponBook } from "@/types/base.type";
+import { authOptions } from "@/libs/authOptions";
 
 async function fetchBooksHome({
   status = BookStatusType.PUBLISH,
