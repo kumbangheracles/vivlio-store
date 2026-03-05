@@ -9,12 +9,11 @@ import styled, { StyleSheetManager } from "styled-components";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { UserProperties } from "@/types/user.type";
-import { ConfigProvider } from "antd";
+
 import GlobalLoading from "./GlobalLoading";
 import { createCache, StyleProvider } from "@ant-design/cssinjs";
 import isPropValid from "@emotion/is-prop-valid";
 import { usePathname } from "next/navigation";
-import AntdRegistry from "@/libs/AntdRegistry";
 import useDeviceType from "@/hooks/useDeviceType";
 import { CategoryProps } from "@/types/category.types";
 import { BookProps } from "@/types/books.type";
@@ -72,41 +71,35 @@ const AppLayout: React.FC<LayoutProps> = ({
 
   return (
     <>
-      <ConfigProvider>
-        <AntdRegistry>
-          <StyleSheetManager shouldForwardProp={isPropValid}>
-            <StyleProvider cache={cache} hashPriority="high">
-              {isPageAuth || isResult ? (
-                <>{children}</>
-              ) : (
-                <>
-                  <WrapperLayout>
-                    <Navbar
-                      dataGenres={dataGenres}
-                      dataUser={dataUser}
-                      dataCategories={dataCategories}
-                      dataCartedBooks={dataCartedBooks}
-                      dataBooks={dataBooks}
-                    />
-                    <WrapperChildren isMobile={isMobile}>
-                      <Suspense fallback={<GlobalLoading />}>
-                        {children}
-                      </Suspense>
-                      {isOverlay && (
-                        <div
-                          onClick={() => setIsOverlay(false)}
-                          className="inset-0 bg-black/50 transition-opacity duration-300 top-0 left-0 fixed h-screen w-screen z-[40]"
-                        ></div>
-                      )}
-                    </WrapperChildren>
-                    <Footer />
-                  </WrapperLayout>
-                </>
-              )}
-            </StyleProvider>
-          </StyleSheetManager>
-        </AntdRegistry>
-      </ConfigProvider>
+      <StyleSheetManager shouldForwardProp={isPropValid}>
+        <StyleProvider cache={cache} hashPriority="high">
+          {isPageAuth || isResult ? (
+            <>{children}</>
+          ) : (
+            <>
+              <WrapperLayout>
+                <Navbar
+                  dataGenres={dataGenres}
+                  dataUser={dataUser}
+                  dataCategories={dataCategories}
+                  dataCartedBooks={dataCartedBooks}
+                  dataBooks={dataBooks}
+                />
+                <WrapperChildren isMobile={isMobile}>
+                  <Suspense fallback={<GlobalLoading />}>{children}</Suspense>
+                  {isOverlay && (
+                    <div
+                      onClick={() => setIsOverlay(false)}
+                      className="inset-0 bg-black/50 transition-opacity duration-300 top-0 left-0 fixed h-screen w-screen z-[40]"
+                    ></div>
+                  )}
+                </WrapperChildren>
+                <Footer />
+              </WrapperLayout>
+            </>
+          )}
+        </StyleProvider>
+      </StyleSheetManager>
     </>
   );
 };

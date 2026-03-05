@@ -1,9 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getSession } from "next-auth/react";
 export const API_URL =
-  typeof window === "undefined"
-    ? process.env.API_BASE_URL
-    : process.env.NEXT_PUBLIC_API_BASE_URL;
+  process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 const myAxios = axios.create({
   baseURL: API_URL || "http://localhost:3000",
   headers: {
@@ -12,7 +10,7 @@ const myAxios = axios.create({
   timeout: 1000 * 60 * 60,
   withCredentials: true,
 });
-
+console.log("API URL: ", API_URL);
 myAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const session = await getSession();
