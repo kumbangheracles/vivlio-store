@@ -16,7 +16,9 @@
     "dev": "nodemon server.js",
     "prod": "pm2 start app.js --watch",
     "stop:prod": "pm2 stop app",
-    "docs": "node docs/swagger.js"
+    "docs": "node docs/swagger.js",
+    "docker-build:dev": "docker build -t expressjs/be-vivibook:1.0.0 -f Dockerfile.dev .",
+    "docker-run:dev": "docker run -it -p 3000:3000 --name expressjs/be-vivibook -v ./:/app -v my-node-modules:/app/node_modules expressjs/be-vivibook:1.0.0"
   },
   "dependencies": {
     "axios": "^1.13.5",

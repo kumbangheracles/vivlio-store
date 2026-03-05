@@ -34,7 +34,7 @@ const RegisterForm: React.FC = () => {
     try {
       const res = await myAxios.get("/roles");
       const data = res.data.results;
-      console.log("data roles: ", data);
+      // console.log("data roles: ", data);
       setDataRole(data);
     } catch (error) {}
   };
@@ -61,13 +61,13 @@ const RegisterForm: React.FC = () => {
         confirmPassword: userData.confirmPassword,
         roleId: userData.roleId,
       };
-      console.log("BOdy:", body);
+      // console.log("BOdy:", body);
       localStorage.setItem("email", body.email!);
       const res = await myAxios.post("auth/register", body);
       if (res) {
         navigate("/register/verification-code");
       }
-      console.log("Data terkirim: ", res.data);
+      // console.log("Data terkirim: ", res.data);
 
       // setUser(res.data);
 
@@ -75,7 +75,7 @@ const RegisterForm: React.FC = () => {
         "Success Registration! Please check your email for verification code.",
       );
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       ErrorHandler(error);
     } finally {
       setLoading(false);
@@ -92,7 +92,7 @@ const RegisterForm: React.FC = () => {
       isEmpty(data.confirmPassword)
     ) {
       message.error("All fields are required");
-      console.log("All fields are required");
+      // console.log("All fields are required");
       return;
     }
 

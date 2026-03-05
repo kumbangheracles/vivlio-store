@@ -13,7 +13,7 @@ const Verification: React.FC = () => {
   const navigate = useNavigate();
   const email = localStorage.getItem("email");
   const deadline = dayjs().add(1, "minutes").valueOf();
-  console.log("current email: ", email);
+  // console.log("current email: ", email);
   const handleResendOtp = async () => {
     try {
       setLoading(true);
@@ -21,13 +21,13 @@ const Verification: React.FC = () => {
         email: email,
       });
       message.success("Resend code success");
-      console.log("Code Otp: ", res.data);
+      // console.log("Code Otp: ", res.data);
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       const backendMsg =
         error?.response?.data?.message ||
         "Resend code failed! Please try again later";
-      console.log("Error from backend:", backendMsg);
+      // console.log("Error from backend:", backendMsg);
       message.error(backendMsg);
     } finally {
       setLoading(false);
@@ -50,12 +50,12 @@ const Verification: React.FC = () => {
       setLoading(true);
 
       const verificationCode = data.join("");
-      console.log("Verification Code: ", verificationCode);
+      // console.log("Verification Code: ", verificationCode);
       const res = await myAxios.post("/auth/verify-email", {
         email: email,
         verificationCode: verificationCode,
       });
-      console.log("Code sended:", res.data);
+      // console.log("Code sended:", res.data);
       message.success("Verification Success!!");
       if (res) {
         setTimeout(() => {
@@ -64,11 +64,11 @@ const Verification: React.FC = () => {
       }
       localStorage.removeItem("email");
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       const backendMsg =
         error?.response?.data?.message ||
         "Verification Failed! Please try again later";
-      console.log("Error from backend:", backendMsg);
+      // console.log("Error from backend:", backendMsg);
       message.error(backendMsg);
     } finally {
       setLoading(false);
@@ -123,9 +123,9 @@ const Verification: React.FC = () => {
                     <Statistic.Countdown
                       value={deadline}
                       format="mm:ss"
-                      onFinish={() => {
-                        console.log("Waktu habis!");
-                      }}
+                      // onFinish={() => {
+                      //   console.log("Waktu habis!");
+                      // }}
                     />
                   </div>
                 </>

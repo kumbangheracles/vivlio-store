@@ -8,7 +8,14 @@ async function seedArticles() {
   const t = await sequelize.transaction();
 
   try {
-    const adminId = "20cb820e-c6a6-4b99-94e4-463a6cc30087";
+    const [admins] = await sequelize.query(
+      `SELECT id FROM Users WHERE username = 'herkalsuperadmin' LIMIT 1;`,
+    );
+    if (admins.length === 0) {
+      throw new Error("No admin found. Please seed admin user first.");
+    }
+
+    const adminId = admins[0].id;
 
     const realArticles = [
       { title: "The Psychology Behind Consumer Behavior" },

@@ -25,7 +25,7 @@ const BookDetail = () => {
     try {
       const res = await myAxios.get(`/books/${id}`);
       setDataBook(res.data.result);
-      console.log("Data book: ", res.data.result);
+      // console.log("Data book: ", res.data.result);
     } catch (error) {
       ErrorHandler(error);
     }
@@ -63,7 +63,7 @@ const BookDetail = () => {
   useEffect(() => {
     fetchAdmin(dataBook?.createdByAdminId as string);
   }, [dataBook?.createdByAdminId]);
-  console.log("Data book one: ", dataBook);
+  // console.log("Data book one: ", dataBook);
   return (
     <>
       {" "}

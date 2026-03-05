@@ -111,7 +111,7 @@ const ArticleIndex = () => {
           const users = responses.map((res) => res.data.result);
           setDataUser(users);
 
-          console.log("Fetched users:", users);
+          // console.log("Fetched users:", users);
         } catch (error) {
           ErrorHandler(error);
         } finally {
@@ -133,7 +133,7 @@ const ArticleIndex = () => {
       // );
 
       message.success("Success update status");
-      console.log("response: ", res.data);
+      // console.log("response: ", res.data);
     } catch (error) {
       ErrorHandler(error);
     } finally {

@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: express_app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env.stg
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    env_file:
+      - .env.stg
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

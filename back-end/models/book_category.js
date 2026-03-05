@@ -6,7 +6,6 @@ const BookCategory = sequelize.define(
     categoryId: {
       type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
       defaultValue: DataTypes.UUIDV4,
     },

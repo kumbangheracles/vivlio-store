@@ -40,7 +40,7 @@ const AppLayout = ({ children }: PropTypes) => {
 
       navigate("/login");
     } catch (error) {
-      console.log("Error Logout: ", error);
+      // console.log("Error Logout: ", error);
       ErrorHandler(error);
     } finally {
       signOut();
@@ -75,7 +75,7 @@ const AppLayout = ({ children }: PropTypes) => {
     try {
       setLoading(true);
       const res = await myAxios.get(`/users/${id}`);
-      console.log("Datauser: ", res.data);
+      // console.log("Datauser: ", res.data);
       setDataUser(res?.data?.result);
     } catch (error) {
       ErrorHandler(error);

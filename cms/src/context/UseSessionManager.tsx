@@ -16,7 +16,7 @@ const countdownInterval = setInterval(() => {
   remainingTime--;
   if (remainingTime <= 0) {
     clearInterval(countdownInterval);
-    console.log("Session countdown finished");
+    // console.log("Session countdown finished");
   }
 }, 1000);
 export const useSessionManager = (user: UserProperties | undefined) => {
@@ -59,7 +59,7 @@ export const useSessionManager = (user: UserProperties | undefined) => {
       message.info("Session expired, please login again.");
       navigate("/login");
     } catch (error) {
-      console.log("Error: ", error);
+      // console.log("Error: ", error);
     } finally {
       signOut();
       setModalVisible(false);

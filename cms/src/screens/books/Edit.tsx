@@ -57,7 +57,7 @@ const BookEdit = () => {
   const fetchCategory = async () => {
     try {
       const res = await myAxios.get("/book-category/get-all");
-      console.log("Fetched categories:", res.data.results);
+      // console.log("Fetched categories:", res.data.results);
       const activeCategories = res.data.results.filter(
         (cat: CategoryProps) => cat.status === true,
       );
@@ -170,7 +170,7 @@ const BookEdit = () => {
         createdByAdminId: auth?.id,
       };
 
-      console.log("Data payload: ", payload);
+      // console.log("Data payload: ", payload);
       if (!id) {
         await myAxios.post("/books", payload);
         message.success("Book created successfully");
@@ -197,7 +197,7 @@ const BookEdit = () => {
     try {
       setIsLoading(true);
       const res = await myAxios.get(`books/${id}`);
-      console.log("Data Book: ", res.data);
+      // console.log("Data Book: ", res.data);
       const data = res.data.result;
       setDataBook(data);
       form.setFieldsValue({

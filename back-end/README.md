@@ -337,3 +337,53 @@ offset = (3 - 1) × 10 = 20
 ```
 
 ```
+
+## DOCKERIZE
+
+<!-- Build first then run -->
+
+<!-- Build -->
+
+docker build -t reactjs/cms-vivibook:1.0.0 .
+
+<!-- Build in specific dockerfile -->
+
+<!-- example for stg -->
+
+docker build -t reactjs-stg/cms-vivibook:1.0.0 -f Dockerfile.stg .
+
+<!-- Run -->
+
+<!-- dev -->
+
+docker run -d -p 3001:3001 reactjs/cms-vivibook:1.0.0
+
+<!-- stg -->
+
+docker run -d -p 3001:3001 reactjs-stg/cms-vivibook:1.0.0
+
+<!-- Run all container -->
+
+docker-compose up -d --build
+
+<!-- Cara  Masuk langsung ke MySQL container -->
+
+docker exec -it mysql_db mysql -u root -p
+
+<!-- delete container and run again -->
+
+docker-compose down -v
+docker-compose up -d --build
+
+<!-- backup data -->
+
+mysqldump -u root -p vivlio_store > backup.sql
+
+docker cp backup.sql mysql_db:/backup.sql
+
+docker exec -i mysql_db mysql -u root -p vivlio_store < backup.sql
+
+<!-- ID -->
+<!-- Ada beberapa kendala saat conteinerisasi setelah db di containerkan nama-nama tabelnya gk konsisten jadi harus rename manual tabel-tabel yg namanya tidak konsisten -->
+<!-- EN -->
+<!-- There are several obstacles during containerization. After the DB is containerized, the table names are inconsistent, so you have to manually rename the tables with inconsistent names. -->

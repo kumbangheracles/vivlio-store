@@ -61,7 +61,7 @@ const LoginForm: React.FC = () => {
       }, 5000);
     } catch (error: any) {
       ErrorHandler(error);
-      console.log("Error login: ", error);
+      // console.log("Error login: ", error);
     } finally {
       setLoading(false);
     }

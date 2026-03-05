@@ -68,7 +68,7 @@ const ArticleEdit = () => {
       }
     } catch (error) {
       message.error("Failed create article.");
-      console.log("Error post article: ", error);
+      // console.log("Error post article: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -180,7 +180,7 @@ const ArticleEdit = () => {
     try {
       setIsLoading(true);
       const res = await myAxios.get(`/articles/${id}`);
-      console.log("Data article: ", res.data);
+      // console.log("Data article: ", res.data);
       const data = res.data.result;
       setArticle(data);
       // form.setFieldsValue(res.data.result);

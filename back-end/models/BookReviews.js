@@ -28,7 +28,7 @@ const BookReview = sequelize.define(
       defaultValue: "IS_UNDER_APPROVAL",
     },
     bookId: {
-      type: DataTypes.UUID,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: "Books",

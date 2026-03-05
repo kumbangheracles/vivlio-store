@@ -17,7 +17,7 @@ const ArticleDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [dataArticle, setDataArticle] = useState<ArticleProperties | undefined>(
-    undefined
+    undefined,
   );
   const [dataUser, setDataUser] = useState<UserProperties>();
   const fetchArticle = async () => {
@@ -25,7 +25,7 @@ const ArticleDetail = () => {
     try {
       const res = await myAxios.get(`/articles/${id}`);
       setDataArticle(res.data.result);
-      console.log("Data article: ", res.data.result);
+      // console.log("Data article: ", res.data.result);
     } catch (error) {
       ErrorHandler(error);
     }
@@ -36,10 +36,10 @@ const ArticleDetail = () => {
 
     try {
       const resUser = await myAxios.get<BaseResponseProps<UserProperties>>(
-        `/users/${id}`
+        `/users/${id}`,
       );
       setDataUser(resUser?.data?.result);
-      console.log("Data User: ", resUser?.data?.result);
+      // console.log("Data User: ", resUser?.data?.result);
     } catch (error) {
       ErrorHandler(error);
     }
