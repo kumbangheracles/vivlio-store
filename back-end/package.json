@@ -15,6 +15,7 @@
     "start": "npx nodemon",
     "dev": "nodemon server.js",
     "prod": "pm2 start app.js --watch",
+    "start:prod": "node server.js",
     "stop:prod": "pm2 stop app",
     "docs": "node docs/swagger.js",
     "docker-build:dev": "docker build -t expressjs/be-vivibook:1.0.0 -f Dockerfile.dev .",
