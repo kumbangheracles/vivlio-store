@@ -39,14 +39,14 @@ const CartIndex = ({ books }: PropTypes) => {
 
   const quantityBooksRecord = books?.reduce(
     (acc, item) => {
-      if (item?.UserCart?.id && typeof item?.UserCart?.quantity === "number") {
-        acc[item?.UserCart?.id] = item?.UserCart.quantity;
+      if (item?.usercart?.id && typeof item?.usercart?.quantity === "number") {
+        acc[item?.usercart?.id] = item?.usercart.quantity;
       }
       return acc;
     },
     {} as Record<string, number>,
   );
-
+  console.log("Books cart: ", books);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<PropCheck[]>([]);
@@ -93,7 +93,7 @@ const CartIndex = ({ books }: PropTypes) => {
         books?.map((book) => ({
           id: book?.id as string,
           bookTitle: book.title,
-          idCart: book?.UserCart?.id as string,
+          idCart: book?.usercart?.id as string,
         })) ?? [];
 
       setIsChecked(allBooks);
@@ -159,7 +159,7 @@ const CartIndex = ({ books }: PropTypes) => {
   }, [books]);
 
   const totalQuantity: number = (isCheckedBooks ?? []).reduce(
-    (acc: number, item: BookProps) => acc + Number(item.UserCart?.quantity),
+    (acc: number, item: BookProps) => acc + Number(item.usercart?.quantity),
     0,
   );
 
@@ -289,7 +289,7 @@ const CartIndex = ({ books }: PropTypes) => {
                           (acc, item) =>
                             acc +
                             Number(item?.price || 0) *
-                              Number(item?.UserCart?.quantity),
+                              Number(item?.usercart?.quantity),
                           0,
                         )
                         .toLocaleString("id-ID")}
@@ -306,7 +306,7 @@ const CartIndex = ({ books }: PropTypes) => {
                           (acc, item) =>
                             acc +
                             Number(item?.price || 0) *
-                              Number(item?.UserCart?.quantity),
+                              Number(item?.usercart?.quantity),
                           0,
                         )
                         .toLocaleString("id-ID")}
@@ -342,7 +342,7 @@ const CartIndex = ({ books }: PropTypes) => {
                       (acc, item) =>
                         acc +
                         Number(item?.price || 0) *
-                          Number(item?.UserCart?.quantity),
+                          Number(item?.usercart?.quantity),
                       0,
                     )
                     .toLocaleString("id-ID")}
@@ -406,15 +406,3 @@ const CartIndex = ({ books }: PropTypes) => {
 };
 
 export default CartIndex;
-
-const StyledCard = styled(Card)`
-  .ant-card-body {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-
-    border: 1px solid black;
-  }
-  width: 100%;
-`;

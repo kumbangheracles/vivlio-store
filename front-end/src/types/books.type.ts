@@ -56,7 +56,7 @@ export type BookProps = {
   isInCart?: boolean;
   quantity?: number;
   reviews?: BookReviewsProps[];
-  UserCart?: { quantity?: number; id?: string };
+  usercart?: { quantity?: number; id?: string };
 };
 
 export interface WishlistUser {

@@ -236,7 +236,7 @@ module.exports = {
       const { books } = req.body;
       const order_id = uuidv4();
       const grossAmount = books.reduce(
-        (acc, item) => acc + item?.price * item?.UserCart?.quantity,
+        (acc, item) => acc + item?.price * item?.usercart?.quantity,
         0,
       );
 
@@ -249,7 +249,7 @@ module.exports = {
           id: item?.id,
           name: item?.title,
           price: Number(item?.price),
-          quantity: Number(item?.UserCart?.quantity),
+          quantity: Number(item?.usercart?.quantity),
         })),
         expiry: {
           unit: "minute",
@@ -268,7 +268,7 @@ module.exports = {
           orderGroupId: order_id,
           bookId: item.id,
           userId: req.id,
-          quantity: Number(item.UserCart.quantity),
+          quantity: Number(item.usercart.quantity),
           priceAtPurchases: Number(item.price),
           midtransToken: transaction.token,
           paymentStatus: "PENDING",

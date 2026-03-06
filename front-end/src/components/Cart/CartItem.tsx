@@ -40,7 +40,7 @@ const CartItem = ({
   };
   const [loading, setLoading] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(
-    book?.UserCart?.quantity as number,
+    book?.usercart?.quantity as number,
   );
   const [isCart, setIsCart] = useState<boolean>(book?.isInCart as boolean);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -81,10 +81,10 @@ const CartItem = ({
   };
   useEffect(() => {
     setIsCart(true);
-    if (book.UserCart?.quantity === 0) {
-      handleChangeQuantity("add", book?.UserCart?.id);
+    if (book.usercart?.quantity === 0) {
+      handleChangeQuantity("add", book?.usercart?.id);
     }
-  }, [book.UserCart?.quantity]);
+  }, [book.usercart?.quantity]);
 
   const handleCart = () => {
     handleAddToCart();
@@ -128,7 +128,7 @@ const CartItem = ({
                   {
                     id: book?.id as string,
                     bookTitle: book?.title,
-                    idCart: book?.UserCart?.id as string,
+                    idCart: book?.usercart?.id as string,
                   },
                 ]);
                 setIsLoading(false);
@@ -192,7 +192,7 @@ const CartItem = ({
                 <Button
                   disabled={isLoading || quantity === 1}
                   onClick={() =>
-                    handleChangeQuantity("remove", book?.UserCart?.id as string)
+                    handleChangeQuantity("remove", book?.usercart?.id as string)
                   }
                 >
                   {isLoading ? <Spin size="small" /> : "-"}
@@ -201,7 +201,7 @@ const CartItem = ({
                 <Button
                   disabled={isLoading}
                   onClick={() =>
-                    handleChangeQuantity("add", book?.UserCart?.id as string)
+                    handleChangeQuantity("add", book?.usercart?.id as string)
                   }
                 >
                   {isLoading ? <Spin size="small" /> : "+"}
@@ -225,7 +225,7 @@ const CartItem = ({
                 {
                   id: book?.id as string,
                   bookTitle: book?.title,
-                  idCart: book?.UserCart?.id as string,
+                  idCart: book?.usercart?.id as string,
                 },
               ]);
             } else {
@@ -279,7 +279,7 @@ const CartItem = ({
               <Button
                 disabled={isLoading || quantity === 1}
                 onClick={() =>
-                  handleChangeQuantity?.("remove", book?.UserCart?.id as string)
+                  handleChangeQuantity?.("remove", book?.usercart?.id as string)
                 }
               >
                 {isLoading ? <Spin size="small" /> : "-"}
@@ -288,7 +288,7 @@ const CartItem = ({
               <Button
                 disabled={isLoading}
                 onClick={() =>
-                  handleChangeQuantity?.("add", book?.UserCart?.id as string)
+                  handleChangeQuantity?.("add", book?.usercart?.id as string)
                 }
               >
                 {isLoading ? <Spin size="small" /> : "+"}
