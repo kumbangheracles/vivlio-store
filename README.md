@@ -11,9 +11,6 @@ Alur Setup Container
 
 1. Pastikan kode sudah beres
 
-sequelize.sync() sudah dihapus dari server.js
-Semua migration sudah lengkap
-
 2. Export data dari MySQL lokal
    export PATH=$PATH:"/c/Program Files/MySQL/MySQL Server 8.0/bin"
    mysqldump -u root -p vivlio_store > backup.sql
