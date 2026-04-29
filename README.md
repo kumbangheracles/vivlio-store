@@ -1,44 +1,209 @@
-# ViviBook
+# 📚 ViviBook — Fullstack Book E-Commerce (EN)
 
-<!-- delete container and run again -->
+ViviBook is a fullstack book e-commerce application designed to simulate a production-ready system, covering authentication, transaction handling, and admin management.
 
-docker-compose down -v
-docker-compose up -d --build
+The system is structured into three main parts:
 
-## Flow
+- **Client (User App)** for end users
+- **Server (REST API)** for business logic and data processing
+- **Admin (CMS)** for system management
 
-Alur Setup Container
+---
 
-1. Pastikan kode sudah beres
+## 🚀 Key Features
 
-2. Export data dari MySQL lokal
-   export PATH=$PATH:"/c/Program Files/MySQL/MySQL Server 8.0/bin"
-   mysqldump -u root -p vivlio_store > backup.sql
-3. Build & jalankan container dari scratch
+### 👤 User (Client)
 
-   docker-compose down -v # hapus container + volume lama
-   docker-compose up -d --build # build ulang
+- JWT Authentication (Register & Login)
+- Browse book catalog
+- Filter by category and genre
+- Search books by name
+- Wishlist & Cart management
+- Checkout with integrated payment gateway
+- Order history tracking
+- Book rating & review system
 
-4. Tunggu container ready, lalu import data
-   Tunggu beberapa detik sampai MySQL container healthy
-   docker exec -i mysql_db mysql -u root -p"db_password" vivlio_store < backup.sql
-5. Restart app (supaya koneksi DB fresh)
+### 🛠️ Admin (CMS)
 
-   docker-compose restart backend
+- Book management (CRUD)
+- Category & genre management
+- Order and transaction management
+- User monitoring
+- Pagination, search, and filtering
 
-6. Verifikasi
-   docker exec -it mysql*db mysql -u root -p"db_password" vivlio_store -e "SHOW TABLES; SELECT COUNT(*) FROM Users; SELECT COUNT(\_) FROM Books;"
+---
 
-# Jika masih gagal
+## 🔐 Authentication & Authorization
 
-# Drop dan recreate database
+- **JWT Access Token + Refresh Token**
+- Secure API route protection
+- **Role-Based Access Control (RBAC)**:
+  - Super Admin
+  - Admin
+  - Customer
 
-docker exec -it mysql_db mysql -u root -p"db_password" -e "DROP DATABASE vivlio_store; CREATE DATABASE vivlio_store;"
+---
 
-# Import backup
+## 💳 Payment Integration
 
-docker exec -i mysql_db mysql -u root -p"db_password" vivlio_store < backup.sql
+- Integrated with **Midtrans**
+- Supports sandbox payment simulation
+- Handles transaction states (pending, success, failed)
 
-# Restart backend supaya koneksi fresh
+---
 
-docker-compose restart backend
+## 🧱 Architecture
+
+```text
+Client (User App)  --->  REST API (Server)  --->  Database
+        |
+        ---> Admin (CMS)
+```
+
+- Client and Admin communicate with the backend via API
+- Backend handles authentication, authorization, and business logic
+
+---
+
+## 📦 Core Modules
+
+- **Auth Module** — JWT & refresh token
+- **User Module** — profile & account management
+- **Book Module** — catalog, filter, search
+- **Wishlist Module**
+- **Cart Module**
+- **Order Module** — checkout & transactions
+- **Review Module** — rating & reviews
+- **Admin Module** — CMS management
+
+---
+
+## 🔍 Highlights
+
+This project demonstrates:
+
+- End-to-end fullstack application development
+- Secure implementation of **JWT with refresh tokens**
+- Structured **RBAC (Role-Based Access Control)**
+- Payment gateway integration
+- Complex state management on the frontend
+- Scalable and well-structured REST API design
+- Real-world e-commerce feature implementation
+
+---
+
+## 🧠 Project Value
+
+ViviBook is more than a basic CRUD application. It represents a real-world e-commerce system that includes:
+
+- Authentication & security
+- Transaction handling
+- Payment integration
+- Multi-role access system
+- User experience & data management
+
+# 📚 ViviBook — Fullstack Book E-Commerce (ID)
+
+ViviBook adalah aplikasi e-commerce buku berbasis fullstack yang dirancang untuk mensimulasikan sistem production-ready dengan fitur lengkap, mulai dari autentikasi, transaksi, hingga manajemen admin.
+
+Aplikasi ini terdiri dari:
+
+- **Client (User App)** untuk pengguna
+- **Server (REST API)** sebagai pusat business logic
+- **Admin (CMS)** untuk manajemen sistem
+
+---
+
+## 🚀 Key Features
+
+### 👤 User (Client)
+
+- JWT Authentication (Login & Register)
+- Browse katalog buku
+- Filter berdasarkan kategori & genre
+- Search buku berdasarkan nama
+- Wishlist & Cart management
+- Checkout dengan integrasi **Midtrans Payment Gateway**
+- Riwayat pesanan
+- Rating & Review buku
+
+### 🛠️ Admin (CMS)
+
+- Manajemen buku (CRUD)
+- Manajemen kategori & genre
+- Manajemen pesanan & status transaksi
+- Monitoring pengguna
+- Pagination, search, dan filter data
+
+---
+
+## 🔐 Authentication & Authorization
+
+- **JWT Access Token + Refresh Token**
+- Secure route protection
+- **Role-Based Access Control (RBAC)**:
+  - Super Admin
+  - Admin
+  - Customer
+
+---
+
+## 💳 Payment Integration
+
+- Terintegrasi dengan **Midtrans**
+- Mendukung simulasi pembayaran (sandbox)
+- Handling status transaksi (pending, success, failed)
+
+---
+
+## 🧱 Architecture
+
+```text
+Client (User App)  --->  REST API (Server)  --->  Database
+        |
+        ---> Admin (CMS)
+```
+
+- Frontend dan CMS mengakses backend melalui API
+- Backend menangani autentikasi, authorization, dan business logic
+
+---
+
+## 📦 Core Modules
+
+- **Auth Module** — JWT + refresh token
+- **User Module** — profil & manajemen akun
+- **Book Module** — katalog, filter, search
+- **Wishlist Module**
+- **Cart Module**
+- **Order Module** — checkout & transaksi
+- **Review Module** — rating & ulasan
+- **Admin Module** — CMS management
+
+---
+
+## 🔍 Highlights
+
+Project ini menunjukkan kemampuan dalam:
+
+- Membangun **fullstack application end-to-end**
+- Implementasi **JWT + refresh token** dengan aman
+- Desain **RBAC (Role-Based Access Control)**
+- Integrasi **payment gateway (Midtrans)**
+- Pengelolaan state kompleks di frontend
+- Pembuatan REST API yang scalable dan terstruktur
+- Pengembangan fitur e-commerce yang lengkap
+
+---
+
+## 🧠 Project Value
+
+ViviBook bukan hanya CRUD application, tetapi simulasi sistem e-commerce nyata yang mencakup:
+
+- Authentication & security
+- Transaction handling
+- Payment integration
+- Multi-role system
+- User experience & data management
+
+---
