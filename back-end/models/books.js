@@ -58,7 +58,7 @@ const Book = sequelize.define(
       allowNull: true,
       references: {
         model: "book_category",
-        key: "id",
+        key: "categoryId",
       },
     },
   },

@@ -12,6 +12,7 @@ const {
 // const Book = require("../models/books");
 // const BookImage = require("../models/bookImage");
 // const Genre = require("../models/genre");
+const redisClient = require("../utils/redisClient");
 const { sequelize } = require("../config/database");
 const { Op, or } = require("sequelize");
 const { deleteFromCloudinary } = require("../helpers/deleteCoudinary");
@@ -415,6 +416,7 @@ module.exports = {
     } = req.query;
     const parsedSortPrice = parseInt(sortPrice);
     console.log("Full Query Books ================= : ", req.query);
+
     const filters = {};
     if (isRecomend !== undefined) {
       filters.isRecomend = isRecomend === "true" || isRecomend === "1";
@@ -464,15 +466,28 @@ module.exports = {
     }
     const userId = req.id;
     const parsedLimit = limit ? parseInt(limit) : 10;
-
     const offset = (page - 1) * parsedLimit;
-    // console.log(">>> req.id:", req.id);
-    // console.log(">>> req.user:", req.user);
-    // console.log("search title: ", title);
-    // console.log("isPopular:", isPopular);
-    // console.log("Login as user");
+
+    // ==========================================
+    // 1. MEMBUAT CACHE KEY YANG UNIK
+    // ==========================================
+    // Menggabungkan req.query dan userId menjadi string JSON sebagai Key unik di Redis
+    const cacheKey = `books:getAll:${JSON.stringify(req.query)}:user:${userId || "guest"}`;
 
     try {
+      // ==========================================
+      // 2. CEK APAKAH DATA ADA DI REDIS
+      // ==========================================
+      const cachedData = await redisClient.get(cacheKey);
+      if (cachedData) {
+        console.log("=== DATA DIAMBIL DARI REDIS CACHE ===");
+        // Jika ada, langsung kembalikan data dari Redis (dikonversi dari string ke JSON)
+        return res.status(200).json(JSON.parse(cachedData));
+      }
+
+      console.log("=== CACHE MISS: DIAMBIL DARI DATABASE SEQUELIZE ===");
+      // Jika data tidak ada di Redis, proses di bawah ini (Database) akan dieksekusi
+
       const order = [];
 
       if (parsedSortPrice) {
@@ -506,6 +521,7 @@ module.exports = {
           : [],
         distinct: true,
       });
+
       const rows = await Book.findAll({
         where: filters,
         order: order,
@@ -554,7 +570,6 @@ module.exports = {
               "purchases",
             ],
           },
-
           ...(req.id
             ? [
                 {
@@ -582,11 +597,10 @@ module.exports = {
               ]
             : []),
         ],
-
         offset,
         distinct: true,
-        // logging: console.log,
       });
+
       const results = rows.map((book) => {
         const bookJson = book.toJSON();
         return {
@@ -596,14 +610,28 @@ module.exports = {
           isInCart: bookJson.cartUsers && bookJson.cartUsers.length > 0,
         };
       });
-      res.status(200).json({
+
+      // Format response yang akan dikirim ke client
+      const responseData = {
         status: 200,
         message: "Success",
         results: results,
         total: total,
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / parsedLimit),
+      };
+
+      // ==========================================
+      // 3. SIMPAN HASIL DATABASE KE REDIS
+      // ==========================================
+      // Mengubah JSON ke string, diberi waktu kedaluwarsa (TTL) 5 menit (300 detik)
+      // agar memori Redis tidak penuh selamanya dan data terupdate berkala.
+      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+        EX: 300,
       });
+
+      // Kirim data asli ke user
+      res.status(200).json(responseData);
     } catch (error) {
       res.status(500).json({
         status: 500,

@@ -1,74 +1,42 @@
 import HomePage from "@/components/Home";
-import fetchBooksHome from "./actions/fetchBooksHome";
-import fetchArticles from "./actions/fetchArticles";
-import fetchCategory from "./actions/fetchCategory";
 import { ArticleStatusType } from "@/types/article.type";
+import fetchArticles from "./actions/fetchArticles";
+import fetchBooksHome from "./actions/fetchBooksHome";
+import fetchCategory from "./actions/fetchCategory";
 import fetchUser from "./actions/fetchUser";
-import { UserProperties } from "@/types/user.type";
 
-export const metadata = {
-  title: "ViviBook - Home",
-  description: "Home page",
-};
-
-export const revalidate = 60;
 export default async function Home() {
-  // const params = await searchParams;
+  const [books, dataUser, popularBooks, newestBooks, categories, articles] =
+    await Promise.all([
+      fetchBooksHome(),
+      fetchUser(),
+      fetchBooksHome({ isPopular: true, limit: 6, sortDate: "newest_saved" }),
+      fetchBooksHome({ sortDate: "newest_saved", limit: 12 }),
+      fetchCategory({ isSuggested: true, limit: 6, sortDate: "newest_saved" }),
+      fetchArticles({ limit: 6, status: ArticleStatusType.PUBLISH }),
+    ]);
 
-  const books = await fetchBooksHome();
-  const dataUser: UserProperties = await fetchUser();
+  // basedOnPreferenceBooks bergantung pada dataUser, jadi tetap setelahnya
   const categoryIds = dataUser?.category_preference?.length
     ? dataUser.category_preference
-        .map((item) => item.categoryId)
+        .map((item: any) => item.categoryId)
         .filter(Boolean)
         .join(",")
     : "";
 
   const basedOnPreferenceBooks = categoryIds
-    ? await fetchBooksHome({
-        limit: 6,
-        categoryIds,
-      })
+    ? await fetchBooksHome({ limit: 6, categoryIds })
     : null;
-  const popularBooks = await fetchBooksHome({
-    isPopular: true,
-    limit: 6,
-    sortDate: "newest_saved",
-  });
 
-  const newestBooks = await fetchBooksHome({
-    sortDate: "newest_saved",
-    limit: 12,
-  });
-
-  const categories = await fetchCategory({
-    isSuggested: true,
-    limit: 6,
-    sortDate: "newest_saved",
-  });
-
-  console.log("Categories: ", categories);
-  const articles = await fetchArticles({
-    limit: 6,
-    status: ArticleStatusType.PUBLISH,
-  });
-
-  await new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("intentional delay");
-    }, 2000);
-  });
   return (
-    <>
-      <HomePage
-        dataBooks={books?.results}
-        dataCategories={categories}
-        popularBooks={popularBooks?.results}
-        newestBooks={newestBooks?.results}
-        dataArticles={articles}
-        preferenceBooks={basedOnPreferenceBooks?.results}
-        dataUser={dataUser}
-      />
-    </>
+    <HomePage
+      dataBooks={books?.results}
+      dataCategories={categories}
+      popularBooks={popularBooks?.results}
+      newestBooks={newestBooks?.results}
+      dataArticles={articles}
+      preferenceBooks={basedOnPreferenceBooks?.results}
+      dataUser={dataUser}
+    />
   );
 }

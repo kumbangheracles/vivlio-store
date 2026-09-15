@@ -6,6 +6,31 @@ const {
   Genre,
 } = require("../models/index");
 const { updateBookPopularity } = require("../helpers/updatePopularityBook");
+const redisClient = require("../utils/redisClient");
+
+// HELPER FUNGSIONAL: Untuk menghapus cache wishlist & buku milik user tertentu
+async function clearWishlistCache(userId) {
+  try {
+    // 1. Hapus cache halaman Wishlist khusus user ini
+    const wishlistKeys = await redisClient.keys(`wishlist:user:${userId}:*`);
+    if (wishlistKeys.length > 0) {
+      await redisClient.del(wishlistKeys);
+      console.log(`=== CACHE WISHLIST DI-CLEAR untuk User ID: ${userId} ===`);
+    }
+
+    // 2. Hapus cache halaman Buku utama yang memuat status wishlist user ini
+    const bookKeys = await redisClient.keys(`books:getAll:*:user:${userId}`);
+    if (bookKeys.length > 0) {
+      await redisClient.del(bookKeys);
+      console.log(
+        `=== CACHE BOOKS:GETALL DI-CLEAR untuk User ID: ${userId} ===`,
+      );
+    }
+  } catch (redisErr) {
+    console.error("Gagal membersihkan cache Redis:", redisErr);
+  }
+}
+
 module.exports = {
   async getBookById(req, res) {
     try {
@@ -59,6 +84,26 @@ module.exports = {
 
     try {
       const userId = req.id;
+
+      // ==========================================
+      // 1. MEMBUAT CACHE KEY KHUSUS USER
+      // ==========================================
+      // Struktur key: wishlist:user:[userId]:[kombinasi query filter]
+      const cacheKey = `wishlist:user:${userId}:${JSON.stringify(req.query)}`;
+
+      // ==========================================
+      // 2. CEK CACHE DI REDIS
+      // ==========================================
+      const cachedWishlist = await redisClient.get(cacheKey);
+      if (cachedWishlist) {
+        console.log(
+          `=== WISHLIST DIAMBIL DARI REDIS CACHE (User: ${userId}) ===`,
+        );
+        return res.status(200).json(JSON.parse(cachedWishlist));
+      }
+
+      console.log("=== CACHE MISS: DIAMBIL DARI DATABASE WISHLIST ===");
+
       const order = [];
       if (sortPrice === 1) {
         order.push([{ model: Book, as: "book" }, "price", "ASC"]);
@@ -89,14 +134,24 @@ module.exports = {
         ],
       });
 
-      res.status(200).json({
+      // Format data response
+      const responseData = {
         status: 200,
         message: "Success",
         results: rows,
         total: count,
         currentPage: parseInt(pageWish),
         totalPages: Math.ceil(count / limitWish),
+      };
+
+      // ==========================================
+      // 3. SIMPAN HASIL KE REDIS (TTL: 5 Menit)
+      // ==========================================
+      await redisClient.set(cacheKey, JSON.stringify(responseData), {
+        EX: 300, // Kedaluwarsa dalam 300 detik
       });
+
+      res.status(200).json(responseData);
     } catch (error) {
       res.status(500).json({
         status: 500,
@@ -160,6 +215,9 @@ module.exports = {
   //   }
   // },
 
+  // Pastikan redisClient sudah di-import di bagian atas file
+  // const redisClient = require('../path/to/redisClient');
+
   async addToWishlist(req, res) {
     try {
       const userId = req.id;
@@ -174,10 +232,15 @@ module.exports = {
 
       await UserWishlist.create({ userId, bookId });
       await updateBookPopularity(bookId);
+
+      // ==========================================
+      // AKSI REDIS: Bersihkan cache karena data berubah
+      // ==========================================
+      await clearWishlistCache(userId);
+
       res.status(200).json({
         status: 200,
         message: "Success Add to wishlist",
-        // result: wishlist,
       });
     } catch (error) {
       res.status(500).json({
@@ -200,11 +263,17 @@ module.exports = {
           .json({ status: 404, message: "Book not found in wishlist" });
       }
 
+      // ==========================================
+      // AKSI REDIS: Bersihkan cache karena data berubah
+      // ==========================================
+      await clearWishlistCache(userId);
+
       res.status(200).json({
         status: 200,
         message: "Removed from wishlist success",
       });
-    } catch (errror) {
+    } catch (error) {
+      // Perbaikan typo 'errror' dari kode asli Anda
       res.status(500).json({
         status: 500,
         message: error.message || "Internal server error",
@@ -222,6 +291,12 @@ module.exports = {
 
       if (exist) {
         await UserWishlist.destroy({ where: { userId, bookId } });
+
+        // ==========================================
+        // AKSI REDIS: Bersihkan cache (Mode Hapus)
+        // ==========================================
+        await clearWishlistCache(userId);
+
         return res.status(200).json({
           status: 200,
           message: "Removed from wishlist",
@@ -230,6 +305,12 @@ module.exports = {
       }
 
       await UserWishlist.create({ userId, bookId });
+
+      // ==========================================
+      // AKSI REDIS: Bersihkan cache (Mode Tambah)
+      // ==========================================
+      await clearWishlistCache(userId);
+
       res.status(200).json({
         status: 200,
         message: "Added to wishlist",
