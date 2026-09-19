@@ -1,8 +1,9 @@
 require("dotenv").config();
 const app = require("./app");
 const { sequelize, connectDB } = require("./config/database");
-
-require("./jobs/cleanUpUnverifiedUsers");
+// require("./workers/email.worker");
+require("./workers/cleanup.worker");
+// require("./jobs/cleanUpUnverifiedUsers");
 
 const PORT = process.env.PORT || 3000;
 

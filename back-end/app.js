@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-
+const scheduleDeleteUnverifiedUsers = require("./jobs/delete-unverified-users");
 const bookRoutes = require("./routes/book");
 const userRoutes = require("./routes/user");
 const BookCategoryRoutes = require("./routes/book_category");
@@ -45,6 +45,11 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
+
+/* ================= JOBS ================= */
+scheduleDeleteUnverifiedUsers()
+  .then(() => console.log("Cleanup job scheduled"))
+  .catch((err) => console.error("Failed to schedule cleanup job:", err));
 
 /* ================= ROUTES ================= */
 
